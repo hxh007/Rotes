@@ -1,0 +1,7 @@
+.idea/*
+*.log
+*.tmp
+*.cache
+*.pyc
+migrations/*
+api/datas/app-dev.sqlite3
