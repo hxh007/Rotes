@@ -3,8 +3,9 @@ import os, sys
 
 
 class Config(object):
+    # api 作为根路径
     basedir = os.path.abspath(os.path.dirname(__file__))
-    # 添加模块加载路径
+    # 将api加入到导入路径中
     sys.path.append(basedir)
     # 调试模式
     DEBUG = None
@@ -15,6 +16,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///'+os.path.join(basedir, "datas", "app-dev.sqlite3")
     # 数据库动态追踪
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class DevelopmentConfig(Config):
     # 开启调试模式
