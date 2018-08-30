@@ -1,9 +1,12 @@
 # coding=utf-8
-import os
+import os, sys
 
 
 class Config(object):
     basedir = os.path.abspath(os.path.dirname(__file__))
+    # 添加模块加载路径
+    sys.path.append(basedir)
+    # print(sys.path)
     # 调试模式
     DEBUG = None
     # 配置秘钥
