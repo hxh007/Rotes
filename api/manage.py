@@ -4,7 +4,7 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
 from api.app import create_app, db
-from api.app.models import Role
+from api.app.models import OnDuty, TempText
 
 # 调用工厂方法 获取app
 app = create_app('dev_config')
@@ -19,7 +19,7 @@ db.create_all(app=app)
 # Shell 初始化
 def make_shell_context():
     return dict(
-        app=app, db=db, Role=Role
+        app=app, db=db, OnDuty=OnDuty, TempText=TempText
     )
 
 manager.add_command("shell", Shell(make_context=make_shell_context))

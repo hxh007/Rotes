@@ -4,8 +4,7 @@ from datetime import datetime
 from api.app import db
 
 
-class BaseModel(db.Model):
-    id = db.Column(db.Integer, primary_key=True, index=True)
+class BaseModel():
     ctime = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now, index=True)
     lastchange = db.Column(db.DateTime(timezone=True), nullable=True, default=datetime.now, onupdate=datetime.now)
     status = db.Column(db.Boolean, default=True)
@@ -14,6 +13,7 @@ class BaseModel(db.Model):
 
 class OnDuty(BaseModel, db.Model):
     __tablename__= 'onduty'
+    id = db.Column(db.Integer, primary_key=True, index=True)
     department_name = db.Column(db.String(64), nullable=False)
     principal = db.Column(db.String(64), nullable=False)
     role_name = db.Column(db.String(64), nullable=False)
@@ -26,6 +26,7 @@ class OnDuty(BaseModel, db.Model):
 
 class TempText(BaseModel, db.Model):
     __tablename__ = 'temptext'
+    id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(64))
     content = db.Column(db.String(256), nullable=False)
 
