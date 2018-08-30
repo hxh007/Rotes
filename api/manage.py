@@ -3,8 +3,8 @@
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
-from api.app import create_app, db
-from api.app.models import OnDuty, TempText
+from app import create_app, db
+from app.models import OnDuty, TempText
 
 # 调用工厂方法 获取app
 app = create_app('dev_config')
