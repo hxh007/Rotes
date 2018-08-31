@@ -41,7 +41,6 @@ class TempText(BaseModel, db.Model):
         return '<TempText %r>' % self.content
 
 
-# houxianghui
 def db_session_commit():
     result = {'code': 0, 'msg': '数据提交成功'}
     try:
@@ -97,7 +96,7 @@ class User(db.Model, BaseModel):
     mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
     tag = db.Column(db.String(64), nullable=False, unique=True) # 工号
     is_department = db.Column(db.Boolean, default=False)  # 部门管理员
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(128), nullable=False)
     login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
     @property
@@ -115,8 +114,14 @@ class User(db.Model, BaseModel):
     def is_active(self):
         return self.status
 
+    # 数据提交
     def add(self, user):
         db.session.add(user)
+        return db_session_commit()
+
+    # 删除用户
+    def delete(self, user):
+        db.session.delete(user)
         return db_session_commit()
 
     def to_dict(self):
@@ -125,10 +130,11 @@ class User(db.Model, BaseModel):
             'username': self.username,
             'fullname': self.fullname,
             'mobile': self.mobile,
+            'tag': self.tag,
             'is_department': self.is_department,
             'status': self.status,
             'login_time': self.login_time.strftime("%Y-%m-%d %H:%M:%S"),
-            'laskchange': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
+            'lastchange': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
             'remark': self.remark
         }
         return resp_dict
