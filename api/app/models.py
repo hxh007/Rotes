@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -40,12 +41,14 @@ class TempText(BaseModel, db.Model):
 
 # houxianghui
 def db_session_commit():
+    result = {'code': 0, 'msg': '数据提交成功'}
     try:
         db.session.commit()
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        reason = str(e)
-        return reason
+        result['code'] = 1
+        result['msg'] = u'数据提交失败'
+    return result
 
 # 角色用户表，建立用户和角色多对多的关系
 tb_role_user = db.Table(
@@ -70,30 +73,30 @@ tb_department_role = db.Table(
 )
 
 # 管理员用户表 建立管理员和用户的多对多关系
-tb_manager_user = db.Table(
-    'info_manager_user',
-    db.Column('manager_id', db.Integer, db.ForeignKey('info_manager.id'), primary_key=True),
+tb_management_user = db.Table(
+    'info_management_user',
+    db.Column('management_id', db.Integer, db.ForeignKey('info_management.id'), primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey('info_user.id'), primary_key=True)
 )
 
 # 管理员权限表 建立管理员和权限的多对多关系
-tb_manager_permission = db.Table(
-    'info_manager_permission',
-    db.Column('manager_id', db.Integer, db.ForeignKey('info_manager.id'), primary_key=True),
+tb_management_permission = db.Table(
+    'info_management_permission',
+    db.Column('management_id', db.Integer, db.ForeignKey('info_management.id'), primary_key=True),
     db.Column('permission_id', db.Integer, db.ForeignKey('info_permission.id'), primary_key=True)
 )
 
 # 用户表
-class User(BaseModel, db.Model):
+class User(db.Model, BaseModel):
     __tablename__ = 'info_user'
     id = db.Column(db.Integer, primary_key=True, index=True)
-    username = db.Column(db.String(128), nullable=False, unique=True)
-    alias = db.Column(db.String(128), nullable=False) # 姓名
-    mobile = db.Column(db.String(128), nullable=False, unique=True)
+    username = db.Column(db.String(128), nullable=False, unique=True) # 用户名
+    fullname = db.Column(db.String(128), nullable=False) # 姓名
+    mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
     tag = db.Column(db.String(64), nullable=False, unique=True) # 工号
-    is_department = db.Column(db.Boolean)  # 部门管理员
+    is_department = db.Column(db.Boolean, default=False)  # 部门管理员
     password_hash = db.Column(db.String(128))
-    login_time = db.Column(db.Integer)
+    login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
     @property
     def password(self):
@@ -118,11 +121,12 @@ class User(BaseModel, db.Model):
         resp_dict = {
             'id': self.id,
             'username': self.username,
-            'alias': self.alias,
+            'fullname': self.fullname,
             'mobile': self.mobile,
+            'is_department': self.is_department,
             'status': self.status,
-            'login_time': self.login_time,
-            'laskchange': self.lastchange,
+            'login_time': self.login_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'laskchange': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
             'remark': self.remark
         }
         return resp_dict
@@ -132,7 +136,7 @@ class User(BaseModel, db.Model):
 
 
 #部门表
-class Department(BaseModel, db.Model):
+class Department(db.Model, BaseModel):
     __tablename__ = 'info_department'
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
@@ -164,7 +168,7 @@ class Department(BaseModel, db.Model):
 
 
 # 角色表
-class Role(BaseModel, db.Model):
+class Role(db.Model, BaseModel):
     __tablename__ = 'info_role'
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
@@ -192,18 +196,18 @@ class Role(BaseModel, db.Model):
 
 
 # 管理员表
-class Manager(BaseModel, db.Model):
-    __tablename__ = 'info_manager'
+class Management(db.Model, BaseModel):
+    __tablename__ = 'info_management'
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
     alias = db.Column(db.String(128))
     # 管理员用户关系
-    users = db.relationship('User', secondary=tb_manager_user, backref=db.backref('u_managers', lazy='dynamic'), lazy='dynamic')
+    users = db.relationship('User', secondary=tb_management_user, backref=db.backref('u_managements', lazy='dynamic'), lazy='dynamic')
     # 管理员权限关系
-    permissions = db.relationship('Permission', secondary=tb_manager_permission, backref=db.backref('p_managers', lazy='dynamic'), lazy='dynamic')
+    permissions = db.relationship('Permission', secondary=tb_management_permission, backref=db.backref('p_managements', lazy='dynamic'), lazy='dynamic')
 
-    def add(self, manager):
-        db.session.add(manager)
+    def add(self, management):
+        db.session.add(management)
         return db.session_commit()
 
     def to_dict(self):
@@ -218,11 +222,11 @@ class Manager(BaseModel, db.Model):
         return resp_dict
 
     def __repr__(self):
-        return '<Manager %r>' % self.name
+        return '<management %r>' % self.name
 
 
 # 权限表
-class Permission(BaseModel, db.Model):
+class Permission(db.Model, BaseModel):
     __tablename__ = 'info_permission'
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
@@ -250,7 +254,7 @@ class Permission(BaseModel, db.Model):
 
 
 # 操作类型表
-class Action_type(db.Model):
+class ActionType(db.Model):
     __tablename__ = 'info_action_type'
     id = db.Column(db.Integer, primary_key=True, index=True)
     codename = db.Column(db.String(64), unique=True, nullable=False)
