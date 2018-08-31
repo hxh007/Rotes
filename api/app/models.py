@@ -88,8 +88,10 @@ class User(BaseModel, db.Model):
     __tablename__ = 'info_user'
     id = db.Column(db.Integer, primary_key=True, index=True)
     username = db.Column(db.String(128), nullable=False, unique=True)
-    alias = db.Column(db.String(128), nullable=False)
+    alias = db.Column(db.String(128), nullable=False) # 姓名
     mobile = db.Column(db.String(128), nullable=False, unique=True)
+    tag = db.Column(db.String(64), nullable=False, unique=True) # 工号
+    is_department = db.Column(db.Boolean)  # 部门管理员
     password_hash = db.Column(db.String(128))
     login_time = db.Column(db.Integer)
 
