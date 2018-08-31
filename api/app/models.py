@@ -2,7 +2,6 @@
 
 from datetime import datetime
 
-from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 

@@ -6,27 +6,24 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.models import User
 from . import blue_auth
+from .common import get_database
 
 
 # 用户列表查询和用户创建
 @blue_auth.route('/users', methods=['GET', 'POST'])
 def users():
-    result = {'code': 0, 'data': [], 'page':{}, 'msg': '用户信息查询成功'}
+    result = {'code': 0, 'data': [], 'page': {}, 'msg': '用户信息查询成功'}
     if request.method == 'GET':
-        try:
-            users = User.query.all()
-        except SQLAlchemyError:
-            result['code'] = 1
-            result['msg'] = u'用户数据查询失败'
-            return jsonify(result)
-        if not users:
-            result['code'] = 1
-            result['msg'] = u'无用户信息'
-            return jsonify(result)
+        # 数据库查询
+        users = get_database(result=result, database=User, execute='all')
+        if type(users) == dict:
+            return jsonify(users)
+        # 获取用户信息
         for user in users:
             result['data'].append(user.to_dict())
         return jsonify(result)
     if request.method == 'POST':
+        print(request.json)
         username = request.json.get('username')
         fullname = request.json.get('fullname')
         mobile = request.json.get('mobile')
@@ -64,16 +61,10 @@ def users():
 @blue_auth.route('/users/<int:uid>', methods=['GET', 'PUT', 'DELETE'])
 def user(uid):
     result = {'code': 0, 'data': [], 'msg': '用户信息查询成功'}
-    try:
-        user = User.query.get(uid)
-    except SQLAlchemyError:
-        result['code'] = 1
-        result['msg'] = u'数据查询失败'
-        return jsonify(result)
-    if not user:
-        result['code'] = 1
-        result['msg'] = u'无用户信息'
-        return jsonify(result)
+    # 数据库查询
+    user = get_database(result=result, database=User, execute='get', id=uid)
+    if type(users) == dict:
+        return jsonify(user)
     if request.method == 'GET':
         result['data'].append(user.to_dict())
         return jsonify(result)
@@ -111,3 +102,15 @@ def user(uid):
     if request.method == 'DELETE':
         result = user.delete(user)
         return jsonify(result)
+
+
+# 部门列表查询和部门创建
+@blue_auth.route('/departments', methods=['GET', 'POST'])
+def departments():
+    pass
+
+
+# 部门信息修改，修改，删改
+@blue_auth.route('/departments/<int:did>', methods=['GET', 'PUT', 'DELETE'])
+def department(did):
+    pass
