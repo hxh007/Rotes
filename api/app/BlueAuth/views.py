@@ -4,7 +4,7 @@ import re
 from flask import jsonify, request
 from sqlalchemy import or_
 
-from app.models import User, Department, db_session_add, db_session_delete, Role
+from app.models import User, Department, db_session_add, db_session_delete, Role, Management
 from . import blue_auth
 from .common import get_table, accept_para
 
@@ -195,7 +195,7 @@ def roles():
     if request.method == 'POST':
         para_list = ['name', 'alias']
         paras = accept_para(para_list)
-        if not all(paras):
+        if not paras[0]:
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
@@ -222,7 +222,7 @@ def role(rid):
     if request.method == 'PUT':
         para_list = ['name', 'alias', 'status', 'remark']
         paras = accept_para(para_list)
-        if not all([paras[0], paras[1]]):
+        if not paras[0]:
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
@@ -243,7 +243,29 @@ def role(rid):
 # 管理员列表查询和创建
 @blue_auth.route('/managements', methods=['GET', 'POST'])
 def managements():
-    pass
+    result = {'code': 0, 'data': [], 'msg': '管理员列表查询成功'}
+    if request.method == 'GET':
+        managements = get_table(result=result, table=Management, execute='all')
+        if type(managements) == dict:
+            return jsonify(managements)
+        for management in managements:
+            result['data'].append(management.to_dict())
+        return jsonify(result)
+    if request.method == 'POST':
+        para_list = ['name', 'alias']
+        paras = accept_para(para_list)
+        if not paras[0]:
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        management = get_table(result=result, table=Management, execute='first', terms=Management.name==paras[0])
+        if type(management) == dict:
+            return jsonify(management)
+        management = Management()
+        management.add_data(paras)
+        result = db_session_add(management)
+        result['msg'] = u'管理员创建成功'
+        return jsonify(result)
 
 
 # 管理员信息查询、修改和删除
