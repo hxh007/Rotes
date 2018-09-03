@@ -40,6 +40,7 @@ class TempText(BaseModel, db.Model):
         return '<TempText %r>' % self.content
 
 
+# 数据提交
 def db_session_commit():
     result = {'code': 0, 'msg': '数据提交成功'}
     try:
@@ -49,6 +50,16 @@ def db_session_commit():
         result['code'] = 1
         result['msg'] = u'数据提交失败'
     return result
+
+# 添加记录
+def db_session_add(table):
+    db.session.add(table)
+    return db_session_commit()
+
+# 删除记录
+def db_session_delete(table):
+    db.session.delete(table)
+    return db_session_commit()
 
 # 角色用户表，建立用户和角色多对多的关系
 tb_role_user = db.Table(
@@ -113,16 +124,6 @@ class User(db.Model, BaseModel):
     def is_active(self):
         return self.status
 
-    # 数据提交
-    def add(self, user):
-        db.session.add(user)
-        return db_session_commit()
-
-    # 删除用户
-    def delete(self, user):
-        db.session.delete(user)
-        return db_session_commit()
-
     def to_dict(self):
         resp_dict = {
             'id': self.id,
@@ -145,7 +146,7 @@ class User(db.Model, BaseModel):
         self.password = paras[3]
         self.tag = paras[4]
 
-    def add_datas(self, paras):
+    def change_data(self, paras):
         self.username = paras[0]
         self.fullname = paras[1]
         self.mobile = paras[2]
@@ -154,6 +155,7 @@ class User(db.Model, BaseModel):
         self.is_department = paras[5]
         self.status = paras[6]
         self.remark = paras[7]
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -171,10 +173,6 @@ class Department(db.Model, BaseModel):
     # 部门权限关系
     permissions = db.relationship('Permission', backref='departments', lazy='dynamic')
 
-    def add(self, department):
-        db.session.add(department)
-        return db_session_commit()
-
     def to_dict(self):
         resp_dict = {
             'id': self.id,
@@ -189,6 +187,12 @@ class Department(db.Model, BaseModel):
     def add_data(self, paras):
         self.name = paras[0]
         self.alias = paras[1]
+
+    def change_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
+        self.status = paras[2]
+        self.remark = paras[3]
 
     def __repr__(self):
         return '<Departmenet %r>' % self.name

@@ -26,22 +26,23 @@ def get_table(result=None, table=None, execute=None, id=None, terms=None):
             result['code'] = 1
             result['msg'] = u'数据查询失败'
             return result
-        if not table:
+        if not data:
             result['code'] = 1
             result['msg'] = u'无数据'
             return result
         return data
     if execute == 'first':
         try:
-            user = table.query.filter(terms).first()
+            data = table.query.filter(terms).first()
         except SQLAlchemyError:
             result['code'] = 1
             result['msg'] = u'数据查询失败'
             return result
-        if user:
+        if data:
             result['code'] = 1
-            result['msg'] = u'用户已存在'
+            result['msg'] = u'数据已存在'
             return result
+        return data
 
 
 # 接收参数
