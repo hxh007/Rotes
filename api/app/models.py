@@ -266,6 +266,12 @@ class Management(db.Model, BaseModel):
         self.name = paras[0]
         self.alias = paras[1]
 
+    def change_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
+        self.status = paras[2]
+        self.remark = paras[3]
+
     def __repr__(self):
         return '<management %r>' % self.name
 

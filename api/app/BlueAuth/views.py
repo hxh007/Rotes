@@ -271,7 +271,33 @@ def managements():
 # 管理员信息查询、修改和删除
 @blue_auth.route('/managements/<int:mid>', methods=['GET', 'PUT', 'DELETE'])
 def management(mid):
-    pass
+    result = {'code': 0, 'data': [], 'msg': '管理员信息查询成功'}
+    management = get_table(result=result, table=Management, execute='get', id=mid)
+    if type(management) == dict:
+        return jsonify(management)
+    if request.method == 'GET':
+        result['data'].append(management.to_dict())
+        return jsonify(result)
+    if request.method == 'PUT':
+        para_list = ['name', 'alias', 'status', 'remark']
+        paras = accept_para(para_list)
+        if not paras[0]:
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        if paras[2] not in [0, 1]:
+            result['code'] = 1
+            result['msg'] = u'参数错误'
+            return jsonify(result)
+        management.change_data(paras)
+        result = db_session_add(management)
+        result['msg'] = u'管理员信息修改成功'
+        return jsonify(result)
+    if request.method == 'DELETE':
+        result = db_session_delete(management)
+        result['msg'] = u'管理员删除成功'
+        return jsonify(result)
+
 
 
 # 权限列表查询和创建
