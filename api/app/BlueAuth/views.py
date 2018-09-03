@@ -2,20 +2,20 @@
 
 import re
 from flask import jsonify, request
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import or_
 
-from app.models import User
+from app.models import User, Department
 from . import blue_auth
-from .common import get_database
+from .common import get_table, accept_para
 
 
 # 用户列表查询和用户创建
 @blue_auth.route('/users', methods=['GET', 'POST'])
 def users():
-    result = {'code': 0, 'data': [], 'page': {}, 'msg': '用户信息查询成功'}
+    result = {'code': 0, 'data': [], 'msg': '用户信息查询成功'}
     if request.method == 'GET':
         # 数据库查询
-        users = get_database(result=result, database=User, execute='all')
+        users = get_table(result=result, table=User, execute='all')
         if type(users) == dict:
             return jsonify(users)
         # 获取用户信息
@@ -23,36 +23,36 @@ def users():
             result['data'].append(user.to_dict())
         return jsonify(result)
     if request.method == 'POST':
-        print(request.json)
-        username = request.json.get('username')
-        fullname = request.json.get('fullname')
-        mobile = request.json.get('mobile')
-        password = request.json.get('password')
-        tag = request.json.get('tag')
-        if not all([username, fullname, mobile, password, tag]):
+        # username = request.json.get('username')
+        # fullname = request.json.get('fullname')
+        # mobile = request.json.get('mobile')
+        # password = request.json.get('password')
+        # tag = request.json.get('tag')
+        para_list = ['username', 'fullname', 'mobile', 'password', 'tag']
+        paras = accept_para(para_list)
+        if not all([paras[0], paras[1], paras[2], paras[3]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
-        if not re.match(r'^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$', mobile):
+        if not re.match(r'^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$', paras[2]):
             result['code'] = 1
             result['msg'] = u'手机号不正确'
             return jsonify(result)
-        try:
-            user = User.query.filter_by(mobile=mobile).first()
-        except SQLAlchemyError:
-            result['code'] = 1
-            result['msg'] = u'数据查询失败'
-            return jsonify(result)
-        if user:
-            result['code'] = 1
-            result['msg'] = u'用户已存在'
-            return jsonify(result)
+        # try:
+        #     user = User.query.filter(or_(User.username==paras[0], User.mobile==paras[2], User.tag==paras[4])).first()
+        # except SQLAlchemyError:
+        #     result['code'] = 1
+        #     result['msg'] = u'数据查询失败'
+        #     return jsonify(result)
+        # if user:
+        #     result['code'] = 1
+        #     result['msg'] = u'用户已存在'
+        #     return jsonify(result)
+        user = get_table(result=result, table=User, terms=or_(User.username==paras[0], User.mobile==paras[2], User.tag==paras[4]), execute='first')
+        if type(user) == dict:
+            return jsonify(user)
         user = User()
-        user.username = username
-        user.fullname = fullname
-        user.mobile = mobile
-        user.password = password
-        user.tag = tag
+        user.add_data(paras)
         result = user.add(user)
         return jsonify(result)
 
@@ -62,41 +62,44 @@ def users():
 def user(uid):
     result = {'code': 0, 'data': [], 'msg': '用户信息查询成功'}
     # 数据库查询
-    user = get_database(result=result, database=User, execute='get', id=uid)
+    user = get_table(result=result, table=User, execute='get', id=uid)
     if type(users) == dict:
         return jsonify(user)
     if request.method == 'GET':
         result['data'].append(user.to_dict())
         return jsonify(result)
     if request.method == 'PUT':
-        username = request.json.get('username')
-        fullname = request.json.get('fullname')
-        mobile = request.json.get('mobile')
-        password = request.json.get('password')
-        tag = request.json.get('tag')
-        is_department = request.json.get('is_department')
-        status = request.json.get('status')
-        remark = request.json.get('remark')
-        if not all([username, fullname, mobile, password, tag]):
+        # username = request.json.get('username')
+        # fullname = request.json.get('fullname')
+        # mobile = request.json.get('mobile')
+        # password = request.json.get('password')
+        # tag = request.json.get('tag')
+        # is_department = request.json.get('is_department')
+        # status = request.json.get('status')
+        # remark = request.json.get('remark')
+        para_list = ['username', 'fullname', 'mobile', 'password', 'tag', 'is_department', 'status', 'remark']
+        paras = accept_para(para_list)
+        if not all([paras[0], paras[1], paras[2], paras[3]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
-        if not re.match(r'^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$', mobile):
+        if not re.match(r'^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$', paras[2]):
             result['code'] = 1
             result['msg'] = u'手机号不正确'
             return jsonify(result)
-        if (is_department or status) not in [0, 1]:
+        if (paras[5] or paras[6]) not in [0, 1]:
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
-        user.username = username
-        user.fullname = fullname
-        user.mobile = mobile
-        user.password = password
-        user.tag = tag
-        user.is_department = is_department
-        user.status = status
-        user.remark = remark
+        # user.username = username
+        # user.fullname = fullname
+        # user.mobile = mobile
+        # user.password = password
+        # user.tag = tag
+        # user.is_department = is_department
+        # user.status = status
+        # user.remark = remark
+        user.add_datas(paras)
         result = user.add(user)
         return jsonify(result)
     if request.method == 'DELETE':
@@ -107,7 +110,26 @@ def user(uid):
 # 部门列表查询和部门创建
 @blue_auth.route('/departments', methods=['GET', 'POST'])
 def departments():
-    pass
+    result = {'code': 0, 'data': [], 'msg': '部门信息查询成功'}
+    if request.method == 'GET':
+        departments = get_table(result=result, table=Department, execute='all')
+        for department in departments:
+            result['data'].append(department.to_dict())
+        return jsonify(result)
+    if request.method == 'POST':
+        para_list = ['name', 'alias']
+        paras = accept_para(para_list)
+        if not all(paras):
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        department = get_table(result=result, table=Department, terms=or_(Department.name==paras[0], Department.alias==paras[1]), execute='first')
+        if type(department) == dict:
+            return jsonify(department)
+        department = Department()
+        department.add_data(paras)
+        result = department.add(department)
+        return jsonify(result)
 
 
 # 部门信息修改，修改，删改

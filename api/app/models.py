@@ -93,9 +93,9 @@ class User(db.Model, BaseModel):
     username = db.Column(db.String(128), nullable=False, unique=True) # 用户名
     fullname = db.Column(db.String(128), nullable=False) # 姓名
     mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
-    tag = db.Column(db.String(64), nullable=False, unique=True) # 工号
+    tag = db.Column(db.String(64), unique=True) # 工号
     is_department = db.Column(db.Boolean, default=False)  # 部门管理员
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(128))
     login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
     @property
@@ -138,6 +138,22 @@ class User(db.Model, BaseModel):
         }
         return resp_dict
 
+    def add_data(self, paras):
+        self.username = paras[0]
+        self.fullname = paras[1]
+        self.mobile = paras[2]
+        self.password = paras[3]
+        self.tag = paras[4]
+
+    def add_datas(self, paras):
+        self.username = paras[0]
+        self.fullname = paras[1]
+        self.mobile = paras[2]
+        self.password = paras[3]
+        self.tag = paras[4]
+        self.is_department = paras[5]
+        self.status = paras[6]
+        self.remark = paras[7]
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -169,6 +185,10 @@ class Department(db.Model, BaseModel):
             'lastchange': self.lastchange
         }
         return resp_dict
+
+    def add_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
 
     def __repr__(self):
         return '<Departmenet %r>' % self.name
