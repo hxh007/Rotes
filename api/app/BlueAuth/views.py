@@ -4,7 +4,7 @@ import re
 from flask import jsonify, request
 from sqlalchemy import or_
 
-from app.models import User, Department, db_session_add, db_session_delete
+from app.models import User, Department, db_session_add, db_session_delete, Role
 from . import blue_auth
 from .common import get_table, accept_para
 
@@ -124,6 +124,8 @@ def departments():
     result = {'code': 0, 'data': [], 'msg': '部门信息查询成功'}
     if request.method == 'GET':
         departments = get_table(result=result, table=Department, execute='all')
+        if type(departments) == dict:
+            return jsonify(departments)
         for department in departments:
             result['data'].append(department.to_dict())
         return jsonify(result)
@@ -171,3 +173,60 @@ def department(did):
     if request.method == 'DELETE':
         result = db_session_delete(department)
         return jsonify(result)
+
+
+# 角色列表查询和角色创建
+@blue_auth.route('/roles', methods=['GET', 'POST'])
+def roles():
+    result = {'code': 0, 'data': [], 'msg': '角色信息查询成功'}
+    if request.method == 'GET':
+        roles = get_table(result=result, table=Role, execute='all')
+        if type(roles) == dict:
+            return jsonify(roles)
+        for role in roles:
+            result['data'].append(role.to_dict())
+        return jsonify(result)
+    if request.method == 'POST':
+        para_list = ['name', 'alias']
+        paras = accept_para(para_list)
+        if not all(paras):
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        role = get_table(result=result, table=Role, execute='first', terms=Role.name==paras[0])
+        if type(role) == dict:
+            return jsonify(role)
+        role = Role()
+        role.add_data(paras)
+        result = db_session_add(role)
+        return jsonify(result)
+
+
+# 角色信息查询、修改和删除
+@blue_auth.route('/roles/<int:rid>', methods=['GET', 'POST', 'DELETE'])
+def role(rid):
+    pass
+
+
+# 管理员列表查询和创建
+@blue_auth.route('/managements', methods=['GET', 'POST'])
+def managements():
+    pass
+
+
+# 管理员信息查询、修改和删除
+@blue_auth.route('/managements/<int:mid>', methods=['GET', 'PUT', 'DELETE'])
+def management(mid):
+    pass
+
+
+# 权限列表查询和创建
+@blue_auth.route('/permissions', methods=['GET', 'POST'])
+def permissions():
+    pass
+
+
+# 权限信息查询、修改和创建
+@blue_auth.route('/permissions/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
+def permission(pid):
+    pass

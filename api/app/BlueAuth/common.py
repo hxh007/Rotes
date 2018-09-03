@@ -1,11 +1,10 @@
 # coding=utf-8
-from flask import request, jsonify
+
+from flask import request
 from sqlalchemy.exc import SQLAlchemyError
 
+
 # 数据库查询
-from app.models import User
-
-
 def get_table(result=None, table=None, execute=None, id=None, terms=None):
     if execute == 'all':
         try:

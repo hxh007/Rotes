@@ -222,6 +222,10 @@ class Role(db.Model, BaseModel):
         }
         return resp_dict
 
+    def add_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
+
     def __repr__(self):
         return '<Role %r>' % self.name
 
