@@ -2,9 +2,9 @@
 
 import re
 from flask import jsonify, request
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
-from app.models import User, Department, db_session_add, db_session_delete, Role, Management
+from app.models import User, Department, db_session_add, db_session_delete, Role, Management, Permission, ActionType
 from . import blue_auth
 from .common import get_table, accept_para
 
@@ -12,7 +12,7 @@ from .common import get_table, accept_para
 # 用户列表查询和用户创建
 @blue_auth.route('/users', methods=['GET', 'POST'])
 def users():
-    result = {'code': 0, 'data': [], 'msg': '用户列表查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'用户列表查询成功'}
     if request.method == 'GET':
         # 数据库查询
         users = get_table(result=result, table=User, execute='all')
@@ -58,14 +58,13 @@ def users():
         user = User()
         user.add_data(paras)
         result = db_session_add(user)
-        result['msg'] = u'用户创建成功'
         return jsonify(result)
 
 
 # 用户信息查询，修改，删除
 @blue_auth.route('/users/<int:uid>', methods=['GET', 'PUT', 'DELETE'])
 def user(uid):
-    result = {'code': 0, 'data': [], 'msg': '用户信息查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'用户信息查询成功'}
     # 数据库查询
     user = get_table(result=result, table=User, execute='get', id=uid)
     if type(users) == dict:
@@ -113,18 +112,16 @@ def user(uid):
         user.change_data(paras)
         # 数据库提交
         result = db_session_add(user)
-        result['msg'] = u'用户信息修改成功'
         return jsonify(result)
     if request.method == 'DELETE':
         result = db_session_delete(user)
-        result['msg'] = u'用户删除成功'
         return jsonify(result)
 
 
 # 部门列表查询和部门创建
 @blue_auth.route('/departments', methods=['GET', 'POST'])
 def departments():
-    result = {'code': 0, 'data': [], 'msg': '部门列表查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'部门列表查询成功'}
     if request.method == 'GET':
         departments = get_table(result=result, table=Department, execute='all')
         if type(departments) == dict:
@@ -145,14 +142,13 @@ def departments():
         department = Department()
         department.add_data(paras)
         result = db_session_add(department)
-        result['msg'] = u'部门创建成功'
         return jsonify(result)
 
 
 # 部门信息查询，修改，删改
 @blue_auth.route('/departments/<int:did>', methods=['GET', 'PUT', 'DELETE'])
 def department(did):
-    result = {'code': 0, 'data': [], 'msg': '部门信息查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'部门信息查询成功'}
     department = get_table(result=result, table=Department, execute='get', id=did)
     if type(department) == dict:
         return jsonify(department)
@@ -173,18 +169,16 @@ def department(did):
             return jsonify(result)
         department.change_data(paras)
         result = db_session_add(department)
-        result['msg'] = u'部门信息修改成功'
         return jsonify(result)
     if request.method == 'DELETE':
         result = db_session_delete(department)
-        result['msg'] = u'部门删除成功'
         return jsonify(result)
 
 
 # 角色列表查询和角色创建
 @blue_auth.route('/roles', methods=['GET', 'POST'])
 def roles():
-    result = {'code': 0, 'data': [], 'msg': '角色列表查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'角色列表查询成功'}
     if request.method == 'GET':
         roles = get_table(result=result, table=Role, execute='all')
         if type(roles) == dict:
@@ -205,14 +199,13 @@ def roles():
         role = Role()
         role.add_data(paras)
         result = db_session_add(role)
-        result['msg'] = u'角色创建成功'
         return jsonify(result)
 
 
 # 角色信息查询、修改和删除
 @blue_auth.route('/roles/<int:rid>', methods=['GET', 'PUT', 'DELETE'])
 def role(rid):
-    result = {'code': 0, 'data': [], 'msg': '角色信息查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'角色信息查询成功'}
     role = get_table(result=result, table=Role, execute='get', id=rid)
     if type(role) == dict:
         return jsonify(role)
@@ -232,18 +225,16 @@ def role(rid):
             return jsonify(result)
         role.change_data(paras)
         result = db_session_add(role)
-        result['msg'] = u'角色信息修改成功'
         return jsonify(result)
     if request.method == 'DELETE':
         result = db_session_delete(role)
-        result['msg'] = u'角色删除成功'
         return jsonify(result)
 
 
 # 管理员列表查询和创建
 @blue_auth.route('/managements', methods=['GET', 'POST'])
 def managements():
-    result = {'code': 0, 'data': [], 'msg': '管理员列表查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'管理员列表查询成功'}
     if request.method == 'GET':
         managements = get_table(result=result, table=Management, execute='all')
         if type(managements) == dict:
@@ -264,14 +255,13 @@ def managements():
         management = Management()
         management.add_data(paras)
         result = db_session_add(management)
-        result['msg'] = u'管理员创建成功'
         return jsonify(result)
 
 
 # 管理员信息查询、修改和删除
 @blue_auth.route('/managements/<int:mid>', methods=['GET', 'PUT', 'DELETE'])
 def management(mid):
-    result = {'code': 0, 'data': [], 'msg': '管理员信息查询成功'}
+    result = {'code': 0, 'data': [], 'msg': u'管理员信息查询成功'}
     management = get_table(result=result, table=Management, execute='get', id=mid)
     if type(management) == dict:
         return jsonify(management)
@@ -291,11 +281,9 @@ def management(mid):
             return jsonify(result)
         management.change_data(paras)
         result = db_session_add(management)
-        result['msg'] = u'管理员信息修改成功'
         return jsonify(result)
     if request.method == 'DELETE':
         result = db_session_delete(management)
-        result['msg'] = u'管理员删除成功'
         return jsonify(result)
 
 
@@ -303,7 +291,35 @@ def management(mid):
 # 权限列表查询和创建
 @blue_auth.route('/permissions', methods=['GET', 'POST'])
 def permissions():
-    pass
+    result = {'code': 0, 'data': [], 'msg': u'权限列表查询成功'}
+    if request.method == 'GET':
+        permissions = get_table(result=result, table=Permission, execute='all')
+        if type(permissions) == dict:
+            return jsonify(permissions)
+        for permission in permissions:
+            result['data'].append(permission.to_dict())
+        return jsonify(result)
+    if request.method == 'POST':
+        para_list = ['name', 'alias', 'codename']
+        paras = accept_para(para_list)
+        if not all([paras[0], paras[2]]):
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        actions = get_table(result=result, table=ActionType, execute='with_entities', terms=ActionType.codename)
+        if type(actions) == dict:
+            return jsonify(actions)
+        if (paras[2],) not in actions:
+            result['code'] = 1
+            result['msg'] = u'参数错误'
+            return jsonify(result)
+        permission = get_table(result=result, table=Permission, execute='first', terms=and_(Permission.name==paras[0], Permission.codename==paras[2]))
+        if type(permission) == dict:
+            return jsonify(permission)
+        permission = Permission()
+        permission.add_data(paras)
+        result = db_session_add(permission)
+        return jsonify(result)
 
 
 # 权限信息查询、修改和创建

@@ -285,10 +285,6 @@ class Permission(db.Model, BaseModel):
     codename = db.Column(db.String(64), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('info_department.id'))
 
-    def add(self, permission):
-        db.session.add(permission)
-        return db.session_commit()
-
     def to_dict(self):
         resp_dict = {
             'id': self.id,
@@ -300,6 +296,11 @@ class Permission(db.Model, BaseModel):
         }
         return resp_dict
 
+    def add_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
+        self.codename = paras[2]
+
     def __repr__(self):
         return '<Permission %r>' % self.name
 
@@ -310,10 +311,6 @@ class ActionType(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True)
     codename = db.Column(db.String(64), unique=True, nullable=False)
     alias = db.Column(db.String(64), unique=True, nullable=False)
-
-    def add(self, permission):
-        db.session.add(permission)
-        return db.session_commit()
 
     def to_dict(self):
         resp_dict = {

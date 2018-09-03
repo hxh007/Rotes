@@ -42,6 +42,18 @@ def get_table(result=None, table=None, execute=None, id=None, terms=None):
             result['msg'] = u'数据已存在'
             return result
         return data
+    if execute == 'with_entities':
+        try:
+            data = table.query.with_entities(terms).all()
+        except SQLAlchemyError:
+            result['code'] = 1
+            result['msg'] = u'数据查询失败'
+            return result
+        if not data:
+            result['code'] = 1
+            result['msg'] = u'数据不存在'
+            return result
+        return data
 
 
 # 接收参数
