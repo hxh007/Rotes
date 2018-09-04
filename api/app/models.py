@@ -207,10 +207,6 @@ class Role(db.Model, BaseModel):
     # 角色用户关系
     users = db.relationship('User', secondary=tb_role_user, backref=db.backref('roles', lazy='dynamic'), lazy='dynamic')
 
-    def add(self, role):
-        db.session.add(role)
-        return db_session_commit()
-
     def to_dict(self):
         resp_dict = {
             'id': self.id,
@@ -246,10 +242,6 @@ class Management(db.Model, BaseModel):
     users = db.relationship('User', secondary=tb_management_user, backref=db.backref('u_managements', lazy='dynamic'), lazy='dynamic')
     # 管理员权限关系
     permissions = db.relationship('Permission', secondary=tb_management_permission, backref=db.backref('p_managements', lazy='dynamic'), lazy='dynamic')
-
-    def add(self, management):
-        db.session.add(management)
-        return db.session_commit()
 
     def to_dict(self):
         resp_dict = {
@@ -300,6 +292,13 @@ class Permission(db.Model, BaseModel):
         self.name = paras[0]
         self.alias = paras[1]
         self.codename = paras[2]
+
+    def change_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
+        self.codename = paras[2]
+        self.status = paras[3]
+        self.remark = paras[4]
 
     def __repr__(self):
         return '<Permission %r>' % self.name

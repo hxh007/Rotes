@@ -9,6 +9,7 @@ from . import blue_auth
 from .common import get_table, accept_para
 
 
+# 资源
 # 用户列表查询和用户创建
 @blue_auth.route('/users', methods=['GET', 'POST'])
 def users():
@@ -287,7 +288,6 @@ def management(mid):
         return jsonify(result)
 
 
-
 # 权限列表查询和创建
 @blue_auth.route('/permissions', methods=['GET', 'POST'])
 def permissions():
@@ -325,4 +325,34 @@ def permissions():
 # 权限信息查询、修改和创建
 @blue_auth.route('/permissions/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
 def permission(pid):
+    result = {'code': 0, 'data':[], 'msg': u'权限信息查询成功'}
+    permission = get_table(result=result, table=Permission, execute='get', id=pid)
+    if type(permission) == dict:
+        return jsonify(permission)
+    if request.method == "GET":
+        result['data'].append(permission.to_dict())
+        return jsonify(result)
+    if request.method == 'PUT':
+        para_list = ['name', 'alias', 'codename', 'status', 'remark']
+        paras = accept_para(para_list)
+        if not all([paras[0], paras[2]]):
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        if paras[3] not in [0, 1]:
+            result['code'] = 1
+            result['msg'] = u'参数错误'
+            return jsonify(result)
+        permission.change_data(paras)
+        result = db_session_add(permission)
+        return jsonify(result)
+    if request.method == 'DELETE':
+        result = db_session_delete(permission)
+        return jsonify(result)
+
+
+# 关系
+# 部门和用户
+@blue_auth.route('/departments/users')
+def department_user():
     pass
