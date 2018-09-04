@@ -61,6 +61,18 @@ def db_session_delete(table):
     db.session.delete(table)
     return db_session_commit()
 
+# 添加用户
+def append_user(table, user):
+    table.users.append(user)
+    result = db_session_add(table)
+    return result
+
+# 删除用户
+def remove_user(table, user):
+    table.users.remove(user)
+    result = db_session_add(table)
+    return result
+
 # 角色用户表，建立用户和角色多对多的关系
 tb_role_user = db.Table(
     "info_role_user",
@@ -136,7 +148,7 @@ class User(db.Model, BaseModel):
             'ding_id': self.ding_id,
             'status': self.status,
             'login_time': self.login_time.strftime("%Y-%m-%d %H:%M:%S"),
-            'lastchange': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_change': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
             'remark': self.remark
         }
         return resp_dict
@@ -182,7 +194,7 @@ class Department(db.Model, BaseModel):
             'alias': self.alias,
             'remark': self.remark,
             'status': self.status,
-            'lastchange': self.lastchange
+            'last_change': self.lastchange
         }
         return resp_dict
 
@@ -196,17 +208,6 @@ class Department(db.Model, BaseModel):
         self.status = paras[2]
         self.remark = paras[3]
 
-    # 添加用户
-    def append_user(self, user):
-        self.users.append(user)
-        result = db_session_add(self)
-        return result
-
-    # 删除用户
-    def remove_user(self, user):
-        self.users.remove(user)
-        result = db_session_add(self)
-        return result
 
     # 添加角色
     def append_role(self, role):
@@ -214,10 +215,12 @@ class Department(db.Model, BaseModel):
         result = db_session_add(self)
         return result
 
+    # 删除角色
     def remove_role(self, role):
         self.roles.remove(role)
         result = db_session_add(self)
         return result
+
     def __repr__(self):
         return '<Departmenet %r>' % self.name
 

@@ -4,7 +4,8 @@ import re
 from flask import jsonify, request
 from sqlalchemy import or_, and_
 
-from app.models import User, Department, db_session_add, db_session_delete, Role, Management, Permission, ActionType
+from app.models import User, Department, db_session_add, db_session_delete, Role, Management, Permission, ActionType, \
+    append_user, remove_user
 from . import blue_auth
 from .common import get_table, accept_para
 
@@ -394,7 +395,7 @@ def department_user(did):
             result['msg'] = u'该用户已添加'
             return jsonify(result)
         # 添加用户
-        result = department.append_user(user)
+        result = append_user(department, user)
         return jsonify(result)
     # 删除部门用户
     if request.method == 'DELETE':
@@ -404,7 +405,7 @@ def department_user(did):
             result['msg'] = u'用户不存在，删除失败'
             return jsonify(result)
         # 删除用户
-        result = department.remove_user(user)
+        result = remove_user(department, user)
         return jsonify(result)
 
 
@@ -467,7 +468,57 @@ def department_roles(did):
 # 角色用户查询、添加和删除
 @blue_auth.route('/roles/users/<int:rid>', methods=['GET', 'POST', 'DELETE'])
 def role_users(rid):
-    pass
+    result = {'code': 0, 'data': [], 'msg': u'角色用户信息查询成功'}
+    # 角色和角色用户查询
+    role = get_table(result=result, table=Role, execute='get', id=rid)
+    if type(role) == dict:
+        return jsonify(role)
+    r_users = get_table(result=result, execute='relationship', relationship=role.users)
+    if type(r_users) == dict:
+        return jsonify(r_users)
+    # 返回角色用户信息
+    if request.method == 'GET':
+        # 角色无用户
+        for r_user in r_users:
+            result['data'].append(r_user.to_dict())
+        return jsonify(result)
+    # 获取用户id
+    uid = request.json.get('uid')
+    # 参数校验
+    if not uid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        uid = int(uid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的用户
+    user = get_table(result=result, table=User, execute='get', id=uid)
+    if type(user) == dict:
+        return jsonify(user)
+    # 角色用户信息修改
+    if request.method == 'POST':
+        # 用户是否属于该角色
+        if user in r_users:
+            result['code'] = 1
+            result['msg'] = u'该用户已添加'
+            return jsonify(result)
+        # 添加用户
+        result = append_user(role, user)
+        return jsonify(result)
+    # 删除角色用户
+    if request.method == 'DELETE':
+        # 用户是否属于该角色
+        if user not in r_users:
+            result['code'] = 1
+            result['msg'] = u'用户不存在，删除失败'
+            return jsonify(result)
+        # 删除
+        result = remove_user(role, user)
+        return jsonify(result)
 
 
 # 管理员权限查询、添加和删除
