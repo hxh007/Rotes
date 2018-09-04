@@ -208,6 +208,16 @@ class Department(db.Model, BaseModel):
         result = db_session_add(self)
         return result
 
+    # 添加角色
+    def append_role(self, role):
+        self.roles.append(role)
+        result = db_session_add(self)
+        return result
+
+    def remove_role(self, role):
+        self.roles.remove(role)
+        result = db_session_add(self)
+        return result
     def __repr__(self):
         return '<Departmenet %r>' % self.name
 

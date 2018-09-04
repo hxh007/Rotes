@@ -411,7 +411,57 @@ def department_user(did):
 # 部门角色查询、添加和删除
 @blue_auth.route('/departments/roles/<int:did>', methods=['GET', 'POST', 'DELETE'])
 def department_roles(did):
-    pass
+    result = {'code': 0, 'data': [], 'msg': u'部门角色信息查询成功'}
+    # 部门和部门角色查询
+    department = get_table(result=result, table=Department, execute='get', id=did)
+    if type(department) == dict:
+        return jsonify(department)
+    d_roles = get_table(result=result, execute='relationship', relationship=department.roles)
+    if type(d_roles) == dict:
+        return jsonify(d_roles)
+    # 返回部门角色信息
+    if request.method == 'GET':
+        # 部门无角色
+        for d_role in d_roles:
+            result['data'].append(d_role.to_dict())
+        return jsonify(result)
+    # 获取角色id
+    rid = request.json.get('rid')
+    # 参数校验
+    if not rid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        rid = int(rid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的角色
+    role = get_table(result=result, table=Role, execute='get', id=rid)
+    if type(role) == dict:
+        return jsonify(role)
+    # 部门角色信息修改
+    if request.method == 'POST':
+        # 角色是否已添加
+        if role in d_roles:
+            result['code'] = 1
+            result['msg'] = u'该角色已添加'
+            return jsonify(result)
+        # 添加角色
+        result = department.append_role(role)
+        return jsonify(result)
+    # 删除部门角色
+    if request.method == 'DELETE':
+        # 角色是否属于该部门
+        if role not in d_roles:
+            result['code'] = 1
+            result['msg'] = u'角色不存在，删除失败'
+            return jsonify(result)
+        # 删除角色
+        result = department.remove_role(role)
+        return jsonify(result)
 
 
 # 角色用户查询、添加和删除
