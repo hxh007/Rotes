@@ -25,6 +25,10 @@ class Duty(BaseModel, db.Model):
     duty_name = db.Column(db.String(64), nullable=False)  # 值班人
     duty_time = db.Column(db.Date(), nullable=False, index=True)  # 值班时间
 
+    def add(self, duty):   # 添加值班记录
+        db.session.add(duty)
+        return db_session_commit()
+
     def __repr__(self):
         return '<Duty %r>' % self.duty_name
 
@@ -36,18 +40,25 @@ class TempText(BaseModel, db.Model):
     name = db.Column(db.String(64))     # 名字
     content = db.Column(db.String(256), nullable=False)  # 短信内容
 
+    def add(self, temptext):  # 添加短信模板
+        db.session.add(temptext)
+        return db_session_commit()
+
     def __repr__(self):
         return '<TempText %r>' % self.content
 
 
 # houxianghui
 def db_session_commit():
+    result = {'code': 0}
     try:
         db.session.commit()
+        result['msg'] = u'数据操作成功'
     except SQLAlchemyError as e:
         db.session.rollback()
-        reason = str(e)
-        return reason
+        result['code'] = 1
+        result['msg'] = u'数据提交失败'
+    return result
 
 # 角色用户表，建立用户和角色多对多的关系
 tb_role_user = db.Table(
