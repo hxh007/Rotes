@@ -104,8 +104,9 @@ class User(db.Model, BaseModel):
     username = db.Column(db.String(128), nullable=False, unique=True) # 用户名
     fullname = db.Column(db.String(128), nullable=False) # 姓名
     mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
-    tag = db.Column(db.String(64), unique=True) # 工号
+    tag = db.Column(db.String(64)) # 工号
     is_department = db.Column(db.Boolean, default=False)  # 部门管理员
+    ding_id = db.Column(db.String(128)) # 钉钉id
     password_hash = db.Column(db.String(128))
     login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
@@ -132,6 +133,7 @@ class User(db.Model, BaseModel):
             'mobile': self.mobile,
             'tag': self.tag,
             'is_department': self.is_department,
+            'ding_id': self.ding_id,
             'status': self.status,
             'login_time': self.login_time.strftime("%Y-%m-%d %H:%M:%S"),
             'lastchange': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
@@ -193,6 +195,18 @@ class Department(db.Model, BaseModel):
         self.alias = paras[1]
         self.status = paras[2]
         self.remark = paras[3]
+
+    # 添加用户
+    def append_user(self, user):
+        self.users.append(user)
+        result = db_session_add(self)
+        return result
+
+    # 删除用户
+    def remove_user(self, user):
+        self.users.remove(user)
+        result = db_session_add(self)
+        return result
 
     def __repr__(self):
         return '<Departmenet %r>' % self.name
@@ -321,4 +335,3 @@ class ActionType(db.Model):
 
     def __repr__(self):
         return '<Action_type %r>' % self.codename
-
