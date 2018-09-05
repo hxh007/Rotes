@@ -27,7 +27,7 @@
             <Avatar icon="ios-person"/>
           </div>
         </Header>
-        <Content :style="{margin: '20px', background: '#fff', minHeight: '100vh', height: 'auto'}">
+        <Content :style="{margin: '20px', background: '#fff', minHeight: '100vh', height: 'auto', marginBottom: '50px'}">
           <router-view></router-view>
         </Content>
       </Layout>
