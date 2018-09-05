@@ -17,6 +17,9 @@ class Config(object):
     # 数据库动态追踪
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # 跨域白名单
+    CORS_URL = '*'
+
 
 class DevelopmentConfig(Config):
     # 开启调试模式
@@ -26,6 +29,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     # 关闭调试模式
     DEBUG = False
+    # 跨域白名单
+    CORS_URL = []
 
 config = {
     "dev_config": DevelopmentConfig,
