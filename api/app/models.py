@@ -291,6 +291,16 @@ class Management(db.Model, BaseModel):
         self.status = paras[2]
         self.remark = paras[3]
 
+    def append_permission(self, permission):
+        self.permissions.append(permission)
+        result = db_session_add(self)
+        return result
+
+    def remove_permission(self, permission):
+        self.permissions.remove(permission)
+        result = db_session_add(self)
+        return result
+
     def __repr__(self):
         return '<management %r>' % self.name
 
