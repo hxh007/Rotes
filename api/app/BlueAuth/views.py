@@ -16,21 +16,24 @@ from .common import get_table, accept_para
 def users():
     result = {'code': 0, 'data': [], 'msg': u'用户列表查询成功'}
     if request.method == 'GET':
+        # 页数，默认1
+        page = request.args.get('page', 1, type=int)
+        # 一页的数据，默认15
+        per_page = request.args.get('per_page', 15, type=int)
         # 数据库查询
-        users = get_table(result=result, table=User, execute='all')
-        if type(users) == dict:
-            return jsonify(users)
+        paginate = get_table(result=result, table=User, execute='paginate', terms=(User.ctime.desc()), page=page, per_page=per_page)
+        if type(paginate) == dict:
+            return jsonify(paginate)
+        users = paginate.items
+        total_page = paginate.pages
+        current_page = paginate.page
         # 获取用户信息
         for user in users:
             result['data'].append(user.to_dict())
+        result['total_page'] = total_page
+        result['current_page'] = current_page
         return jsonify(result)
     if request.method == 'POST':
-        # username = request.json.get('username')
-        # fullname = request.json.get('fullname')
-        # mobile = request.json.get('mobile')
-        # password = request.json.get('password')
-        # tag = request.json.get('tag')
-
         # 获取参数
         para_list = ['username', 'fullname', 'mobile', 'password', 'tag']
         paras = accept_para(para_list)
@@ -42,17 +45,6 @@ def users():
             result['code'] = 1
             result['msg'] = u'手机号不正确'
             return jsonify(result)
-        # try:
-        #     user = User.query.filter(or_(User.username==paras[0], User.mobile==paras[2], User.tag==paras[4])).first()
-        # except SQLAlchemyError:
-        #     result['code'] = 1
-        #     result['msg'] = u'数据查询失败'
-        #     return jsonify(result)
-        # if user:
-        #     result['code'] = 1
-        #     result['msg'] = u'用户已存在'
-        #     return jsonify(result)
-
         # 查询用户是否存在
         user = get_table(result=result, table=User, terms=or_(User.username==paras[0], User.mobile==paras[2]), execute='first')
         if type(user) == dict:
@@ -76,15 +68,6 @@ def user(uid):
         result['data'].append(user.to_dict())
         return jsonify(result)
     if request.method == 'PUT':
-        # username = request.json.get('username')
-        # fullname = request.json.get('fullname')
-        # mobile = request.json.get('mobile')
-        # password = request.json.get('password')
-        # tag = request.json.get('tag')
-        # is_department = request.json.get('is_department')
-        # status = request.json.get('status')
-        # remark = request.json.get('remark')
-
         # 接收参数
         para_list = ['username', 'fullname', 'mobile', 'password', 'tag', 'is_department', 'status', 'remark']
         paras = accept_para(para_list)
@@ -101,15 +84,6 @@ def user(uid):
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
-        # user.username = username
-        # user.fullname = fullname
-        # user.mobile = mobile
-        # user.password = password
-        # user.tag = tag
-        # user.is_department = is_department
-        # user.status = status
-        # user.remark = remark
-
         # 修改用户信息
         user.change_data(paras)
         # 数据库提交
@@ -353,7 +327,7 @@ def permission(pid):
 
 
 # 操作类型查询，添加
-@blue_auth.route('/actiontypes')
+@blue_auth.route('/actiontypes', methods=['GET', 'POST'])
 def action_type():
     result = {'code': 0, 'data': [], 'msg': u'查询成功'}
     if request.method == "GET":
