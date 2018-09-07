@@ -4,11 +4,13 @@ import re
 from flask import jsonify, request
 from sqlalchemy import or_, and_
 
-from app.models import User, Department, db_session_add, db_session_delete, Role, Management, Permission, ActionType
+from app.models import User, Department, db_session_add, db_session_delete, Role, Management, Permission, ActionType, \
+    append_user, remove_user
 from . import blue_auth
 from .common import get_table, accept_para
 
 
+# 资源
 # 用户列表查询和用户创建
 @blue_auth.route('/users', methods=['GET', 'POST'])
 def users():
@@ -52,7 +54,7 @@ def users():
         #     return jsonify(result)
 
         # 查询用户是否存在
-        user = get_table(result=result, table=User, terms=or_(User.username==paras[0], User.mobile==paras[2], User.tag==paras[4]), execute='first')
+        user = get_table(result=result, table=User, terms=or_(User.username==paras[0], User.mobile==paras[2]), execute='first')
         if type(user) == dict:
             return jsonify(user)
         user = User()
@@ -287,7 +289,6 @@ def management(mid):
         return jsonify(result)
 
 
-
 # 权限列表查询和创建
 @blue_auth.route('/permissions', methods=['GET', 'POST'])
 def permissions():
@@ -325,4 +326,308 @@ def permissions():
 # 权限信息查询、修改和创建
 @blue_auth.route('/permissions/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
 def permission(pid):
-    pass
+    result = {'code': 0, 'data':[], 'msg': u'权限信息查询成功'}
+    permission = get_table(result=result, table=Permission, execute='get', id=pid)
+    if type(permission) == dict:
+        return jsonify(permission)
+    if request.method == "GET":
+        result['data'].append(permission.to_dict())
+        return jsonify(result)
+    if request.method == 'PUT':
+        para_list = ['name', 'alias', 'codename', 'status', 'remark']
+        paras = accept_para(para_list)
+        if not all([paras[0], paras[2]]):
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        if paras[3] not in [0, 1]:
+            result['code'] = 1
+            result['msg'] = u'参数错误'
+            return jsonify(result)
+        permission.change_data(paras)
+        result = db_session_add(permission)
+        return jsonify(result)
+    if request.method == 'DELETE':
+        result = db_session_delete(permission)
+        return jsonify(result)
+
+
+# 关系
+# 部门用户查询，添加， 删除
+@blue_auth.route('/departments/users/<int:did>', methods = ['GET', 'POST', 'DELETE'])
+def department_user(did):
+    result = {'code': 0, 'data': [], 'msg': u'部门用户信息查询成功'}
+    # 部门和部门用户查询
+    department = get_table(result=result, table=Department, execute='get', id=did)
+    if type(department) == dict:
+        return jsonify(department)
+    d_users = get_table(result=result, execute='relationship', relationship=department.users)
+    if type(d_users) == dict:
+        return jsonify(d_users)
+    # 返回部门用户信息
+    if request.method == 'GET':
+        # 部门无用户
+        for d_user in d_users:
+            result['data'].append(d_user.to_dict())
+        return jsonify(result)
+    # 获取用户id
+    uid = request.json.get('uid')
+    # 参数校验
+    if not uid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        uid = int(uid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的用户
+    user = get_table(result=result, table=User, execute='get', id=uid)
+    if type(user) == dict:
+        return jsonify(user)
+    # 部门用户信息添加
+    if request.method == 'POST':
+        # 用户是否属于该部门
+        if user in d_users:
+            result['code'] = 1
+            result['msg'] = u'该用户已添加'
+            return jsonify(result)
+        # 添加用户
+        result = append_user(department, user)
+        return jsonify(result)
+    # 删除部门用户
+    if request.method == 'DELETE':
+        # 用户是否属于该部门
+        if user not in d_users:
+            result['code'] = 1
+            result['msg'] = u'用户不存在，删除失败'
+            return jsonify(result)
+        # 删除用户
+        result = remove_user(department, user)
+        return jsonify(result)
+
+
+# 部门角色查询、添加和删除
+@blue_auth.route('/departments/roles/<int:did>', methods=['GET', 'POST', 'DELETE'])
+def department_roles(did):
+    result = {'code': 0, 'data': [], 'msg': u'部门角色信息查询成功'}
+    # 部门和部门角色查询
+    department = get_table(result=result, table=Department, execute='get', id=did)
+    if type(department) == dict:
+        return jsonify(department)
+    d_roles = get_table(result=result, execute='relationship', relationship=department.roles)
+    if type(d_roles) == dict:
+        return jsonify(d_roles)
+    # 返回部门角色信息
+    if request.method == 'GET':
+        # 部门无角色
+        for d_role in d_roles:
+            result['data'].append(d_role.to_dict())
+        return jsonify(result)
+    # 获取角色id
+    rid = request.json.get('rid')
+    # 参数校验
+    if not rid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        rid = int(rid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的角色
+    role = get_table(result=result, table=Role, execute='get', id=rid)
+    if type(role) == dict:
+        return jsonify(role)
+    # 部门角色信息添加
+    if request.method == 'POST':
+        # 角色是否已添加
+        if role in d_roles:
+            result['code'] = 1
+            result['msg'] = u'该角色已添加'
+            return jsonify(result)
+        # 添加角色
+        result = department.append_role(role)
+        return jsonify(result)
+    # 删除部门角色
+    if request.method == 'DELETE':
+        # 角色是否属于该部门
+        if role not in d_roles:
+            result['code'] = 1
+            result['msg'] = u'角色不存在，删除失败'
+            return jsonify(result)
+        # 删除角色
+        result = department.remove_role(role)
+        return jsonify(result)
+
+
+# 角色用户查询、添加和删除
+@blue_auth.route('/roles/users/<int:rid>', methods=['GET', 'POST', 'DELETE'])
+def role_users(rid):
+    result = {'code': 0, 'data': [], 'msg': u'角色用户信息查询成功'}
+    # 角色和角色用户查询
+    role = get_table(result=result, table=Role, execute='get', id=rid)
+    if type(role) == dict:
+        return jsonify(role)
+    r_users = get_table(result=result, execute='relationship', relationship=role.users)
+    if type(r_users) == dict:
+        return jsonify(r_users)
+    # 返回角色用户信息
+    if request.method == 'GET':
+        # 角色无用户
+        for r_user in r_users:
+            result['data'].append(r_user.to_dict())
+        return jsonify(result)
+    # 获取用户id
+    uid = request.json.get('uid')
+    # 参数校验
+    if not uid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        uid = int(uid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的用户
+    user = get_table(result=result, table=User, execute='get', id=uid)
+    if type(user) == dict:
+        return jsonify(user)
+    # 角色用户信息添加
+    if request.method == 'POST':
+        # 用户是否属于该角色
+        if user in r_users:
+            result['code'] = 1
+            result['msg'] = u'该用户已添加'
+            return jsonify(result)
+        # 添加用户
+        result = append_user(role, user)
+        return jsonify(result)
+    # 删除角色用户
+    if request.method == 'DELETE':
+        # 用户是否属于该角色
+        if user not in r_users:
+            result['code'] = 1
+            result['msg'] = u'用户不存在，删除失败'
+            return jsonify(result)
+        # 删除
+        result = remove_user(role, user)
+        return jsonify(result)
+
+
+# 管理员用户查询、添加和删除
+@blue_auth.route('/managements/users/<int:mid>', methods=['GET', 'POST', 'DELETE'])
+def management_users(mid):
+    result = {'code': 0, 'data': [], 'msg': u'管理人员信息查询成功'}
+    # 管理和管理人员查询
+    management = get_table(result=result, table=Management, execute='get', id=mid)
+    if type(management) == dict:
+        return jsonify(management)
+    m_users = get_table(result=result, execute='relationship', relationship=management.users)
+    if type(m_users) == dict:
+        return jsonify(m_users)
+    # 返回管理用户信息
+    if request.method == 'GET':
+        # 角色无用户
+        for m_user in m_users:
+            result['data'].append(m_user.to_dict())
+        return jsonify(result)
+    # 获取用户id
+    uid = request.json.get('uid')
+    # 参数校验
+    if not uid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        uid = int(uid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的用户
+    user = get_table(result=result, table=User, execute='get', id=uid)
+    if type(user) == dict:
+        return jsonify(user)
+    # 管理员信息添加
+    if request.method == 'POST':
+        # 用户是否属于管理员
+        if user in m_users:
+            result['code'] = 1
+            result['msg'] = u'该用户已添加'
+            return jsonify(result)
+        # 添加
+        result = append_user(management, user)
+        return jsonify(result)
+    # 删除管理用户
+    if request.method == 'DELETE':
+        # 用户是否是管理员
+        if user not in m_users:
+            result['code'] = 1
+            result['msg'] = u'用户不存在，删除失败'
+            return jsonify(result)
+        # 删除
+        result = remove_user(management, user)
+        return jsonify(result)
+
+
+# 管理员权限查询、添加和删除
+@blue_auth.route('/managements/permissions/<int:mid>', methods=['GET', 'POST', 'DELETE'])
+def management_permissions(mid):
+    result = {'code': 0, 'data': [], 'msg': u'管理员权限信息查询成功'}
+    # 管理和管理权限查询
+    management = get_table(result=result, table=Management, execute='get', id=mid)
+    if type(management) == dict:
+        return jsonify(management)
+    m_permissions = get_table(result=result, execute='relationship', relationship=management.permissions)
+    if type(m_permissions) == dict:
+        return jsonify(m_permissions)
+    # 返回管理权限信息
+    if request.method == 'GET':
+        # 无权限
+        for m_permission in m_permissions:
+            result['data'].append(m_permission.to_dict())
+        return jsonify(result)
+    # 获取权限id
+    pid = request.json.get('pid')
+    # 参数校验
+    if not pid:
+        result['code'] = 1
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    try:
+        pid = int(pid)
+    except Exception:
+        result['code'] = 1
+        result['msg'] = u'数据格式错误'
+        return jsonify(result)
+    # 需要添加或删除的权限
+    permission = get_table(result=result, table=Permission, execute='get', id=pid)
+    if type(permission) == dict:
+        return jsonify(permission)
+    # 管理权限信息修改
+    if request.method == 'POST':
+        # 权限是否属于该管理
+        if permission in m_permissions:
+            result['code'] = 1
+            result['msg'] = u'该权限已添加'
+            return jsonify(result)
+        # 添加权限
+        result = management.append_permission(permission)
+        return jsonify(result)
+    # 删除权限
+    if request.method == 'DELETE':
+        # 权限是否属于该管理员
+        if permission not in m_permissions:
+            result['code'] = 1
+            result['msg'] = u'权限不存在，删除失败'
+            return jsonify(result)
+        # 删除
+        result = management.remove_permission(permission)
+        return jsonify(result)

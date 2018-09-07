@@ -69,6 +69,18 @@ def db_session_delete(table):
     db.session.delete(table)
     return db_session_commit()
 
+# 添加用户
+def append_user(table, user):
+    table.users.append(user)
+    result = db_session_add(table)
+    return result
+
+# 删除用户
+def remove_user(table, user):
+    table.users.remove(user)
+    result = db_session_add(table)
+    return result
+
 # 角色用户表，建立用户和角色多对多的关系
 tb_role_user = db.Table(
     "info_role_user",
@@ -112,8 +124,9 @@ class User(db.Model, BaseModel):
     username = db.Column(db.String(128), nullable=False, unique=True) # 用户名
     fullname = db.Column(db.String(128), nullable=False) # 姓名
     mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
-    tag = db.Column(db.String(64), unique=True) # 工号
+    tag = db.Column(db.String(64)) # 工号
     is_department = db.Column(db.Boolean, default=False)  # 部门管理员
+    ding_id = db.Column(db.String(128)) # 钉钉id
     password_hash = db.Column(db.String(128))
     login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
@@ -140,9 +153,10 @@ class User(db.Model, BaseModel):
             'mobile': self.mobile,
             'tag': self.tag,
             'is_department': self.is_department,
+            'ding_id': self.ding_id,
             'status': self.status,
             'login_time': self.login_time.strftime("%Y-%m-%d %H:%M:%S"),
-            'lastchange': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_change': self.lastchange.strftime("%Y-%m-%d %H:%M:%S"),
             'remark': self.remark
         }
         return resp_dict
@@ -188,7 +202,7 @@ class Department(db.Model, BaseModel):
             'alias': self.alias,
             'remark': self.remark,
             'status': self.status,
-            'lastchange': self.lastchange
+            'last_change': self.lastchange
         }
         return resp_dict
 
@@ -202,6 +216,19 @@ class Department(db.Model, BaseModel):
         self.status = paras[2]
         self.remark = paras[3]
 
+
+    # 添加角色
+    def append_role(self, role):
+        self.roles.append(role)
+        result = db_session_add(self)
+        return result
+
+    # 删除角色
+    def remove_role(self, role):
+        self.roles.remove(role)
+        result = db_session_add(self)
+        return result
+
     def __repr__(self):
         return '<Departmenet %r>' % self.name
 
@@ -214,10 +241,6 @@ class Role(db.Model, BaseModel):
     alias = db.Column(db.String(128))
     # 角色用户关系
     users = db.relationship('User', secondary=tb_role_user, backref=db.backref('roles', lazy='dynamic'), lazy='dynamic')
-
-    def add(self, role):
-        db.session.add(role)
-        return db_session_commit()
 
     def to_dict(self):
         resp_dict = {
@@ -255,10 +278,6 @@ class Management(db.Model, BaseModel):
     # 管理员权限关系
     permissions = db.relationship('Permission', secondary=tb_management_permission, backref=db.backref('p_managements', lazy='dynamic'), lazy='dynamic')
 
-    def add(self, management):
-        db.session.add(management)
-        return db.session_commit()
-
     def to_dict(self):
         resp_dict = {
             'id': self.id,
@@ -279,6 +298,16 @@ class Management(db.Model, BaseModel):
         self.alias = paras[1]
         self.status = paras[2]
         self.remark = paras[3]
+
+    def append_permission(self, permission):
+        self.permissions.append(permission)
+        result = db_session_add(self)
+        return result
+
+    def remove_permission(self, permission):
+        self.permissions.remove(permission)
+        result = db_session_add(self)
+        return result
 
     def __repr__(self):
         return '<management %r>' % self.name
@@ -309,6 +338,13 @@ class Permission(db.Model, BaseModel):
         self.alias = paras[1]
         self.codename = paras[2]
 
+    def change_data(self, paras):
+        self.name = paras[0]
+        self.alias = paras[1]
+        self.codename = paras[2]
+        self.status = paras[3]
+        self.remark = paras[4]
+
     def __repr__(self):
         return '<Permission %r>' % self.name
 
@@ -330,4 +366,3 @@ class ActionType(db.Model):
 
     def __repr__(self):
         return '<Action_type %r>' % self.codename
-

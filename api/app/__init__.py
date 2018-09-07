@@ -2,6 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 from config import config
 # 实例化sqlalchemy
@@ -17,6 +18,7 @@ def create_app(config_name):
 
     # 关联程序实例
     db.init_app(app)
+    CORS(app, origins=config[config_name].CORS_URL)
 
     # 注册蓝图
     from .BlueWatch import blue_watch
