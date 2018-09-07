@@ -24,6 +24,12 @@ class Duty(BaseModel, db.Model):
     role = db.Column(db.String(64), nullable=False)    # 角色
     duty_name = db.Column(db.String(64), nullable=False)  # 值班人
     duty_time = db.Column(db.Date(), nullable=False, index=True)  # 值班时间
+    mobile = db.Column(db.String(128), nullable=False)        # 手机号
+    tag = db.Column(db.String(128), nullable=False)        # 工号
+
+    def add(self, duty):   # 添加值班记录
+        db.session.add(duty)
+        return db_session_commit()
 
     def __repr__(self):
         return '<Duty %r>' % self.duty_name
@@ -35,6 +41,10 @@ class TempText(BaseModel, db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(64))     # 名字
     content = db.Column(db.String(256), nullable=False)  # 短信内容
+
+    def add(self, temptext):  # 添加短信模板
+        db.session.add(temptext)
+        return db_session_commit()
 
     def __repr__(self):
         return '<TempText %r>' % self.content
