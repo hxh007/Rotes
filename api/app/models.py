@@ -25,7 +25,7 @@ class Duty(BaseModel, db.Model):
     duty_name = db.Column(db.String(64), nullable=False)  # 值班人
     duty_time = db.Column(db.Date(), nullable=False, index=True)  # 值班时间
     mobile = db.Column(db.String(128), nullable=False)        # 手机号
-    tag = db.Column(db.String(128), nullable=False)        # 工号
+    ding_id = db.Column(db.String(128))  # 钉钉id
 
     def add(self, duty):   # 添加值班记录
         db.session.add(duty)
