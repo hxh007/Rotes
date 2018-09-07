@@ -1,0 +1,120 @@
+{
+  "code": 0,
+  "date": "2019-09-01",
+  "data": [
+    {
+      "departId": 1,
+      "departName": "系统运维部",
+      "total": 7,
+      "roleList": [
+        {
+          "roleId": 1,
+          "roleName": "一线",
+          "total": 1,
+          "dutyList": [
+            {
+              "dutyId": 1,
+              "dutyName": "鲁智深"
+            }
+          ]
+        },
+        {
+          "roleId": 2,
+          "roleName": "二线",
+          "total": 1,
+          "dutyList": [
+            {
+              "dutyId": 2,
+              "dutyName": "安琪拉"
+            }
+          ]
+        },
+        {
+          "roleId": 3,
+          "roleName": "2.5线",
+          "total": 5,
+          "dutyList": [
+            {
+              "dutyId": 3,
+              "dutyName": "甄姬"
+            },
+            {
+              "dutyId": 4,
+              "dutyName": "黄忠"
+            },
+            {
+              "dutyId": 5,
+              "dutyName": "鬼谷子"
+            },
+            {
+              "dutyId": 6,
+              "dutyName": "后羿"
+            },
+            {
+              "dutyId": 7,
+              "dutyName": "狄仁杰"
+            }
+          ]
+        }
+      ],
+      "msg": "查询成功"
+    },
+    {
+      "departId": 2,
+      "departName": "网络安全部",
+      "total": 7,
+      "roleList": [
+        {
+          "roleId": 1,
+          "roleName": "一线",
+          "total": 1,
+          "dutyList": [
+            {
+              "dutyId": 1,
+              "dutyName": "鲁智深"
+            }
+          ]
+        },
+        {
+          "roleId": 2,
+          "roleName": "二线",
+          "total": 1,
+          "dutyList": [
+            {
+              "dutyId": 2,
+              "dutyName": "安琪拉"
+            }
+          ]
+        },
+        {
+          "roleId": 3,
+          "roleName": "2.5线",
+          "total": 5,
+          "dutyList": [
+            {
+              "dutyId": 3,
+              "dutyName": "甄姬"
+            },
+            {
+              "dutyId": 4,
+              "dutyName": "黄忠"
+            },
+            {
+              "dutyId": 5,
+              "dutyName": "鬼谷子"
+            },
+            {
+              "dutyId": 6,
+              "dutyName": "后羿"
+            },
+            {
+              "dutyId": 7,
+              "dutyName": "狄仁杰"
+            }
+          ]
+        }
+      ],
+      "msg": "查询成功"
+    }
+  ]
+}
