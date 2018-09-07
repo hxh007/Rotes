@@ -2,6 +2,8 @@
 import ConfigParser
 import os, sys
 
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+
 
 class Config(object):
     # api 作为根路径
@@ -33,6 +35,18 @@ class Config(object):
     CACHE_TYPE = conf.get('redis', 'cache_type')
     CACHE_KEY_PREFIX = conf.get('redis', 'cache_key_prefix')
     REDIS_MAX_CONNECTIONS = conf.get('redis', 'redis_exchange')
+
+    SCHEDULER_JOBSTORES = {
+        'default':SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)
+    }
+    SCHEDULER_EXECUTORS = {
+        'default':{'type':'threadpool', 'max_workers':9}
+    }
+    SCHEDULER_JOB_DEFAULTS = {
+        'coalesce':False,
+        'max_instances':3
+    }
+    SCHEDULER_API_ENABLED = False
 
 
 class DevelopmentConfig(Config):
