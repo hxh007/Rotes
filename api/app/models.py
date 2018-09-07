@@ -24,6 +24,8 @@ class Duty(BaseModel, db.Model):
     role = db.Column(db.String(64), nullable=False)    # 角色
     duty_name = db.Column(db.String(64), nullable=False)  # 值班人
     duty_time = db.Column(db.Date(), nullable=False, index=True)  # 值班时间
+    mobile = db.Column(db.String(128), nullable=False)        # 手机号
+    tag = db.Column(db.String(128), nullable=False)        # 工号
 
     def add(self, duty):   # 添加值班记录
         db.session.add(duty)
