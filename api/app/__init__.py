@@ -1,12 +1,20 @@
 # coding=utf-8
 
+from redis import StrictRedis
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
-from config import config
+from config import config, Config
 # 实例化sqlalchemy
 db = SQLAlchemy()
+
+# redis
+Redis = StrictRedis(host=Config.REDIS_HOST,
+                    port=Config.REDIS_PORT,
+                    db=Config.REDIS_DB,
+                    password=Config.REDIS_PASSWORD,
+                    max_connections=int(Config.REDIS_MAX_CONNECTIONS))
 
 
 # 定义工厂方法
