@@ -259,7 +259,7 @@ class Role(db.Model, BaseModel):
         return '<Role %r>' % self.name
 
 
-# 管理员表
+# 管理表
 class Management(db.Model, BaseModel):
     __tablename__ = 'info_management'
     id = db.Column(db.Integer, primary_key=True, index=True)
@@ -309,16 +309,15 @@ class Management(db.Model, BaseModel):
 class Permission(db.Model, BaseModel):
     __tablename__ = 'info_permission'
     id = db.Column(db.Integer, primary_key=True, index=True)
-    name = db.Column(db.String(128), nullable=False, unique=True)
-    alias = db.Column(db.String(128))
+    alias = db.Column(db.String(128), nullable=False, unique=True)
     codename = db.Column(db.String(64), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('info_department.id'))
 
     def to_dict(self):
         resp_dict = {
             'id': self.id,
-            'name': self.name,
             'alias': self.alias,
+            'codename': self.codename,
             'remark': self.remark,
             'status': self.status,
             'lastchange': self.lastchange
@@ -326,16 +325,15 @@ class Permission(db.Model, BaseModel):
         return resp_dict
 
     def add_data(self, paras):
-        self.name = paras[0]
-        self.alias = paras[1]
-        self.codename = paras[2]
+        self.alias = paras[0]
+        self.codename = paras[1]
+        self.department_id = paras[2]
 
     def change_data(self, paras):
-        self.name = paras[0]
-        self.alias = paras[1]
-        self.codename = paras[2]
-        self.status = paras[3]
-        self.remark = paras[4]
+        self.alias = paras[0]
+        self.codename = paras[1]
+        self.status = paras[2]
+        self.remark = paras[3]
 
     def __repr__(self):
         return '<Permission %r>' % self.name

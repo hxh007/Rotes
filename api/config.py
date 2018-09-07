@@ -1,4 +1,5 @@
 # coding=utf-8
+import ConfigParser
 import os, sys
 
 
@@ -19,6 +20,19 @@ class Config(object):
 
     # 跨域白名单
     CORS_URL = '*'
+
+    # 配置redis
+    conf = ConfigParser.RawConfigParser()
+    conf.read(os.path.join(basedir, 'config.ini'))
+
+    REDIS_HOST = conf.get('redis', 'host')
+    REDIS_PORT = conf.get('redis', 'port')
+    REDIS_PASSWORD = conf.get('redis', 'pwd')
+    REDIS_DB = conf.get('redis', 'redis_exchange')
+    REDIS_CACHE_DB = conf.get('redis', 'redis_cache')
+    CACHE_TYPE = conf.get('redis', 'cache_type')
+    CACHE_KEY_PREFIX = conf.get('redis', 'cache_key_prefix')
+    REDIS_MAX_CONNECTIONS = conf.get('redis', 'redis_exchange')
 
 
 class DevelopmentConfig(Config):

@@ -301,20 +301,20 @@ def permissions():
             result['data'].append(permission.to_dict())
         return jsonify(result)
     if request.method == 'POST':
-        para_list = ['name', 'alias', 'codename']
+        para_list = ['alias', 'codename', 'department_id']
         paras = accept_para(para_list)
-        if not all([paras[0], paras[2]]):
+        if not all([paras[0], paras[1]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
         actions = get_table(result=result, table=ActionType, execute='with_entities', terms=ActionType.codename)
         if type(actions) == dict:
             return jsonify(actions)
-        if (paras[2],) not in actions:
+        if (paras[1],) not in actions:
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
-        permission = get_table(result=result, table=Permission, execute='first', terms=and_(Permission.name==paras[0], Permission.codename==paras[2]))
+        permission = get_table(result=result, table=Permission, execute='first', terms=and_(Permission.alias==paras[0], Permission.codename==paras[1]))
         if type(permission) == dict:
             return jsonify(permission)
         permission = Permission()
@@ -323,7 +323,7 @@ def permissions():
         return jsonify(result)
 
 
-# 权限信息查询、修改和创建
+# 权限信息查询、修改和删除
 @blue_auth.route('/permissions/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
 def permission(pid):
     result = {'code': 0, 'data':[], 'msg': u'权限信息查询成功'}
@@ -334,13 +334,13 @@ def permission(pid):
         result['data'].append(permission.to_dict())
         return jsonify(result)
     if request.method == 'PUT':
-        para_list = ['name', 'alias', 'codename', 'status', 'remark']
+        para_list = ['alias', 'codename', 'status', 'remark']
         paras = accept_para(para_list)
-        if not all([paras[0], paras[2]]):
+        if not all([paras[0], paras[1]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
-        if paras[3] not in [0, 1]:
+        if paras[2] not in [0, 1]:
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
@@ -349,6 +349,34 @@ def permission(pid):
         return jsonify(result)
     if request.method == 'DELETE':
         result = db_session_delete(permission)
+        return jsonify(result)
+
+
+# 操作类型查询，添加
+@blue_auth.route('/actiontypes')
+def action_type():
+    result = {'code': 0, 'data': [], 'msg': u'查询成功'}
+    if request.method == "GET":
+        actions = get_table(result=result, table=ActionType, execute='all')
+        if type(actions) == dict:
+            return jsonify(actions)
+        for action in actions:
+            result['data'].append(action.to_dict())
+        return jsonify(result)
+    if request.method == "POST":
+        para_list = ['codename', 'alias']
+        paras = accept_para(para_list)
+        if not all([paras[0], paras[1]]):
+            result['code'] = 1
+            result['msg'] = u'参数缺失'
+            return jsonify(result)
+        action = get_table(result=result, table=ActionType, execute='first',
+                               terms=ActionType.codename == paras[0])
+        if type(action) == dict:
+            return jsonify(action)
+        action = ActionType()
+        action.add_data(paras)
+        result = db_session_add(action)
         return jsonify(result)
 
 
