@@ -174,7 +174,6 @@ class User(db.Model, BaseModel):
         self.username = paras[0]
         self.fullname = paras[1]
         self.mobile = paras[2]
-        self.password = paras[3]
         self.tag = paras[4]
         self.is_department = paras[5]
         self.status = paras[6]
@@ -363,6 +362,10 @@ class ActionType(db.Model):
             'alias': self.alias
         }
         return resp_dict
+
+    def add_data(self, paras):
+        self.alias = paras[0]
+        self.codename = paras[1]
 
     def __repr__(self):
         return '<Action_type %r>' % self.codename
