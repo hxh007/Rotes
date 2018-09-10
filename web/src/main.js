@@ -7,7 +7,7 @@ import store from './store'
 import iView from 'iview'
 import fullCalendar from 'vue-fullcalendar'
 import 'iview/dist/styles/iview.css'
-
+import '@/assets/common.css'
 Vue.config.productionTip = false
 Vue.use(iView)
 Vue.component('full-calendar', fullCalendar)

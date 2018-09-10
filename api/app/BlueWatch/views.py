@@ -461,3 +461,46 @@ def dutys():
     result['code'] = 0
     result['msg'] = u'所有部门值班记录'
     return jsonify(result)
+
+
+# 编辑短信内容模板
+@blue_watch.route('/smsTemplate', methods=['GET', 'PUT', 'DELETE'])
+def smsTemplate():
+    result = {'code': 0, 'data': {}, 'msg': u'暂无模板数据'}
+    if request.method == 'GET':
+        try:
+            tempContent = TempText.query.filter_by(id=1).first().content
+        except:
+            return jsonify(result)
+        result['data']['tempContent'] = tempContent
+        result['msg'] = u'查询模板数据成功'
+        return jsonify(result)
+    if request.method == 'PUT':
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = request.values
+        tempContent = data.get('tempContent')
+        if not tempContent:
+            result['msg'] = u'内容不能为空'
+            return jsonify(result)
+        try:
+            # 修改模板内容
+            temp_obj = TempText.query.filter_by(id=1).first()
+            temp_obj.content = tempContent
+            result1 = temp_obj.add(temp_obj)
+        except:
+            # 新增
+            temp_obj = TempText(content=tempContent)
+            result1 = temp_obj.add(temp_obj)
+        return jsonify(result1)
+    if request.method == 'DELETE':
+        try:
+            temp_obj = TempText.query.filter_by(id=1).first()
+            db.session.delete(temp_obj)
+            db.session.commit()
+            result['msg'] = u'删除成功'
+        except:
+            result['code'] = 1
+            result['msg'] = u'删除失败'
+        return jsonify(result)
