@@ -171,7 +171,7 @@ export default {
     })
   },
   updated () {
-    console.log(this.tableList)
+    //
   }
 }
 </script>

@@ -16,6 +16,12 @@ module.exports = {
         pathRewrite:{
           '^/api': '/static/mock'
         }
+      },
+      '/back':{
+        target : 'http://172.20.163.9:5000',
+        pathRewrite: {
+          '^/back/users': '/auth/users'
+        }
       }
     },
 
