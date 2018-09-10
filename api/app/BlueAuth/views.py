@@ -72,7 +72,7 @@ def user(uid):
         para_list = ['username', 'fullname', 'mobile', 'password', 'tag', 'is_department', 'status', 'remark']
         paras = accept_para(para_list)
         # 参数校验
-        if not all([paras[0], paras[1], paras[2], paras[3]]):
+        if not all([paras[0], paras[1], paras[2]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
@@ -84,7 +84,11 @@ def user(uid):
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
-        # 修改用户信息
+        # 密码存在  修改密码
+        if paras[3]:
+            # 修改用户信息
+            user.change_data(paras)
+            user.password = paras[3]
         user.change_data(paras)
         # 数据库提交
         result = db_session_add(user)
