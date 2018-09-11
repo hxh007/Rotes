@@ -56,4 +56,10 @@ DEFAULT_ROLES = [
         "alias": u"四线"
     },
 ]
+DEFAULT_TEMPTEXT = [
+    {
+        'name': u'短信模板',
+        'content': u'记得明天9:00值班'
+    }
+]
 

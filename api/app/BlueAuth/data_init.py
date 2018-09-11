@@ -1,8 +1,8 @@
 # coding=utf-8
 from app import db
 from . import blue_auth
-from app.models import User, Management, ActionType, db_session_add, Role
-from .datas import DEFAULT_SUPPER_MANAGEMENT, DEFAULT_SUPPER_USER, DEFAULT_ACTION, DEFAULT_ROLES
+from app.models import User, Management, ActionType, db_session_add, Role, TempText
+from .datas import DEFAULT_SUPPER_MANAGEMENT, DEFAULT_SUPPER_USER, DEFAULT_ACTION, DEFAULT_ROLES, DEFAULT_TEMPTEXT
 
 
 # 数据初始化
@@ -60,5 +60,14 @@ def data_init():
             new_role.name = a['name']
             new_role.alias = a['alias']
             db_session_add(new_role)
+    else:
+        pass
+    # 添加短信内容模板
+    tempText_obj = TempText.query.with_entities(TempText.content).all()
+    if len(tempText_obj) == 0:
+        for a_temp in DEFAULT_TEMPTEXT:
+            new_tempText = TempText(name=a_temp['name'], content=a_temp['content'])
+            db.session.add(new_tempText)
+            db.session.commit()
     else:
         pass

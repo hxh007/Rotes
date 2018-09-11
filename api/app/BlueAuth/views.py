@@ -61,7 +61,7 @@ def user(uid):
     result = {'code': 0, 'data': [], 'msg': u'用户信息查询成功'}
     # 数据库查询
     user = get_table(result=result, table=User, execute='get', id=uid)
-    if type(users) == dict:
+    if type(user) == dict:
         return jsonify(user)
     if request.method == 'GET':
         # to_dict() 返回用户信息字典
@@ -332,7 +332,7 @@ def permission(pid):
 
 # 操作类型查询，添加
 @blue_auth.route('/actiontypes', methods=['GET', 'POST'])
-def action_type():
+def action_types():
     result = {'code': 0, 'data': [], 'msg': u'查询成功'}
     if request.method == "GET":
         actions = get_table(result=result, table=ActionType, execute='all')
@@ -356,6 +356,16 @@ def action_type():
         action.add_data(paras)
         result = db_session_add(action)
         return jsonify(result)
+
+
+@blue_auth.route('/actiontypes/<int:aid>', methods = ['DELETE'])
+def action_type(aid):
+    result = {'code': 0, 'data': [], 'msg': u'查询成功'}
+    action = get_table(result=result, table=ActionType, execute='get', id=aid)
+    if type(action) == dict:
+        return jsonify(action)
+    result = db_session_delete(action)
+    return jsonify(result)
 
 
 # 关系
