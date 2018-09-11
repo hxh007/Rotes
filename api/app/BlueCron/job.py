@@ -10,6 +10,6 @@ def test_job_conversation():
     # TODO: create ding conversation
     print u"创建钉钉会话"
 
-FUNC_MAP = {'app.BlueCron.job:test_job_notice':test_job_notice, \
-            'app.BlueCron.job:test_job_conversation':test_job_conversation, \
+FUNC_MAP = {'app.BlueCron.job:test_job_notice':{'func':test_job_notice, 'info':u"[测试] 通知任务"}, \
+            'app.BlueCron.job:test_job_conversation':{'func':test_job_conversation, 'info':u"[测试] 钉钉建群任务"}, \
 }
