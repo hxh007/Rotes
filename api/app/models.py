@@ -127,10 +127,17 @@ class User(db.Model, BaseModel):
     fullname = db.Column(db.String(128), nullable=False) # 姓名
     mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
     tag = db.Column(db.String(64)) # 工号
-    is_department = db.Column(db.Boolean, default=False)  # 部门管理员
-    ding_id = db.Column(db.String(128)) # 钉钉id
+    is_department = db.Column(db.Boolean, default=False)  # 部门负责人，钉钉isLeader
     password_hash = db.Column(db.String(128))
     login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
+
+    # 钉钉预留字段
+    ding_id = db.Column(db.String(128), unique=True, index=True)  # 钉钉id
+    email = db.Column(db.String(128))
+    active = db.Column(db.Boolean, default=False)
+    isBoss = db.Column(db.Boolean, default=False)
+    isAdmin = db.Column(db.Boolean, default=False)
+    isHide = db.Column(db.Boolean, default=False)
 
     @property
     def password(self):
@@ -195,6 +202,10 @@ class Department(db.Model, BaseModel):
     roles = db.relationship('Role', secondary=tb_department_role, backref=db.backref('department', lazy='dynamic'), lazy='dynamic')
     # 部门权限关系
     permissions = db.relationship('Permission', backref='departments', lazy='dynamic')
+
+    # 钉钉预留字段
+    deptid = db.Column(db.String(256), unique=True, index=True) # 钉钉id
+    pid = db.Column(db.String(256),index=True) # 上级部门id
 
     def to_dict(self):
         resp_dict = {

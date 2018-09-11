@@ -15,7 +15,6 @@ def get_table(result=None, table=None, execute=None, id=None, terms=None, relati
             result['msg'] = u'数据查询失败'
             return result
         if not data:
-            result['code'] = 1
             result['msg'] = u'无数据'
             return result
         return data
