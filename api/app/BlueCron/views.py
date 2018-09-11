@@ -306,7 +306,7 @@ def jobstores_query_single(jsname):
         if queryed_js:
             result['detail']['alias'] = jsname
             result['detail']['ref'] = queryed_js.__repr__()
-            result['msg'] = u"[success] 查询指定 JobStore<0> 成功".format(jsname)
+            result['msg'] = u"[success] 查询指定 JobStore<{0}> 成功".format(jsname)
             result['ret'] = 1
             code = 200
         else:
