@@ -1,8 +1,8 @@
-'use strict'
+'use strict';
 // Template version: 1.3.1
 // see http://vuejs-templates.github.io/webpack for documentation.
 
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   dev: {
@@ -18,9 +18,10 @@ module.exports = {
         }
       },
       '/back':{
-        target : 'http://172.20.163.9:5000',
+        target : 'http://localhost:5000',
         pathRewrite: {
-          '^/back/users': '/auth/users'
+          '^/back/users': '/auth/users',
+          '^/back/users/:id': '/auth/users/:id'
         }
       }
     },
@@ -86,4 +87,4 @@ module.exports = {
     // Set to `true` or `false` to always turn it on or off
     bundleAnalyzerReport: process.env.npm_config_report
   }
-}
+};
