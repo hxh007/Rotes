@@ -312,9 +312,9 @@ def permission(pid):
         result['data'].append(permission.to_dict())
         return jsonify(result)
     if request.method == 'PUT':
-        para_list = ['alias', 'codename', 'status', 'remark']
+        para_list = ['alias', 'codename', 'status', 'remark', 'department_id']
         paras = accept_para(para_list)
-        if not all([paras[0], paras[1]]):
+        if not all([paras[0], paras[1], paras[4]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)

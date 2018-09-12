@@ -1,16 +1,20 @@
 # coding=utf-8
 from app import db
 from . import blue_auth
-from app.models import User, Management, ActionType, db_session_add, Role, TempText
-from .datas import DEFAULT_SUPPER_MANAGEMENT, DEFAULT_SUPPER_USER, DEFAULT_ACTION, DEFAULT_ROLES, DEFAULT_TEMPTEXT
+from app.models import (User, Management, ActionType, db_session_add,
+                        Role, TempText, Department, Permission
+                        )
+from .datas import (DEFAULT_SUPPER_MANAGEMENT, DEFAULT_SUPPER_USER,
+                    DEFAULT_ACTION, DEFAULT_ROLES, DEFAULT_DEPARTMENT, DEFAULT_TEMPTEXT,
+                    DEFAULT_PERMISSIONS)
 
 
 # 数据初始化
 @blue_auth.before_app_first_request
 def data_init():
-    # 添加管理（组）
+    # 添加管理组
     c_managements = Management.query.with_entities(Management.name).all()
-    # 添加超级管理
+    # 添加超级管理组
     if not len(c_managements):
         for m in DEFAULT_SUPPER_MANAGEMENT:
             new_management = Management()
@@ -60,6 +64,37 @@ def data_init():
             new_role.name = a['name']
             new_role.alias = a['alias']
             db_session_add(new_role)
+    else:
+        pass
+    # 添加部门
+    d_department = Department.query.with_entities(Department.name).all()
+    if len(d_department) == 0:
+        for d in DEFAULT_DEPARTMENT:
+            new_department = Department()
+            new_department.name = d['name']
+            new_department.alias = d['alias']
+            db_session_add(new_department)
+    else:
+        pass
+    # 添加权限
+    p_permissions = Permission.query.with_entities(Permission.codename).all()
+    if len(p_permissions) == 0:
+        for p in DEFAULT_PERMISSIONS:
+            new_permission = Permission()
+            new_permission.codename = p['codename']
+            new_permission.alias = p['alias']
+            department_wanted = Department.query.filter_by(name=p.get('department', 'UNKNOW')).first()
+            if department_wanted:
+                department_wanted.permissions.append(new_permission)
+            else:
+                del new_permission
+                continue
+            db.session.add_all([new_permission, department_wanted])
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
     else:
         pass
     # 添加短信内容模板
