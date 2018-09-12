@@ -242,7 +242,7 @@ class Department(db.Model, BaseModel):
         return result
 
     def __repr__(self):
-        return '<Departmenet %r>' % self.name
+        return '<Department %r>' % self.name
 
 
 # 角色表
@@ -338,6 +338,7 @@ class Permission(db.Model, BaseModel):
             'id': self.id,
             'alias': self.alias,
             'codename': self.codename,
+            'department_id': self.department_id,
             'remark': self.remark,
             'status': self.status,
             'lastchange': self.lastchange

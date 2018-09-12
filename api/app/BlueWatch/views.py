@@ -464,12 +464,12 @@ def dutys():
 
 
 # 编辑短信内容模板
-@blue_watch.route('/smsTemplate', methods=['GET', 'PUT', 'DELETE'])
+@blue_watch.route('/tempContent', methods=['GET', 'PUT', 'DELETE'])
 def smsTemplate():
     result = {'code': 0, 'data': {}, 'msg': u'暂无模板数据'}
     if request.method == 'GET':
         try:
-            tempContent = TempText.query.filter_by(id=1).first().content
+            tempContent = TempText.query.filter_by(name='SMS').first().content
         except:
             return jsonify(result)
         result['data']['tempContent'] = tempContent
@@ -486,17 +486,17 @@ def smsTemplate():
             return jsonify(result)
         try:
             # 修改模板内容
-            temp_obj = TempText.query.filter_by(id=1).first()
+            temp_obj = TempText.query.filter_by(name='SMS').first()
             temp_obj.content = tempContent
             result1 = temp_obj.add(temp_obj)
         except:
             # 新增
-            temp_obj = TempText(content=tempContent)
+            temp_obj = TempText(name='SMS', content=tempContent)
             result1 = temp_obj.add(temp_obj)
         return jsonify(result1)
     if request.method == 'DELETE':
         try:
-            temp_obj = TempText.query.filter_by(id=1).first()
+            temp_obj = TempText.query.filter_by(name='SMS').first()
             db.session.delete(temp_obj)
             db.session.commit()
             result['msg'] = u'删除成功'
