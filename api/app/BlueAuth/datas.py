@@ -3,17 +3,25 @@
 DEFAULT_SUPPER_USER = [
     {
     'username': 'admin',
-    'fullname': u'管理员',
+    'fullname': u'超级管理员',
     'mobile': '13455556666',
     'password': 'a1s2d3f4',
-    'management': 'ADMIN'
+    'management': 's_management'
     }
 ]
 DEFAULT_SUPPER_MANAGEMENT = [
     {
-        'name': 'ADMIN',
-        'alias': u'超级管理员'
-    }
+        'name': 's_management',
+        'alias': u'超级管理'
+    },
+    {
+        'name': 'd_management',
+        'alias': u'部门管理'
+    },
+    {
+        'name': 'b_management',
+        'alias': u'业务管理'
+    },
 
 ]
 DEFAULT_ACTION = [

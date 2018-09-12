@@ -12,9 +12,8 @@ from .datas import (DEFAULT_SUPPER_MANAGEMENT, DEFAULT_SUPPER_USER,
 # 数据初始化
 @blue_auth.before_app_first_request
 def data_init():
-    # 添加管理组
+    # 添加管理
     c_managements = Management.query.with_entities(Management.name).all()
-    # 添加超级管理组
     if not len(c_managements):
         for m in DEFAULT_SUPPER_MANAGEMENT:
             new_management = Management()

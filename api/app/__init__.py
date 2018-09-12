@@ -38,6 +38,8 @@ def create_app(config_name):
     app.register_blueprint(blue_watch)
     from .BlueAuth import blue_auth
     app.register_blueprint(blue_auth)
+    from .BlueUser import  blue_user
+    app.register_blueprint(blue_user)
 
     from .BlueCron import blue_cron
     app.register_blueprint(blue_cron)
