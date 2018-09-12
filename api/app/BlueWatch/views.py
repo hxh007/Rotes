@@ -183,7 +183,7 @@ def dutyLists():
                         dict1_duty['dutyId'] = duty_obj.id
                         dict1_duty['dutyName'] = duty_obj.duty_name
                         duty_list.append(dict1_duty)
-                dict_role['duty_list'] = duty_list
+                dict_role['dutyList'] = duty_list
                 roleList.append(dict_role)
         dict_duty['roleList'] = roleList
         data.append(dict_duty)
@@ -223,6 +223,7 @@ def dutyLists():
                 data.append(dict1)
     # 4 返回结果
     result['code'] = 0
+    result['msg'] = u'查询值班记录成功'
     result['data'] = data
     return jsonify(result)
 
