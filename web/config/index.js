@@ -21,11 +21,14 @@ module.exports = {
         target : 'http://localhost:5000',
         pathRewrite: {
           '^/back/users': '/auth/users',
+          '^/back/admin': '/auth/managements',
           '^/back/users/:id': '/auth/users/:id',
           '^/back/permissions': '/auth/permissions',
           '^/back/departments': '/auth/departments',
           '^/back/departments/:id': '/auth/departments/:id',
-          '^/back/actiontypes': '/auth/actiontypes'
+          '^/back/actiontypes': '/auth/actiontypes',
+          '^/back/roles': '/auth/roles',
+          '^/back/duties': '/dutys'
         }
       }
     },

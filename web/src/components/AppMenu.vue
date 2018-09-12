@@ -8,7 +8,7 @@
         <span v-if="isCollapse === true">R</span>
       </router-link>
     </div>
-    <Menu active-name="1-2" theme="dark" width="auto" :open-names="[]">
+    <Menu active-name="1-1" theme="dark" width="auto" :open-names="[]">
       <Submenu name="1">
         <template slot="title">
           <Icon type="ios-navigate"></Icon>
@@ -32,22 +32,30 @@
           后台管理
         </template>
         <MenuItem name="3-1">
+          <router-link tag="li" to="/backend/adminManage">
+            管理员
+          </router-link>
+        </MenuItem>
+        <MenuItem name="3-2">
           <router-link tag="li" to="/backend/userManage">
             用户管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-2">
+        <MenuItem name="3-3">
           <router-link tag="li" to="/backend/permissionManage">
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-3">
+        <MenuItem name="3-4">
           <router-link tag="li" to="/backend/departManage">
             部门管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-4">角色管理</MenuItem>
-        <MenuItem name="3-5">分组管理</MenuItem>
+        <MenuItem name="3-5">
+          <router-link tag="li" to="/backend/roleManage">
+            角色管理
+          </router-link>
+        </MenuItem>
         <MenuItem name="3-6">
           <router-link tag="li" to="/backend/operationManage">
             操作管理

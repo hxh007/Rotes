@@ -134,15 +134,30 @@ export default {
     getDutySucc (data) {
       let res = data.data
       if (res.code === 0 && res.data) {
-        this.fcEvents = res.data
+        // this.fcEvents = res.data
+        console.log(res)
+        let departId = this.flag === 1 ? undefined : this.$store.state.departId
+        res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
+          let dutyListData = res.data.dutyList
+          if (departId) { // 某个部门
+            // let departRoles = res.data.departRoles // 某个部门才需要显示具体的角色
+            for (let i in dutyListData) {
+              console.log(i)
+              if (i === item) { // 找到相同的日期
+              }
+            }
+          } else {
+          }
+        })
       }
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
       let departId = this.flag === 1 ? undefined : this.$store.state.departId
-      axios.get('/api/arrangeDuty.json', {
+      axios.get('/back/duties', {
         params: {
           departId: departId,
-          dateRange: [this.monthviewFisrt, this.monthviewLast]
+          dateStart: this.monthviewFisrt,
+          dateEnd: this.monthviewLast
         }
       }).then(this.getDutySucc)
     },
