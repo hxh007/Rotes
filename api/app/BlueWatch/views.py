@@ -130,7 +130,7 @@ def duty_edit(duty_id):
 # 某天值班记录
 @blue_watch.route('/dutyLists', methods=['GET'])
 def dutyLists():
-    result = {'code': 1, 'data': {}, 'msg': u'查询值班记录成功'}
+    result = {'code': 1, 'data': {}, 'msg': u'参数缺失'}
     # 1 接收参数
     if request.is_json:
         data = request.get_json()
@@ -141,7 +141,6 @@ def dutyLists():
     departId = data.get('departId')
     # 2 参数校验
     if not all([dateStart, dateEnd]):
-        result['msg'] = u'参数缺失'
         return jsonify(result)
     if dateStart != dateEnd:
         result['msg'] = u'日期不正确'
@@ -223,6 +222,7 @@ def dutyLists():
                 dict1['roleList'] = roleList1
                 data.append(dict1)
     # 4 返回结果
+    result['code'] = 0
     result['data'] = data
     return jsonify(result)
 
@@ -491,6 +491,7 @@ def smsTemplate():
             data = request.values
         tempContent = data.get('tempContent')
         if not tempContent:
+            result['code'] = 1
             result['msg'] = u'内容不能为空'
             return jsonify(result)
         try:
