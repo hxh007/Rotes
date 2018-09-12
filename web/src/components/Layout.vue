@@ -6,7 +6,7 @@
         <app-menu :isCollapse="isCollapsed"></app-menu>
       </Sider>
       <Layout :style="[layoutStyle]">
-        <Header :style="{padding: 0}" class="layout-header-bar">
+        <Header :style="{padding: '0', position: 'fixed', width: `calc(100% - 200px)`, zIndex: 100}" :class="{'layout-header-bar': true, 'toggleWidth': this.widthFlag}">
           <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '0 20px'}" type="md-menu" size="24"></Icon>
           <div class="user-info-box">
             <div class="icons-box">
@@ -27,7 +27,7 @@
             <Avatar icon="ios-person"/>
           </div>
         </Header>
-        <Content :style="{margin: '20px', background: '#fff', minHeight: '100vh', height: 'auto', marginBottom: '50px'}">
+        <Content :style="{margin: '88px 20px 20px 20px', background: '#fff', minHeight: '100vh', height: 'auto', marginBottom: '50px'}">
           <router-view></router-view>
         </Content>
       </Layout>
@@ -41,7 +41,23 @@ export default {
     return {
       isCollapsed: false,
       layoutStyle: {
-        marginLeft: ''
+        marginLeft: '200px'
+      },
+      styleObj: {
+        padding: 0,
+        position: 'fixed',
+        zIndex: 100
+      },
+      widthFlag: false
+    }
+  },
+  watch: {
+    isCollapsed (val, oldVal) {
+      console.log('val:' + val)
+      if (val !== oldVal && val === true) {
+        this.widthFlag = true
+      } else {
+        this.widthFlag = false
       }
     }
   },
@@ -94,6 +110,9 @@ export default {
     .layout-header-bar
       background: #fff
       box-shadow: 0 1px 1px rgba(0,0,0,.1)
+      width calc(100% - 200px)
       .rotate-icon
         transform: rotate(-90deg)
+  .toggleWidth
+    width calc(100% - 78px)!important
 </style>

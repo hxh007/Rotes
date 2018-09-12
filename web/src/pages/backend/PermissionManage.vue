@@ -29,6 +29,38 @@
         <Button type="primary" size="large" @click="createPermissionOk('formValidate')">确定</Button>
       </div>
     </Modal>
+    <!--编辑权限modal-->
+    <Modal v-model="editPermissionFlag"
+           title="编辑权限">
+      <Form ref="editFormValidate" :model="editFormValidate" :rules="ruleValidate" :label-width="80">
+        <FormItem label="部门">
+          <Select v-model="selectDepart">
+            <Option v-for="item in departLists" :value="item.id" :key="item.id">{{ item.label }}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="权限名">
+          <Select v-model="selectAction">
+            <Option v-for="item in actionLists" :value="item.value" :key="item.id">{{item.label}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="权限别称" prop="alias">
+          <Input type="text" v-model="editFormValidate.alias" placeholder="请输入权限别称,格式：部门-操作"></Input>
+        </FormItem>
+        <FormItem label="备注" prop="remark">
+          <Input type="textarea" v-model="editFormValidate.remark" :autosize="true" placeholder="请输入备注" />
+        </FormItem>
+        <FormItem label="状态">
+          <i-switch v-model="editFormValidate.status" size="large">
+            <span slot="open">激活</span>
+            <span slot="close">禁用</span>
+          </i-switch>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text" size="large" @click="editPermissionCancel('editFormValidate')">取消</Button>
+        <Button type="primary" size="large" @click="editPermissionOk('editFormValidate')">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -112,25 +144,33 @@ export default {
       departLists: [], // 可以最开始的时候加载出来
       actionLists: [],
       formValidate: {
-        // department: '',
-        // codeName: '',
+        department: '',
+        codeName: '',
         alias: ''
       },
       ruleValidate: {
-        // department: [
-        //   { required: true, message: '请选择部门名', trigger: 'change' }
-        // ],
-        // codeName: [
-        //   { required: true, message: '请选择权限名', trigger: 'change' }
-        // ],
+        department: [
+          { required: true, message: '请选择部门名', trigger: 'change' }
+        ],
+        codeName: [
+          { required: true, message: '请选择权限名', trigger: 'change' }
+        ],
         alias: [
           { required: true, message: '请输入权限别称,格式：部门-操作', trigger: 'blur' }
         ]
       },
+      editFormValidate: {
+        department: '',
+        codeName: '',
+        alias: '',
+        remark: '',
+        status: ''
+      },
       createPermissionFlag: false,
       editPermissionFlag: false,
       selectDepart: '',
-      selectAction: ''
+      selectAction: '',
+      curItem: {}
     }
   },
   methods: {
@@ -141,6 +181,8 @@ export default {
       }
     },
     createPermissionFunc () {
+      this.selectDepart = ''
+      this.selectAction = ''
       this.createPermissionFlag = true
     },
     createPermissionCancel (name) {
@@ -167,6 +209,45 @@ export default {
       } else {
         this.$Message.error(res.msg)
       }
+    },
+    show (params) {
+      this.curItem = JSON.parse(JSON.stringify(params.row))
+      console.log(this.curItem)
+      this.editFormValidate.id = this.curItem.id
+      this.selectAction = this.curItem.codename
+      this.selectDepart = this.curItem.derpartment_id
+      this.editFormValidate.alias = this.curItem.alias
+      this.editFormValidate.remark = this.curItem.remark
+      this.editFormValidate.status = this.curItem.status
+      this.editPermissionFlag = true
+    },
+    editPermissionCancel (name) {
+      this.$refs[name].resetFields()
+      this.editPermissionFlag = false
+    },
+    editPermissionOk (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+
+        }
+      })
+    },
+    remove (id) {
+      let that = this
+      this.$Modal.confirm({
+        title: '删除权限',
+        content: '确认要删除该权限？',
+        onOk: function () {
+          axios.delete('/back/permissions/' + id).then(function (response) {
+            if (response.data.code === 0) {
+              that.$Message.success('权限删除成功！')
+              axios.get('/back/permissions').then(that.loadAllPermissions)
+            } else {
+              that.$Message.error(response.data.msg)
+            }
+          })
+        }
+      })
     }
   },
   mounted () {
