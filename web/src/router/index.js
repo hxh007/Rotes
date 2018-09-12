@@ -4,6 +4,12 @@ import Layout from '@/components/Layout'
 import Home from '@/pages/home/Home'
 import Schedule from '@/pages/schedule/Schedule'
 import UserManage from '@/pages/backend/UserManage'
+import AdminManage from '@/pages/backend/AdminManage'
+import DepartManage from '@/pages/backend/DepartManage'
+import RoleManage from '@/pages/backend/RoleManage'
+import OperationManage from '@/pages/backend/OperationManage'
+import PermissionManage from '@/pages/backend/PermissionManage'
+
 Vue.use(Router)
 
 export default new Router({
@@ -31,6 +37,26 @@ export default new Router({
         path: '/backend/userManage',
         name: 'UserManage',
         component: UserManage
+      }, {
+        path: '/backend/permissionManage',
+        name: 'PermissionManage',
+        component: PermissionManage
+      }, {
+        path: '/backend/departManage',
+        name: 'DepartManage',
+        component: DepartManage
+      }, {
+        path: '/backend/roleManage',
+        name: 'RoleManage',
+        component: RoleManage
+      }, {
+        path: '/backend/adminManage',
+        name: 'AdminManage',
+        component: AdminManage
+      }, {
+        path: '/backend/operationManage',
+        name: 'OperationManage',
+        component: OperationManage
       }]
     }
   ]

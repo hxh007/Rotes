@@ -235,13 +235,13 @@ export default {
       },
       editRule1Validate: {
         userName: [{
-          required: true, message: '请输入用户名!', trigger: 'blur'
+          required: true, type: 'string', message: '请输入用户名!', trigger: 'blur'
         }],
         fullName: [
-          {required: true, message: '请输入姓名!', trigger: 'blur'}
+          {required: true, type: 'string', message: '请输入姓名!', trigger: 'blur'}
         ],
         mobile: [
-          {required: true, message: '请输入手机号码!', trigger: 'blur'}
+          {required: true, type: 'string', message: '请输入手机号码!', trigger: 'blur'}
         ],
         password: [
           {required: this.isEditPass, type: 'string', message: '请输入密码!', trigger: 'blur'}
@@ -327,10 +327,10 @@ export default {
         if (valid) {
           axios.post('/back/users', paramObj).then(this.createUserCallback)
           this.createFlag = false
+          this.$refs[name].resetFields()
         } else {
           this.$Message.error('Fail!')
         }
-        this.$refs[name].resetFields()
       })
     },
     editUserOk (name) {

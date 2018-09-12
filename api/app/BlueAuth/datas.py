@@ -58,8 +58,8 @@ DEFAULT_ROLES = [
 ]
 DEFAULT_TEMPTEXT = [
     {
-        'name': u'短信模板',
-        'content': u'记得明天9:00值班'
+        'name': 'SMS',
+        'content': u'央视网技术中心提醒：您大运维值班时间是明天（{TOMORROW}）9:00--9:00+1，谢谢。'
     }
 ]
 # 部门
