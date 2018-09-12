@@ -31,6 +31,11 @@ def duty_add():
             duty_time = datetime.strptime(date, '%Y-%m-%d').date()
             depart = Department.query.filter_by(id=departId, status=1).first().alias
             role = Role.query.filter_by(id=roleId, status=1).first().alias
+            # 部门角色关联关系
+            departRoles = Department.query.filter_by(id=departId, status=1).first().roles.all()
+            departRole_list = []
+            for departRole in departRoles:
+                departRole_list.append(departRole.id)
             user = User.query.filter_by(id=staffId, status=1).first()
         except:
             result['code'] = 1
@@ -39,6 +44,10 @@ def duty_add():
         if not user:
             result['code'] = 1
             result['msg'] = u'无此用户'
+            return jsonify(result)
+        if roleId not in departRole_list:
+            result['code'] = 1
+            result['msg'] = u'此部门无此角色'
             return jsonify(result)
         duty_name = user.fullname
         mobile = user.mobile
