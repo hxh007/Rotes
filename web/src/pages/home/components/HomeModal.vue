@@ -48,7 +48,7 @@
                   </thead>
                 </table>
               </div>
-              <div class="ivu-table-body ivu-table-overflowY" style="height: 100%">
+              <div class="ivu-table-body ivu-table-overflowY" style="height: 100%" v-if="tableList.length !== 0">
                 <table cellspacing="0" cellpadding="0" border="0" style="width: 663px">
                   <colgroup>
                     <col width="200">
@@ -84,6 +84,17 @@
                   </tbody>
                 </table>
               </div>
+              <div class="ivu-table-tip" style="" v-else>
+                <table cellspacing="0" cellpadding="0" border="0">
+                  <tbody>
+                  <tr>
+                    <td style="width: 591px">
+                      <span>暂无数据</span>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </Card>
@@ -96,18 +107,21 @@
               <FormItem label="所属部门">
                 <h3>{{this.$store.state.departName}}</h3>
               </FormItem>
-              <FormItem label="排班角色" prop="role">
-                <Select v-model="formValidate.role" placeholder="选择排班角色">
-                  <Option value="一线">一线</Option>
-                  <Option value="二线">二线</Option>
-                  <Option value="2.5线">2.5线</Option>
+              <!--<FormItem label="排班角色">-->
+                <!--<Select v-model="formValidate.role" placeholder="选择排班角色">-->
+                  <!--<Option value="一线">一线</Option>-->
+                  <!--<Option value="二线">二线</Option>-->
+                  <!--<Option value="2.5线">2.5线</Option>-->
+                <!--</Select>-->
+              <!--</FormItem>-->
+              <FormItem label="排班角色">
+                <Select v-model="selectRole">
+                  <Option v-for="item in roleLists" :value="item.id" :key="item.id">{{ item.label }}</Option>
                 </Select>
               </FormItem>
               <FormItem label="选择人员" prop="staff">
-                <Select v-model="formValidate.staff" placeholder="选择排班人员">
-                  <Option value="侯相会">侯相会</Option>
-                  <Option value="张可">张可</Option>
-                  <Option value="刘梦溪">刘孟希</Option>
+                <Select v-model="selectStaff">
+                  <Option v-for="item in staffLists" :value="item.staffId" :key="item.staffId">{{ item.label }}</Option>
                 </Select>
               </FormItem>
               <FormItem>
@@ -123,6 +137,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'HomeModal',
   data () {
@@ -133,14 +148,15 @@ export default {
         staff: ''
       },
       ruleValidate: {
-        role: [
-          { required: true, message: '排班角色不能为空！', trigger: 'change' }
-        ],
         staff: [
-          { required: true, message: '排班人员不能为空！', trigger: 'change' }
+          {required: true, message: '排班员工不能为空！', trigger: 'change'}
         ]
       },
-      departOneModalCopy: false
+      departOneModalCopy: false,
+      staffLists: [],
+      roleLists: [],
+      selectStaff: '',
+      selectRole: ''
     }
   },
   props: {
@@ -163,12 +179,36 @@ export default {
     },
     deleteDutyRecord (dutyId) {
       alert(dutyId)
+    },
+    getAllStaffSuccess (response) {
+      let res = response.data
+      if (res.code === 0) {
+        res.data.forEach((item, index) => {
+          this.staffLists.push({
+            staffId: item.id,
+            label: item.fullname
+          })
+        })
+      }
+    },
+    getRelatedRoles (response) {
+      let res = response.data
+      if (res.code === 0) {
+        res.data.forEach((item, index) => {
+          this.roleLists.push({
+            id: item.id,
+            label: item.alias
+          })
+        })
+      }
     }
   },
   mounted () {
     this.bus.$on('dayClickWatch', (param) => {
       this.departOneModalCopy = true
     })
+    axios.get('/back/users').then(this.getAllStaffSuccess)
+    axios.get('/back/departments/roles/' + this.$store.state.departId).then(this.getRelatedRoles)
   },
   updated () {
     //

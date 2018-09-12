@@ -135,7 +135,6 @@ export default {
       let res = data.data
       if (res.code === 0 && res.data) {
         // this.fcEvents = res.data
-        console.log(res)
         let departId = this.flag === 1 ? undefined : this.$store.state.departId
         res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
           let dutyListData = res.data.dutyList
@@ -169,7 +168,7 @@ export default {
       let departId = this.flag === 1 ? undefined : this.$store.state.departId
       let dateStart = departId === 0 ? this.monthviewFisrt : this.currentDay
       let dateEnd = departId === 0 ? this.monthviewLast : this.currentDay
-      axios.get('/api/search.json', {
+      axios.get('/back/dutyLists', {
         params: {
           departId: departId,
           dateStart: dateStart,
@@ -180,6 +179,7 @@ export default {
     searchDetailCallback (response) {
       this.tableList = []
       let res = response.data
+      console.log(res)
       if (res.code === 0) { // 返回正常
         if (this.flag === 0) { // 本部门
           let data = res.data[0]
