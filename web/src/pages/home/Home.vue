@@ -136,17 +136,22 @@ export default {
       if (res.code === 0 && res.data) {
         // this.fcEvents = res.data
         let departId = this.flag === 1 ? undefined : this.$store.state.departId
-        res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
-          let dutyListData = res.data.dutyList
-          if (departId) { // 某个部门
-            // let departRoles = res.data.departRoles // 某个部门才需要显示具体的角色
-            for (let i in dutyListData) {
-              if (i === item) { // 找到相同的日期
-              }
+        if (departId) { // 某个部门
+          res.data.dateList.forEach((item, date) => { // 遍历排班的所有日期
+            let dutyListData = res.data.dutyList
+            if (dutyListData[date]) { // 该日有值班记录
+
+            } else { // 该日没有值班记录
+              this.fcEvents.push({
+                'title': '无值班记录',
+                'start': this.monthviewFisrt,
+                'end': this.monthviewLast
+              })
             }
-          } else {
-          }
-        })
+          })
+        } else { // 所有部门
+
+        }
       }
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
@@ -178,6 +183,7 @@ export default {
     searchDetailCallback (response) {
       this.tableList = []
       let res = response.data
+      console.log(res)
       if (res.code === 0) { // 返回正常
         if (this.flag === 0) { // 本部门
           let data = res.data[0]
@@ -211,24 +217,38 @@ export default {
           let num
           res.data.forEach((pData, pindex) => { // 遍历每个部门的值班信息
             this.pNum = 0
-            pData.roleList.forEach((item, index) => {
+            pData.roleList.forEach((item, index) => { // 遍历每个部门下的每个角色，无论是否有值班记录
               for (let i in item) {
                 if (i === 'dutyList') {
-                  num = 0
-                  item[i].forEach((ite, ind) => { // 排班角色
+                  if (item.dutyList.length === 0) { // 某个角色下没有任何值班记录
+                    console.log(1)
                     this.tableList.push({
                       'departName': pData.departName,
                       'col1Rospan': pData.total,
                       'col1RospanShow': Boolean(this.pNum === 0),
                       'roleName': item.roleName,
-                      'col2Rospan': item.total,
-                      'col2RospanShow': Boolean(num === 0),
-                      'dutyName': ite.dutyName,
-                      'dutyId': ite.dutyId
+                      'col2Rospan': 1,
+                      'col2RospanShow': true,
+                      'dutyName': '--'
                     })
-                    num++
                     ++this.pNum
-                  })
+                  } else {
+                    num = 0
+                    item[i].forEach((ite, ind) => { // 排班角色
+                      this.tableList.push({
+                        'departName': pData.departName,
+                        'col1Rospan': pData.total,
+                        'col1RospanShow': Boolean(this.pNum === 0),
+                        'roleName': item.roleName,
+                        'col2Rospan': item.total,
+                        'col2RospanShow': Boolean(num === 0),
+                        'dutyName': ite.dutyName,
+                        'dutyId': ite.dutyId
+                      })
+                      num++
+                      ++this.pNum
+                    })
+                  }
                 }
               }
             })
