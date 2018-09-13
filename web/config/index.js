@@ -31,6 +31,7 @@ module.exports = {
           '^/back/roles': '/auth/roles',
           '^/back/duty': '/duty',
           '^/back/duties': '/dutys',
+          '^/back/dutysCount': '/dutysCount',
           '^/back/duty/:id': '/duty/:id',
           '^/back/dutyLists': '/dutyLists'
         }

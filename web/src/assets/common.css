@@ -10,3 +10,13 @@
   border-radius: 50%;
   background: red;
 }
+
+.noRecord{
+  background: orange!important;
+  color: #fff!important;
+}
+
+.warnRecord{
+  background: red!important;
+  color: #ffffff;
+}

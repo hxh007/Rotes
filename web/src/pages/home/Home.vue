@@ -97,8 +97,10 @@ export default {
       fcEvents: [],
       currentDay: '', // 点击的具体某个日期
       curMonthview: new Date().getMonth() + 1, // 获得点击的当月月份，8月,9月...,
-      monthviewFisrt: [new Date().getFullYear(), new Date().getMonth() + 1, '01'].join('-'),
-      monthviewLast: [new Date().getFullYear(), new Date().getMonth() + 1,
+      monthviewFisrt: [new Date().getFullYear(),
+        String(new Date().getMonth() + 1).length === 1 ? '0' + String(new Date().getMonth() + 1) : (new Date().getMonth() + 1), '01'].join('-'),
+      monthviewLast: [new Date().getFullYear(),
+        String(new Date().getMonth() + 1).length < 2 ? '0' + String(new Date().getMonth() + 1) : (new Date().getMonth() + 1),
         new Date().getDate(new Date().getFullYear(), new Date().getMonth() + 1, 0)].join('-'),
       toggleShow: Boolean(this.$store.state.userId),
       flag: 0, // 1--所有部门，0--当前用户所属部门
@@ -132,31 +134,81 @@ export default {
       this.searchDetail()
     },
     getDutySucc (data) {
+      this.fcEvents = []
       let res = data.data
+      console.log(res)
       if (res.code === 0 && res.data) {
         // this.fcEvents = res.data
         let departId = this.flag === 1 ? undefined : this.$store.state.departId
         if (departId) { // 某个部门
-          res.data.dateList.forEach((item, date) => { // 遍历排班的所有日期
+          res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
             let dutyListData = res.data.dutyList
-            if (dutyListData[date]) { // 该日有值班记录
-
+            if (dutyListData[item]) { // 该日有值班记录
+              for (let dutyName in dutyListData[item]) {
+                this.fcEvents.push({
+                  'title': dutyName + '——' + dutyListData[item][dutyName] + '条记录',
+                  'start': item,
+                  'end': item
+                })
+              }
             } else { // 该日没有值班记录
               this.fcEvents.push({
                 'title': '无值班记录',
-                'start': this.monthviewFisrt,
-                'end': this.monthviewLast
+                'start': item,
+                'end': item,
+                'cssClass': ['noRecord']
               })
             }
           })
         } else { // 所有部门
-
+          // 先将departId,departName与本来应有的角色对应起来
+          let perfectDepartInfo = []
+          for (let dId in res.data.departInfo) {
+            let myObj = {}
+            myObj = {
+              departId: dId,
+              departName: res.data.departInfo[dId],
+              roleLists: [] // 放应该有的roleId作对照用
+            }
+            for (let ddid in res.data.departRoles) {
+              myObj.roleLists.push(res.data.departRoles[ddid])
+            }
+            perfectDepartInfo.push(myObj)
+          }
+          res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
+            let dutyListData = res.data.dutyList
+            if (dutyListData[item]) { // dutyListData[item] --- 系统运维部:{一线: 1}
+              for (let i = 0; i < perfectDepartInfo.length; i++) {
+                let roles = perfectDepartInfo[i].roleLists
+                for (let dName in dutyListData[item]) {
+                  if (dName === perfectDepartInfo[i].departName) { // 当前日期中有该部门的值班记录
+                    roles.splice(roles.indexOf(dName), 1)
+                  }
+                }
+                if (roles.length > 0) { // 说明当前部门有些排班角色还未提交完全
+                  this.fcEvents.push({
+                    title: perfectDepartInfo[i].departName,
+                    start: item,
+                    end: item,
+                    cssClass: ['warnRecord']
+                  })
+                }
+              }
+            } else {
+              this.fcEvents.push({
+                'title': '无值班记录',
+                'start': item,
+                'end': item,
+                'cssClass': ['noRecord']
+              })
+            }
+          })
         }
       }
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
       let departId = this.flag === 1 ? undefined : this.$store.state.departId
-      axios.get('/back/duties', {
+      axios.get('/back/dutysCount', {
         params: {
           departId: departId,
           dateStart: this.monthviewFisrt,
@@ -166,6 +218,7 @@ export default {
     },
     changeToggleFunc () {
       this.flag = this.toggleShow === true ? 1 : 0
+      this.getDuties()
     },
     searchDetail () {
       // 先判断当前是显示所有部门的还是本部门的 1---所有部门 0---当前部门
@@ -183,7 +236,6 @@ export default {
     searchDetailCallback (response) {
       this.tableList = []
       let res = response.data
-      console.log(res)
       if (res.code === 0) { // 返回正常
         if (this.flag === 0) { // 本部门
           let data = res.data[0]
