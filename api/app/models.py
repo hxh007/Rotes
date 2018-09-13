@@ -83,12 +83,12 @@ def remove_user(table, user):
     result = db_session_add(table)
     return result
 
-# 角色用户表，建立用户和角色多对多的关系
-tb_role_user = db.Table(
-    "info_role_user",
-    db.Column("role_id", db.Integer, db.ForeignKey("info_role.id"), primary_key=True),
-    db.Column("user_id", db.Integer, db.ForeignKey("info_user.id"), primary_key=True)
-)
+# # 角色用户表，建立用户和角色多对多的关系
+# tb_role_user = db.Table(
+#     "info_role_user",
+#     db.Column("role_id", db.Integer, db.ForeignKey("info_role.id"), primary_key=True),
+#     db.Column("user_id", db.Integer, db.ForeignKey("info_user.id"), primary_key=True)
+# )
 
 # 部门用户表 建立部门和用户多对多的关系
 tb_department_user = db.Table(
@@ -251,8 +251,8 @@ class Role(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
     alias = db.Column(db.String(128))
-    # 角色用户关系
-    users = db.relationship('User', secondary=tb_role_user, backref=db.backref('roles', lazy='dynamic'), lazy='dynamic')
+    # # 角色用户关系
+    # users = db.relationship('User', secondary=tb_role_user, backref=db.backref('roles', lazy='dynamic'), lazy='dynamic')
 
     def to_dict(self):
         resp_dict = {
