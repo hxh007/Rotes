@@ -224,6 +224,8 @@ def dutyLists():
                                 dict3['dutyName'] = duty_obj1.duty_name
                                 dutyList1.append(dict3)
                         dict2['dutyList'] = dutyList1
+                        if dict2['dutyList'] == []:
+                            dict1['total'] += 1
                         roleList1.append(dict2)
                 dict1['roleList'] = roleList1
                 data.append(dict1)
@@ -473,6 +475,7 @@ def dutys():
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name
                 # count
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role]['count'] = 1
+    # result['data']['dutyList'].keys()
     result['data']['dutyList'] = dutyLists
     result['code'] = 0
     result['msg'] = u'所有部门值班记录'
@@ -521,11 +524,3 @@ def smsTemplate():
             result['code'] = 1
             result['msg'] = u'删除失败'
         return jsonify(result)
-
-
-@blue_watch.route('/sql_group_by', methods=['GET', 'POST'])
-def sql_group_by():
-    s = db.session.query(Duty.duty_time, sql.func.count(Duty.role)).filter(Duty.status == 1).group_by(Duty.role).all()
-    print s
-    return 'ok'
-    pass
