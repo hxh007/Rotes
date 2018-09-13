@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 from flask import render_template, request, jsonify
+from sqlalchemy import func, sql
 
 from . import blue_watch
 from app import db
@@ -50,6 +51,11 @@ def duty_add():
             result['msg'] = u'此部门无此角色'
             return jsonify(result)
         duty_name = user.fullname
+        is_duty = Duty.query.filter_by(depart=depart, role=role, duty_time=duty_time, duty_name=duty_name).first()
+        if is_duty:
+            result['code'] = 1
+            result['msg'] = u'已存在此条值班记录'
+            return jsonify(result)
         mobile = user.mobile
         ding_id = user.ding_id
         # 逻辑处理，入库
@@ -515,3 +521,11 @@ def smsTemplate():
             result['code'] = 1
             result['msg'] = u'删除失败'
         return jsonify(result)
+
+
+@blue_watch.route('/sql_group_by', methods=['GET', 'POST'])
+def sql_group_by():
+    s = db.session.query(Duty.duty_time, sql.func.count(Duty.role)).filter(Duty.status == 1).group_by(Duty.role).all()
+    print s
+    return 'ok'
+    pass
