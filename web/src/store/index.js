@@ -9,8 +9,8 @@ export default new Vuex.Store({
     username: '',
     roleId: 0,
     roleName: '',
-    departId: 1,
-    departName: '系统运维部'
+    departId: 2,
+    departName: '网络安全部'
   },
   mutations: {
     changeUserInfo (state, userInfo) {

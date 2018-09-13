@@ -29,7 +29,9 @@ module.exports = {
           '^/back/actiontypes': '/auth/actiontypes',
           '^/back/departments/roles/:id': '/auth/departments/roles/:id',
           '^/back/roles': '/auth/roles',
+          '^/back/duty': '/duty',
           '^/back/duties': '/dutys',
+          '^/back/duty/:id': '/duty/:id',
           '^/back/dutyLists': '/dutyLists'
         }
       }

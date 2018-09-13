@@ -10,7 +10,7 @@
         </i-switch>
       </div>
     </full-calendar>
-    <home-modal :show="departOneModal" :currentDay="currentDay" :tableList="tableList"></home-modal>
+    <home-modal :show="departOneModal" :currentDay="currentDay" :flag="flag"></home-modal>
     <Modal width="60%"
       v-model="departsAllShowDetail"
       title="Common Modal dialog box title"
@@ -141,7 +141,6 @@ export default {
           if (departId) { // 某个部门
             // let departRoles = res.data.departRoles // 某个部门才需要显示具体的角色
             for (let i in dutyListData) {
-              console.log(i)
               if (i === item) { // 找到相同的日期
               }
             }
@@ -179,7 +178,6 @@ export default {
     searchDetailCallback (response) {
       this.tableList = []
       let res = response.data
-      console.log(res)
       if (res.code === 0) { // 返回正常
         if (this.flag === 0) { // 本部门
           let data = res.data[0]
@@ -191,6 +189,8 @@ export default {
                 num = 0
                 item[i].forEach((ite, ind) => { // 排班角色
                   this.tableList.push({
+                    'departId': data.departId,
+                    'roleId': data.roleId,
                     'departName': data.departName,
                     'col1Rospan': data.total,
                     'col1RospanShow': Boolean(count === 0),
@@ -201,11 +201,12 @@ export default {
                     'dutyId': ite.dutyId
                   })
                   num++
+                  count++
                 })
               }
             }
-            count++
           })
+          this.bus.$emit('sendDepartData', this.tableList)
         } else { // 所有部门
           let num
           res.data.forEach((pData, pindex) => { // 遍历每个部门的值班信息
@@ -226,10 +227,10 @@ export default {
                       'dutyId': ite.dutyId
                     })
                     num++
+                    ++this.pNum
                   })
                 }
               }
-              ++this.pNum
             })
           })
         }

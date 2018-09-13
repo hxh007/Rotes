@@ -48,7 +48,7 @@
                   </thead>
                 </table>
               </div>
-              <div class="ivu-table-body ivu-table-overflowY" style="height: 100%" v-if="tableList.length !== 0">
+              <div class="ivu-table-body ivu-table-overflowY" style="height: 100%" v-if="dutyLists.length !== 0">
                 <table cellspacing="0" cellpadding="0" border="0" style="width: 663px">
                   <colgroup>
                     <col width="200">
@@ -57,7 +57,7 @@
                     <col width="72">
                   </colgroup>
                   <tbody class="ivu-table-tbody">
-                  <tr class="ivu-table-row"  v-for="(item, index) in tableList" :key="index">
+                  <tr class="ivu-table-row"  v-for="(item, index) in dutyLists" :key="index">
                     <td :rowspan="item.col1Rospan" v-if="item.col1RospanShow">
                       <div class="ivu-table-cell">
                         <span>{{item.departName}}</span>
@@ -107,13 +107,6 @@
               <FormItem label="所属部门">
                 <h3>{{this.$store.state.departName}}</h3>
               </FormItem>
-              <!--<FormItem label="排班角色">-->
-                <!--<Select v-model="formValidate.role" placeholder="选择排班角色">-->
-                  <!--<Option value="一线">一线</Option>-->
-                  <!--<Option value="二线">二线</Option>-->
-                  <!--<Option value="2.5线">2.5线</Option>-->
-                <!--</Select>-->
-              <!--</FormItem>-->
               <FormItem label="排班角色">
                 <Select v-model="selectRole">
                   <Option v-for="item in roleLists" :value="item.id" :key="item.id">{{ item.label }}</Option>
@@ -148,37 +141,116 @@ export default {
         staff: ''
       },
       ruleValidate: {
-        staff: [
-          {required: true, message: '排班员工不能为空！', trigger: 'change'}
-        ]
       },
       departOneModalCopy: false,
       staffLists: [],
       roleLists: [],
       selectStaff: '',
-      selectRole: ''
+      selectRole: '',
+      dutyLists: []
     }
   },
   props: {
     departOneModal: Boolean,
     currentDay: String,
-    tableList: Array
+    tableList: Array,
+    flag: Number
   },
   methods: {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.$Message.success('Success!')
+          axios.post('/back/duty', {
+            departId: this.$store.state.departId,
+            dutyDate: this.currentDay,
+            roleId: this.selectRole,
+            staffId: this.selectStaff
+          }).then(this.createDutySucess)
         } else {
           this.$Message.error('Fail!')
         }
       })
     },
+    createDutySucess (response) {
+      let res = response.data
+      console.log(res)
+      if (res.code === 0) {
+        this.$Message.success('值班记录提交成功！')
+        this.getAllDutyRecords()
+      }
+    },
+    getAllDutyRecords () {
+      axios.get('/back/dutyLists', {
+        params: {
+          departId: this.$store.state.departId,
+          dateStart: this.currentDay,
+          dateEnd: this.currentDay
+        }
+      }).then(this.loadAllRelatedDuties)
+    },
+    loadAllRelatedDuties (response) {
+      let res = response.data
+      this.dutyLists = []
+      console.log(res)
+      if (res.code === 0) { // 返回正常
+        if (this.flag === 0) { // 本部门
+          let data = res.data[0]
+          let count = 0
+          let num
+          data.roleList.forEach((item, index) => {
+            for (let i in item) {
+              if (i === 'dutyList') {
+                num = 0
+                item[i].forEach((ite, ind) => { // 排班角色
+                  this.dutyLists.push({
+                    'departId': data.departId,
+                    'roleId': data.roleId,
+                    'departName': data.departName,
+                    'col1Rospan': data.total,
+                    'col1RospanShow': Boolean(count === 0),
+                    'roleName': item.roleName,
+                    'col2Rospan': item.total,
+                    'col2RospanShow': Boolean(num === 0),
+                    'dutyName': ite.dutyName,
+                    'dutyId': ite.dutyId
+                  })
+                  num++
+                  count++
+                })
+              }
+            }
+          })
+          // 对对象列表进行排序
+          this.dutyLists.sort((obj1, obj2) => {
+            if (obj1['departId'] === obj2['departId']) { // 部门相同
+              if (obj1['roleId'] === obj2['roleId']) {
+                return -1
+              }
+            }
+          })
+        }
+      }
+    },
     handleReset (name) {
-      this.$refs[name].resetFields()
+      this.selectStaff = ''
+      this.selectRole = ''
     },
     deleteDutyRecord (dutyId) {
-      alert(dutyId)
+      let that = this
+      this.$Modal.confirm({
+        title: '删除排班记录',
+        content: '确认要删除该排班记录？',
+        onOk: function () {
+          axios.delete('/back/duty/' + dutyId).then(function (response) {
+            if (response.data.code === 0) {
+              that.getAllDutyRecords()
+              that.$Message.success('删除成功！')
+            } else {
+              that.$Message.error(response.data.msg)
+            }
+          })
+        }
+      })
     },
     getAllStaffSuccess (response) {
       let res = response.data
@@ -204,8 +276,13 @@ export default {
     }
   },
   mounted () {
+    this.selectRole = ''
+    this.selectDepart = ''
     this.bus.$on('dayClickWatch', (param) => {
       this.departOneModalCopy = true
+    })
+    this.bus.$on('sendDepartData', (param) => {
+      this.dutyLists = param
     })
     axios.get('/back/users').then(this.getAllStaffSuccess)
     axios.get('/back/departments/roles/' + this.$store.state.departId).then(this.getRelatedRoles)
