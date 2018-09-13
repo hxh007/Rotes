@@ -44,7 +44,7 @@ DEFAULT_ACTION = [
 ]
 DEFAULT_ROLES = [
     {
-        "name": "one",
+        "name": "LEVEL1",
         "alias": u"一线"
     },
     {
