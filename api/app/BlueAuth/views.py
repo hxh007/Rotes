@@ -70,7 +70,7 @@ def user(uid):
         return jsonify(result)
     if request.method == 'PUT':
         # 接收参数
-        para_list = ['username', 'fullname', 'mobile', 'password', 'tag', 'is_department', 'status', 'remark']
+        para_list = ['username', 'fullname', 'mobile', 'password', 'tag', 'is_department', 'status', 'remark', 'is_default_ops']
         paras = accept_para(para_list)
         # 参数校验
         if not all([paras[0], paras[1], paras[2]]):
@@ -81,7 +81,7 @@ def user(uid):
             result['code'] = 1
             result['msg'] = u'手机号不正确'
             return jsonify(result)
-        if (paras[5] or paras[6]) not in [0, 1]:
+        if (paras[5] or paras[6] or paras[8]) not in [0, 1]:
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
@@ -212,7 +212,7 @@ def role(rid):
         return jsonify(result)
 
 
-# 管理员列表查询和创建
+# 管理组列表查询和创建
 @blue_auth.route('/managements', methods=['GET', 'POST'])
 def managements():
     result = {'code': 0, 'data': [], 'msg': u'管理员列表查询成功'}

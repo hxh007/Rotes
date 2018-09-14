@@ -1,29 +1,89 @@
 # coding=utf-8
-
+# 超级管理员
 DEFAULT_SUPPER_USER = [
     {
     'username': 'admin',
     'fullname': u'超级管理员',
     'mobile': '13455556666',
     'password': 'a1s2d3f4',
-    'management': 's_management'
+    'management': 'S_MANAGEMENT'
     }
 ]
+# 管理组
 DEFAULT_SUPPER_MANAGEMENT = [
     {
-        'name': 's_management',
+        'name': 'S_MANAGEMENT',
         'alias': u'超级管理'
     },
     {
-        'name': 'd_management',
-        'alias': u'部门管理'
+        'name':"OP_MANAGEMENT",
+        'alias': u'系统运维部管理'
+    },
+
+    {
+        'name': 'SEC_MANAGEMENT',
+        'alias': u'网络安全部管理'
     },
     {
-        'name': 'b_management',
+        'name': 'PLDEV_MANAGEMENT',
+        'alias': u'平台开发部管理'
+    },
+    {
+        'name': 'VSOURCE_MANAGEMENT',
+        'alias': u'视频技术中心信源技术部管理'
+    },
+    {
+        'name': 'VAPP_MANAGEMENT',
+        'alias': u'视频技术中心应用开发部管理'
+    },
+    {
+        'name': 'VDATA_MANAGEMENT',
+        'alias': u'视频技术中心数据技术部管理'
+    },
+    {
+        'name': 'APP_MANAGEMENT',
+        'alias': u'应用开发部管理'
+    },
+    {
+        'name': 'IDC_MANAGEMENT',
+        'alias': u'基础设施部管理'
+    },
+    {
+        'name': 'MUTUAL_MANAGEMENT',
+        'alias': u'新媒体创新孵化中心\互动融合中心管理'
+    },
+    {
+        'name': 'IPTV_MANAGEMENT',
+        'alias': u'IP电视事业部管理'
+    },
+    {
+        'name': 'CCP_MANAGEMENT',
+        'alias': u'共产党员网管理'
+    },
+    {
+        'name': 'MD_MANAGEMENT',
+        'alias': u'移动开发中心管理'
+    },
+    {
+        'name': 'IT_MANAGEMENT',
+        'alias': u'IT支持组管理'
+    },
+    {
+        'name': 'UD_MANAGEMENT',
+        'alias': u'用户数据中心管理'
+
+    },
+    {
+        'name': 'TF_MANAGEMENT',
+        'alias': u'三、四线部门管理'
+    },
+    {
+        'name': 'BU_MANAGEMENT',
         'alias': u'业务管理'
     },
 
 ]
+# 操作类型
 DEFAULT_ACTION = [
     {
         "codename": "GET",
@@ -42,10 +102,11 @@ DEFAULT_ACTION = [
         "alias": u"删除"
     }
 ]
+# 角色
 DEFAULT_ROLES = [
     {
         "name": "LEVEL1",
-        "alias": u"一线"
+        "alias": u"一线值班"
     },
     {
         "name": "LEVEL2",
@@ -53,7 +114,7 @@ DEFAULT_ROLES = [
     },
     {
         "name": "LEVEL2.5",
-        "alias": u"2.5线"
+        "alias": u"2.5线值班"
     },
     {
         "name": "LEVEL3",
@@ -76,7 +137,6 @@ DEFAULT_DEPARTMENT = [
         'name':"MODULE_OP",
         'alias': u'系统运维部'
     },
-
     {
         'name': 'MODULE_SEC',
         'alias': u'网络安全部'
@@ -129,6 +189,10 @@ DEFAULT_DEPARTMENT = [
         'name': 'MODULE_UD',
         'alias': u'用户数据中心'
 
+    },
+    {
+        'name': 'MODULE_VT',
+        'alias': u'三、四线部'
     }
     ]
 # 权限
@@ -416,5 +480,25 @@ DEFAULT_PERMISSIONS = [
         'codename': 'DELETE',
         'alias': u'用户数据中心排班表：删除'
 
-    }
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'GET',
+        'alias': u'三、四线值班表：查看'
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'POST',
+        'alias': u'三、四线值班表：创建'
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'PUT',
+        'alias': u'三、四线值班表：修改'
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'DELETE',
+        'alias': u'三、四线值班表：删除'
+    },
 ]
