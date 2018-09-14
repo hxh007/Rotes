@@ -292,7 +292,13 @@ export default {
       this.dutyLists = param
     })
     axios.get('/back/users').then(this.getAllStaffSuccess)
-    axios.get('/back/departments/roles/' + this.$store.state.departId).then(this.getRelatedRoles)
+    axios.get('/back/relations', {
+      params: {
+        fid: this.$store.state.departId,
+        genre: 2,
+        not_add: 0
+      }
+    }).then(this.getRelatedRoles)
   },
   updated () {
     //

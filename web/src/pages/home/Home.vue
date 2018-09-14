@@ -101,7 +101,7 @@ export default {
       monthviewFisrt: this.$root.formatDate('yyyy-MM-dd', new Date([new Date().getFullYear(), new Date().getMonth() + 1, '01'].join('-'))),
       monthviewLast: this.$root.formatDate('yyyy-MM-dd', new Date([new Date().getFullYear(),
         new Date().getMonth() + 1,
-        new Date().getDate(new Date().getFullYear(), new Date().getMonth() + 1, 0)].join('-'))),
+        new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()].join('-'))),
       toggleShow: Boolean(this.$store.state.userId),
       flag: 0, // 1--所有部门，0--当前用户所属部门
       tableList: [], // 用于渲染modal中的表格数据
@@ -117,11 +117,7 @@ export default {
         let year = new Date(arguments[2]).getFullYear()
         let month = new Date(arguments[2]).getMonth() + 1
         let days = new Date(year, month, 0).getDate()
-        if (new Date([year, month, days].join('-')) > new Date(this.today)) {
-          this.monthviewLast = this.today
-        } else {
-          this.monthviewLast = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, days].join('-')))
-        }
+        this.monthviewLast = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, days].join('-')))
         this.getDuties()
       }
     },
