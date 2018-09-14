@@ -3,6 +3,7 @@
 from flask import request
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.models import Department, User, Role, Management, Permission
 
 # 数据库查询
 def get_table(result=None, table=None, execute=None, id=None, terms=None, relationship=None, page=None, per_page=None):
@@ -60,7 +61,7 @@ def get_table(result=None, table=None, execute=None, id=None, terms=None, relati
     # 表关系查询
     if execute == 'relationship':
         try:
-            data = relationship
+            data = relationship.all()
         except SQLAlchemyError:
             result['code'] = 1
             result['msg'] = u'数据查询失败'
@@ -95,4 +96,30 @@ def response_return(code=None, msg=None, data=None, manager=None):
         'data': data,
         'manager': manager,
         'msg' : msg
+    }
+
+
+# 查询关系类型
+class TableTelationType:
+    # 部门和用户多对多关系
+    DU = 1
+    # 部门和角色多对多关系
+    DR = 2
+    # 管理组和用户多对多关系
+    MU = 3
+    # 管理组和权限多对多关系
+    MP = 4
+    genre = {
+        DU: {'f_table': Department,
+             's_table': User
+        },
+        DR: {'f_table': Department,
+             's_table': Role
+        },
+        MU: {'f_table': Management,
+             's_table': User
+        },
+        MP: {'f_table': Management,
+             's_table': Permission
+        }
     }

@@ -71,24 +71,45 @@ def db_session_delete(table):
     db.session.delete(table)
     return db_session_commit()
 
-# 添加用户
-def append_user(table, user):
-    table.users.append(user)
+# 添加关系
+def append_relation(table, relation, genre):
+    # 添加部门用户、管理组用户
+    if genre == (1 or 3):
+        table.users.append(relation)
+    # 添加部门角色
+    if genre == 2:
+        table.roles.append(relation)
+    # 添加管理组权限
+    if genre == 4:
+        table.permissions.append(relation)
     result = db_session_add(table)
     return result
 
-# 删除用户
-def remove_user(table, user):
-    table.users.remove(user)
+# 删除关系
+def remove_relation(table, relation, genre):
+    # 添加部门用户、管理组用户
+    if genre == (1 or 3):
+        table.users.remove(relation)
+    # 添加部门角色
+    if genre == 2:
+        table.roles.remove(relation)
+    # 添加管理组权限
+    if genre == 4:
+        table.permissions.remove(relation)
     result = db_session_add(table)
     return result
 
-# # 角色用户表，建立用户和角色多对多的关系
-# tb_role_user = db.Table(
-#     "info_role_user",
-#     db.Column("role_id", db.Integer, db.ForeignKey("info_role.id"), primary_key=True),
-#     db.Column("user_id", db.Integer, db.ForeignKey("info_user.id"), primary_key=True)
-# )
+# 关系查询
+def query_relation(table, genre):
+    # 部门用户、管理组用户
+    if genre in [1, 3]:
+        return table.users
+    # 部门角色
+    if genre == 2:
+        return table.roles
+    # 管理组权限
+    if genre == 4:
+        return table.permissions
 
 # 部门用户表 建立部门和用户多对多的关系
 tb_department_user = db.Table(
@@ -228,19 +249,6 @@ class Department(db.Model, BaseModel):
         self.status = paras[2]
         self.remark = paras[3]
 
-
-    # 添加角色
-    def append_role(self, role):
-        self.roles.append(role)
-        result = db_session_add(self)
-        return result
-
-    # 删除角色
-    def remove_role(self, role):
-        self.roles.remove(role)
-        result = db_session_add(self)
-        return result
-
     def __repr__(self):
         return '<Department %r>' % self.name
 
@@ -251,8 +259,6 @@ class Role(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
     alias = db.Column(db.String(128))
-    # # 角色用户关系
-    # users = db.relationship('User', secondary=tb_role_user, backref=db.backref('roles', lazy='dynamic'), lazy='dynamic')
 
     def to_dict(self):
         resp_dict = {
@@ -279,7 +285,7 @@ class Role(db.Model, BaseModel):
         return '<Role %r>' % self.name
 
 
-# 管理表
+# 管理组表
 class Management(db.Model, BaseModel):
     __tablename__ = 'info_management'
     id = db.Column(db.Integer, primary_key=True, index=True)
@@ -310,16 +316,6 @@ class Management(db.Model, BaseModel):
         self.alias = paras[1]
         self.status = paras[2]
         self.remark = paras[3]
-
-    def append_permission(self, permission):
-        self.permissions.append(permission)
-        result = db_session_add(self)
-        return result
-
-    def remove_permission(self, permission):
-        self.permissions.remove(permission)
-        result = db_session_add(self)
-        return result
 
     def __repr__(self):
         return '<management %r>' % self.name

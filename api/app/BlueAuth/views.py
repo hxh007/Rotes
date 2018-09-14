@@ -2,12 +2,13 @@
 
 import re
 from flask import jsonify, request
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, not_
 
-from app.models import User, Department, db_session_add, db_session_delete, Role, Management, Permission, ActionType, \
-    append_user, remove_user
+from app.models import (User, Department, Role, Management, Permission,
+                        ActionType, db_session_add, db_session_delete,
+                        query_relation, append_relation, remove_relation)
 from . import blue_auth
-from .common import get_table, accept_para
+from .common import (get_table, accept_para, response_return, TableTelationType)
 
 
 # 资源
@@ -358,6 +359,7 @@ def action_types():
         return jsonify(result)
 
 
+# 操作类型删除
 @blue_auth.route('/actiontypes/<int:aid>', methods = ['DELETE'])
 def action_type(aid):
     result = {'code': 0, 'data': [], 'msg': u'查询成功'}
@@ -367,283 +369,65 @@ def action_type(aid):
     result = db_session_delete(action)
     return jsonify(result)
 
-
-# 关系
-# 部门用户查询，添加， 删除
-@blue_auth.route('/departments/users/<int:did>', methods = ['GET', 'POST', 'DELETE'])
-def department_user(did):
-    result = {'code': 0, 'data': [], 'msg': u'部门用户信息查询成功'}
-    # 部门和部门用户查询
-    department = get_table(result=result, table=Department, execute='get', id=did)
-    if type(department) == dict:
-        return jsonify(department)
-    d_users = get_table(result=result, execute='relationship', relationship=department.users)
-    if type(d_users) == dict:
-        return jsonify(d_users)
-    # 返回部门用户信息
+# 关系查询、添加、删除
+@blue_auth.route('/relations', methods=['GET', 'POST', 'DELETE'])
+def many_to_many():
+    # 父级资源id
+    fid = request.args.get('fid', None, type=int)
+    # 关系类型
+    genre = request.args.get('genre', None, type=int)
+    if not all([fid, genre]):
+        return jsonify(response_return(1, u'参数缺失'))
+    genre_dict = TableTelationType.genre.get(genre, None)
+    if not genre_dict:
+        return jsonify(response_return(1, u'genre无效'))
+    # 查询
+    f_table = get_table(result=response_return(), table=genre_dict['f_table'], execute='get', id=fid)
+    if isinstance(f_table, dict):
+        return jsonify(response_return(1, u'数据查询失败或无此数据'))
+    # 子资源
+    f_s_table = get_table(execute='relationship', relationship=query_relation(f_table, genre))
+    if isinstance(f_s_table, dict):
+        return jsonify(response_return(1, u'数据查询失败'))
+    # 返回关系信息
     if request.method == 'GET':
-        # 部门无用户
-        for d_user in d_users:
-            result['data'].append(d_user.to_dict())
-        return jsonify(result)
-    # 获取用户id
-    uid = request.json.get('uid')
-    # 参数校验
-    if not uid:
-        result['code'] = 1
-        result['msg'] = u'参数缺失'
-        return jsonify(result)
+        if not f_s_table:
+            return jsonify(response_return(0, data=[]))
+        # 查询类型
+        not_add = request.args.get('not_add', None, type=int)
+        data = []
+        if not not_add:
+            for s in f_s_table:
+                data.append(s.to_dict())
+        # 未添加子资源
+        s_table = genre_dict['s_table'].query.all()
+        for s in s_table:
+            if s not in f_s_table:
+                data.append(s.to_dict())
+        return jsonify(response_return(0, u'关系查询成功', data=data))
+    # 子级资源id
+    sid = request.json.get('sid')
+    # 子表id校验
+    if not sid:
+        return jsonify(response_return(1, u'sid参数缺失'))
     try:
-        uid = int(uid)
+        sid = int(sid)
     except Exception:
-        result['code'] = 1
-        result['msg'] = u'数据格式错误'
-        return jsonify(result)
-    # 需要添加或删除的用户
-    user = get_table(result=result, table=User, execute='get', id=uid)
-    if type(user) == dict:
-        return jsonify(user)
-    # 部门用户信息添加
+        return jsonify(response_return(1, u'sid格式错误'))
+    # 需要添加或删除的关系
+    s_table= get_table(result=response_return(), table=genre_dict['s_table'], execute='get', id=sid)
+    if isinstance(s_table, dict):
+        return jsonify(response_return(1, u'数据查询失败或无数据'))
+    # 添加关系
     if request.method == 'POST':
-        # 用户是否属于该部门
-        if user in d_users:
-            result['code'] = 1
-            result['msg'] = u'该用户已添加'
-            return jsonify(result)
-        # 添加用户
-        result = append_user(department, user)
+        if s_table in f_s_table:
+            return jsonify(response_return(1, u'关系已存在'))
+        # 添加关系
+        result = append_relation(f_table, s_table, genre)
         return jsonify(result)
-    # 删除部门用户
+    # 删除关系
     if request.method == 'DELETE':
-        # 用户是否属于该部门
-        if user not in d_users:
-            result['code'] = 1
-            result['msg'] = u'用户不存在，删除失败'
-            return jsonify(result)
-        # 删除用户
-        result = remove_user(department, user)
-        return jsonify(result)
-
-
-# 部门角色查询、添加和删除
-@blue_auth.route('/departments/roles/<int:did>', methods=['GET', 'POST', 'DELETE'])
-def department_roles(did):
-    result = {'code': 0, 'data': [], 'msg': u'部门角色信息查询成功'}
-    # 部门和部门角色查询
-    department = get_table(result=result, table=Department, execute='get', id=did)
-    if type(department) == dict:
-        return jsonify(department)
-    d_roles = get_table(result=result, execute='relationship', relationship=department.roles)
-    if type(d_roles) == dict:
-        return jsonify(d_roles)
-    # 返回部门角色信息
-    if request.method == 'GET':
-        # 部门无角色
-        for d_role in d_roles:
-            result['data'].append(d_role.to_dict())
-        return jsonify(result)
-    # 获取角色id
-    rid = request.json.get('rid')
-    # 参数校验
-    if not rid:
-        result['code'] = 1
-        result['msg'] = u'参数缺失'
-        return jsonify(result)
-    try:
-        rid = int(rid)
-    except Exception:
-        result['code'] = 1
-        result['msg'] = u'数据格式错误'
-        return jsonify(result)
-    # 需要添加或删除的角色
-    role = get_table(result=result, table=Role, execute='get', id=rid)
-    if type(role) == dict:
-        return jsonify(role)
-    # 部门角色信息添加
-    if request.method == 'POST':
-        # 角色是否已添加
-        if role in d_roles:
-            result['code'] = 1
-            result['msg'] = u'该角色已添加'
-            return jsonify(result)
-        # 添加角色
-        result = department.append_role(role)
-        return jsonify(result)
-    # 删除部门角色
-    if request.method == 'DELETE':
-        # 角色是否属于该部门
-        if role not in d_roles:
-            result['code'] = 1
-            result['msg'] = u'角色不存在，删除失败'
-            return jsonify(result)
-        # 删除角色
-        result = department.remove_role(role)
-        return jsonify(result)
-
-
-# # 角色用户查询、添加和删除
-# @blue_auth.route('/roles/users/<int:rid>', methods=['GET', 'POST', 'DELETE'])
-# def role_users(rid):
-#     result = {'code': 0, 'data': [], 'msg': u'角色用户信息查询成功'}
-#     # 角色和角色用户查询
-#     role = get_table(result=result, table=Role, execute='get', id=rid)
-#     if type(role) == dict:
-#         return jsonify(role)
-#     r_users = get_table(result=result, execute='relationship', relationship=role.users)
-#     if type(r_users) == dict:
-#         return jsonify(r_users)
-#     # 返回角色用户信息
-#     if request.method == 'GET':
-#         # 角色无用户
-#         for r_user in r_users:
-#             result['data'].append(r_user.to_dict())
-#         return jsonify(result)
-#     # 获取用户id
-#     uid = request.json.get('uid')
-#     # 参数校验
-#     if not uid:
-#         result['code'] = 1
-#         result['msg'] = u'参数缺失'
-#         return jsonify(result)
-#     try:
-#         uid = int(uid)
-#     except Exception:
-#         result['code'] = 1
-#         result['msg'] = u'数据格式错误'
-#         return jsonify(result)
-#     # 需要添加或删除的用户
-#     user = get_table(result=result, table=User, execute='get', id=uid)
-#     if type(user) == dict:
-#         return jsonify(user)
-#     # 角色用户信息添加
-#     if request.method == 'POST':
-#         # 用户是否属于该角色
-#         if user in r_users:
-#             result['code'] = 1
-#             result['msg'] = u'该用户已添加'
-#             return jsonify(result)
-#         # 添加用户
-#         result = append_user(role, user)
-#         return jsonify(result)
-#     # 删除角色用户
-#     if request.method == 'DELETE':
-#         # 用户是否属于该角色
-#         if user not in r_users:
-#             result['code'] = 1
-#             result['msg'] = u'用户不存在，删除失败'
-#             return jsonify(result)
-#         # 删除
-#         result = remove_user(role, user)
-#         return jsonify(result)
-
-
-# 管理员用户查询、添加和删除
-@blue_auth.route('/managements/users/<int:mid>', methods=['GET', 'POST', 'DELETE'])
-def management_users(mid):
-    result = {'code': 0, 'data': [], 'msg': u'管理人员信息查询成功'}
-    # 管理和管理人员查询
-    management = get_table(result=result, table=Management, execute='get', id=mid)
-    if type(management) == dict:
-        return jsonify(management)
-    m_users = get_table(result=result, execute='relationship', relationship=management.users)
-    if type(m_users) == dict:
-        return jsonify(m_users)
-    # 返回管理用户信息
-    if request.method == 'GET':
-        # 角色无用户
-        for m_user in m_users:
-            result['data'].append(m_user.to_dict())
-        return jsonify(result)
-    # 获取用户id
-    uid = request.json.get('uid')
-    # 参数校验
-    if not uid:
-        result['code'] = 1
-        result['msg'] = u'参数缺失'
-        return jsonify(result)
-    try:
-        uid = int(uid)
-    except Exception:
-        result['code'] = 1
-        result['msg'] = u'数据格式错误'
-        return jsonify(result)
-    # 需要添加或删除的用户
-    user = get_table(result=result, table=User, execute='get', id=uid)
-    if type(user) == dict:
-        return jsonify(user)
-    # 管理员信息添加
-    if request.method == 'POST':
-        # 用户是否属于管理员
-        if user in m_users:
-            result['code'] = 1
-            result['msg'] = u'该用户已添加'
-            return jsonify(result)
-        # 添加
-        result = append_user(management, user)
-        return jsonify(result)
-    # 删除管理用户
-    if request.method == 'DELETE':
-        # 用户是否是管理员
-        if user not in m_users:
-            result['code'] = 1
-            result['msg'] = u'用户不存在，删除失败'
-            return jsonify(result)
-        # 删除
-        result = remove_user(management, user)
-        return jsonify(result)
-
-
-# 管理员权限查询、添加和删除
-@blue_auth.route('/managements/permissions/<int:mid>', methods=['GET', 'POST', 'DELETE'])
-def management_permissions(mid):
-    result = {'code': 0, 'data': [], 'msg': u'管理员权限信息查询成功'}
-    # 管理和管理权限查询
-    management = get_table(result=result, table=Management, execute='get', id=mid)
-    if type(management) == dict:
-        return jsonify(management)
-    m_permissions = get_table(result=result, execute='relationship', relationship=management.permissions)
-    if type(m_permissions) == dict:
-        return jsonify(m_permissions)
-    # 返回管理权限信息
-    if request.method == 'GET':
-        # 无权限
-        for m_permission in m_permissions:
-            result['data'].append(m_permission.to_dict())
-        return jsonify(result)
-    # 获取权限id
-    pid = request.json.get('pid')
-    # 参数校验
-    if not pid:
-        result['code'] = 1
-        result['msg'] = u'参数缺失'
-        return jsonify(result)
-    try:
-        pid = int(pid)
-    except Exception:
-        result['code'] = 1
-        result['msg'] = u'数据格式错误'
-        return jsonify(result)
-    # 需要添加或删除的权限
-    permission = get_table(result=result, table=Permission, execute='get', id=pid)
-    if type(permission) == dict:
-        return jsonify(permission)
-    # 管理权限信息修改
-    if request.method == 'POST':
-        # 权限是否属于该管理
-        if permission in m_permissions:
-            result['code'] = 1
-            result['msg'] = u'该权限已添加'
-            return jsonify(result)
-        # 添加权限
-        result = management.append_permission(permission)
-        return jsonify(result)
-    # 删除权限
-    if request.method == 'DELETE':
-        # 权限是否属于该管理员
-        if permission not in m_permissions:
-            result['code'] = 1
-            result['msg'] = u'权限不存在，删除失败'
-            return jsonify(result)
-        # 删除
-        result = management.remove_permission(permission)
+        if s_table not in f_s_table:
+            return jsonify(response_return(1, u'关系不存在，删除失败'))
+        result = remove_relation(f_table, s_table, genre)
         return jsonify(result)

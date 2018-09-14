@@ -157,6 +157,9 @@ def dutyLists():
     except:
         result['msg'] = u'参数格式不正确'
         return jsonify(result)
+    if len(dateStart) != 10 or len(dateEnd) != 10:
+        result['msg'] = u'日期格式不规范'
+        return jsonify(result)
     # 1 日期
     result['date'] = dateStart
     # 2 值班数据
@@ -259,6 +262,9 @@ def dutysCount():
         e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
     except:
         result['msg'] = u'日期格式不正确'
+        return jsonify(result)
+    if len(dateStart) != 10 or len(dateEnd) != 10:
+        result['msg'] = u'日期格式不规范'
         return jsonify(result)
     # 3 日期列表
     dateList = []
@@ -371,6 +377,9 @@ def dutys():
         e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
     except:
         result['msg'] = u'日期格式不正确'
+        return jsonify(result)
+    if len(dateStart) != 10 or len(dateEnd) != 10:
+        result['msg'] = u'日期格式不规范'
         return jsonify(result)
     # 3 日期列表
     dateList = []
