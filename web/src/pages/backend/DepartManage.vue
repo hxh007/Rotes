@@ -87,7 +87,7 @@
                 <h3>请选择部门：</h3>
               </Col>
               <Col span="12">
-                <Select v-model="selectDepart" @on-change="loadRoles">
+                <Select v-model="selectDepart" @on-change="loadUsers">
                   <Option v-for="item in selectedDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
                 </Select>
               </Col>
@@ -95,12 +95,12 @@
           </div>
           <div class="hasSelectedRoles">
             <h3>已有的用户列表</h3>
-            <Table border :columns="hasSelectedUserCols" :data="hasSelectedUsers"></Table>
+            <Table height="300" border :columns="hasSelectedUserCols" :data="hasSelectedUsers"></Table>
           </div>
           <Divider></Divider>
           <div class="couldSelectedRoles">
             <h3>可选择用户列表</h3>
-            <Table border :columns="couldSelectedUserCols" :data="couldSelectedUsers"></Table>
+            <Table height="300" border :columns="couldSelectedUserCols" :data="couldSelectedUsers"></Table>
           </div>
         </Col>
       </Row>
@@ -264,8 +264,60 @@ export default {
           }
         }
       ],
-      hasSelectedUserCols: [],
-      couldSelectedUserCols: [],
+      hasSelectedUserCols: [
+        {
+          title: '用户名',
+          key: 'fullname'
+        },
+        {
+          title: 'Action',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.removeUser(params.row.id)
+                  }
+                }
+              }, '删除')
+            ])
+          }
+        }
+      ],
+      couldSelectedUserCols: [
+        {
+          title: '用户名',
+          key: 'fullname'
+        },
+        {
+          title: 'Action',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.addUser(params.row.id)
+                  }
+                }
+              }, '添加')
+            ])
+          }
+        }
+      ],
       hasSelectedRoles: [],
       couldSelectedRoles: [],
       hasSelectedUsers: [],
@@ -399,22 +451,22 @@ export default {
       }
     },
     removeRole (id) { // 删除已添加的角色
-      axios.post('/back/relations', {
-        fid: this.selectDepart,
-        genre: 2,
-        sid: id
+      axios.delete('/back/relations?fid=' + this.selectDepart + '&genre=' + 2, {
+        data: {
+          sid: id
+        }
       }).then(this.removeRoleSuccess)
     },
     removeRoleSuccess (response) {
       let res = response.data
       if (res.code === 0) { // 删除成功
         this.loadRoles()
+      } else {
+        this.$Message.error(res.msg)
       }
     },
     addRole (id) { // 添加角色给指定部门
-      axios.post('/back/relations', {
-        fid: this.selectDepart,
-        genre: 2,
+      axios.post('/back/relations?fid=' + this.selectDepart + '&genre=' + 2, {
         sid: id
       }).then(this.addRoleSuccess)
     },
@@ -422,9 +474,69 @@ export default {
       let res = response.data
       if (res.code === 0) {
         this.loadRoles()
+      } else {
+        this.$Message.error(res.msg)
       }
     },
-    usersManageFunc () {}
+    usersManageFunc () {
+      this.userToDepartFlag = true
+    },
+    loadUsers () {
+      axios.get('/back/relations', { // 已添加关系
+        params: {
+          fid: this.selectDepart,
+          genre: 1,
+          not_add: 0
+        }
+      }).then(this.loadAllHasSelectedUsers)
+      axios.get('/back/relations', { // 未添加关系
+        params: {
+          fid: this.selectDepart,
+          genre: 1,
+          not_add: 1
+        }
+      }).then(this.loadAllCouldSelectedUsers)
+    },
+    loadAllHasSelectedUsers (response) {
+      let res = response.data
+      if (res.code === 0) {
+        this.hasSelectedUsers = res.data
+      }
+    },
+    loadAllCouldSelectedUsers (response) {
+      let res = response.data
+      if (res.code === 0) {
+        this.couldSelectedUsers = res.data
+      }
+    },
+    addUser (id) { // 添加用户给指定部门
+      axios.post('/back/relations?fid=' + this.selectDepart + '&genre=' + 1, {
+        sid: id
+      }).then(this.addUserSuccess)
+    },
+    addUserSuccess (response) {
+      let res = response.data
+      if (res.code === 0) {
+        this.loadUsers()
+      } else {
+        this.$Message.error(res.msg)
+      }
+    },
+    removeUser (id) { // 删除已添加的用户
+      axios.delete('/back/relations?fid=' + this.selectDepart + '&genre=' + 1, {
+        data: {
+          sid: id
+        }
+      }).then(this.removeUserSuccess)
+    },
+    removeUserSuccess (response) {
+      let res = response.data
+      if (res.code === 0) { // 删除成功
+        this.loadUsers()
+      } else {
+        this.$Message.error(res.msg)
+      }
+    }
   },
   mounted () {
     axios.get('/back/departments').then(this.loadAllDeparts)
