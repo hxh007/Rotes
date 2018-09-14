@@ -3,7 +3,7 @@
     <div class="action-box" :style="{'overflow': 'hidden'}">
       <h3 :style="{'float': 'left'}">部门管理</h3>
       <Button :style="{'float': 'right'}" type="primary" size="small" @click="createDepartFunc">新建</Button>
-      <Button :style="{'float': 'right', 'marginRight': '10px'}" type="primary" size="small">角色管理</Button>
+      <Button :style="{'float': 'right', 'marginRight': '10px'}" type="primary" size="small" @click="roleManageFunc">角色管理</Button>
     </div>
     <Divider/>
     <Table border :columns="columns" :data="departLists"></Table>
@@ -48,6 +48,34 @@
         <Button type="primary" size="large" @click="editDepartOk('editFormValidate')">确定</Button>
       </div>
     </Modal>
+    <!--编辑部门的角色-->
+    <Modal v-model="roleToDepartFlag" fullscreen title="部门角色管理">
+      <Row :style="{'marginTop': '20px'}">
+        <Col span="18" offset="3">
+          <div class="selectDepart">
+            <Row>
+              <Col span="4">
+                <h3>请选择部门：</h3>
+              </Col>
+              <Col span="12">
+                <Select v-model="selectDepart" @on-change="loadRoles">
+                  <Option v-for="item in selectedDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
+                </Select>
+              </Col>
+            </Row>
+          </div>
+          <div class="hasSelectedRoles">
+            <h3>已有的角色列表</h3>
+            <Table border :columns="hasSelectedCols" :data="hasSelectedRoles"></Table>
+          </div>
+          <Divider></Divider>
+          <div class="couldSelectedRoles">
+            <h3>可选择角色列表</h3>
+            <Table border :columns="couldSelectedCols" :data="couldSelectedRoles"></Table>
+          </div>
+        </Col>
+      </Row>
+    </Modal>
   </div>
 </template>
 
@@ -57,9 +85,12 @@ export default {
   name: 'DepartManage',
   data () {
     return {
+      model9: '',
       departLists: [],
+      selectedDeparts: [],
       createDepartFlag: false,
       editDepartFlag: false,
+      roleToDepartFlag: false,
       columns: [
         {
           title: '部门名',
@@ -147,7 +178,64 @@ export default {
         departAlias: '',
         remark: ''
       },
-      curItem: {}
+      curItem: {},
+      selectDepart: '',
+      hasSelectedCols: [
+        {
+          title: '角色名',
+          key: 'alias'
+        },
+        {
+          title: 'Action',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.remove(params.row.id)
+                  }
+                }
+              }, '删除')
+            ])
+          }
+        }
+      ],
+      couldSelectedCols: [
+        {
+          title: '角色名',
+          key: 'alias'
+        },
+        {
+          title: 'Action',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.remove(params.row.id)
+                  }
+                }
+              }, '添加')
+            ])
+          }
+        }
+      ],
+      hasSelectedRoles: [],
+      couldSelectedRoles: []
     }
   },
   methods: {
@@ -156,6 +244,13 @@ export default {
       if (res.code === 0) {
         this.departLists = res.data
       }
+      this.departLists.forEach((item, index) => {
+        this.selectedDeparts.push({
+          label: item.alias,
+          name: item.name,
+          id: item.id
+        })
+      })
     },
     createDepartFunc () {
       this.createDepartFlag = true
@@ -237,6 +332,37 @@ export default {
           })
         }
       })
+    },
+    roleManageFunc () {
+      this.roleToDepartFlag = true
+    },
+    loadRoles () {
+      axios.get('/back/relations', { // 已添加关系
+        params: {
+          fid: this.selectDepart,
+          genre: 2,
+          not_add: 0
+        }
+      }).then(this.loadAllHasSelectedRoles)
+      axios.get('/back/relations', { // 未添加关系
+        params: {
+          fid: this.selectDepart,
+          genre: 2,
+          not_add: 1
+        }
+      }).then(this.loadAllCouldSelectedRoles)
+    },
+    loadAllHasSelectedRoles (response) {
+      let res = response.data
+      if (res.code === 0) {
+        this.hasSelectedRoles = res.data
+      }
+    },
+    loadAllCouldSelectedRoles (response) {
+      let res = response.data
+      if (res.code === 0) {
+        this.couldSelectedRoles = res.data
+      }
     }
   },
   mounted () {
@@ -245,6 +371,13 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="stylus">
+.hasSelectedRoles
+  margin-top 30px
+  h3
+    margin-bottom 10px
+.couldSelectedRoles
+  margin-top 30px
+  h3
+    margin-bottom 10px
 </style>

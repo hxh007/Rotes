@@ -50,6 +50,17 @@ class TempText(BaseModel, db.Model):
         return '<TempText %r>' % self.content
 
 
+# 通知操作记录
+class NoticeRecord(BaseModel, db.Model):
+    __tablename__ = 'notice_record'
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    kind = db.Column(db.String(64), index=True, nullable=False, default='UNKNOW')
+    info = db.Column(db.String(256), nullable=True)
+
+    def __repr__(self):
+        return '<NoticeRecord %r|%r>' %(self.kind, self.id)
+
+
 # 数据提交
 def db_session_commit():
     result = {'code': 0, 'msg': '数据提交成功'}
