@@ -22,7 +22,7 @@
         </template>
         <MenuItem name="/backend/adminManage">
           <router-link tag="li" to="/backend/adminManage">
-            管理员
+            管理组
           </router-link>
         </MenuItem>
         <MenuItem name="/backend/userManage">
