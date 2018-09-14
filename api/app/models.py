@@ -149,6 +149,7 @@ class User(db.Model, BaseModel):
     mobile = db.Column(db.String(128), nullable=False, unique=True) # 手机号
     tag = db.Column(db.String(64)) # 工号
     is_department = db.Column(db.Boolean, default=False)  # 部门负责人，钉钉isLeader
+    is_default_ops = db.Column(db.Boolean, default=False) # 默认进群人员
     password_hash = db.Column(db.String(128))
     login_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
@@ -183,6 +184,7 @@ class User(db.Model, BaseModel):
             'mobile': self.mobile,
             'tag': self.tag,
             'is_department': self.is_department,
+            'is_default_ops': self.is_default_ops,
             'ding_id': self.ding_id,
             'status': self.status,
             'login_time': self.login_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -191,6 +193,7 @@ class User(db.Model, BaseModel):
         }
         return resp_dict
 
+    # 创建记录
     def add_data(self, paras):
         self.username = paras[0]
         self.fullname = paras[1]
@@ -198,6 +201,7 @@ class User(db.Model, BaseModel):
         self.password = paras[3]
         self.tag = paras[4]
 
+    # 修改记录
     def change_data(self, paras):
         self.username = paras[0]
         self.fullname = paras[1]
@@ -206,6 +210,7 @@ class User(db.Model, BaseModel):
         self.is_department = paras[5]
         self.status = paras[6]
         self.remark = paras[7]
+        self.is_default_ops = paras[8]
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -228,11 +233,30 @@ class Department(db.Model, BaseModel):
     deptid = db.Column(db.String(256), unique=True, index=True) # 钉钉id
     pid = db.Column(db.String(256),index=True) # 上级部门id
 
+    # 该部门所有角色列表
+    def to_roles_list(self):
+        to_list = []
+        for r in self.roles.all():
+            r_dict = {}
+            r_dict[r.id] = r.alias
+            to_list.append(r_dict)
+        return to_list
+
+    # 该部门所有用户列表
+    def to_users_list(self):
+        to_list = []
+        for u in self.users.all():
+            u_dict = {}
+            u_dict[u.id] = u.fullname
+            to_list.append(u_dict)
+        return to_list
     def to_dict(self):
         resp_dict = {
             'id': self.id,
             'name': self.name,
             'alias': self.alias,
+            'roles': self.to_roles_list(),
+            'users': self.to_users_list(),
             'remark': self.remark,
             'status': self.status,
             'last_change': self.lastchange
@@ -296,11 +320,31 @@ class Management(db.Model, BaseModel):
     # 管理员权限关系
     permissions = db.relationship('Permission', secondary=tb_management_permission, backref=db.backref('p_managements', lazy='dynamic'), lazy='dynamic')
 
+    # 该管理组所有用户列表
+    def to_users_list(self):
+        to_list = []
+        for u in self.users.all():
+            u_dict = {}
+            u_dict[u.id] = u.fullname
+            to_list.append(u_dict)
+        return to_list
+
+    # 该管理组所有用户列表
+    def to_permissions_list(self):
+        to_list = []
+        for p in self.permissions.all():
+            p_dict = {}
+            p_dict[p.id] = p.alias
+            to_list.append(p_dict)
+        return to_list
+
     def to_dict(self):
         resp_dict = {
             'id': self.id,
             'name': self.name,
             'alias': self.alias,
+            'users': self.to_users_list(),
+            'permissions': self.to_permissions_list(),
             'remark': self.remark,
             'status': self.status,
             'lastchange': self.lastchange
