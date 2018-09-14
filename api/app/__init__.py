@@ -5,6 +5,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_apscheduler import APScheduler
+from apscheduler.events import (EVENT_JOB_ERROR, EVENT_JOB_EXECUTED)
+
 
 from config import config, Config
 # 实例化sqlalchemy
@@ -30,7 +32,9 @@ def create_app(config_name):
     db.init_app(app)
     CORS(app, origins=config[config_name].CORS_URL)
     
+    from .BlueCron.job import listener_cronEvent
     cron_scheduler.init_app(app)
+    cron_scheduler.add_listener(listener_cronEvent, EVENT_JOB_EXECUTED|EVENT_JOB_ERROR)
     cron_scheduler.start(paused=True)
 
     # 注册蓝图
