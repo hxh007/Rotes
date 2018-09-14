@@ -4,6 +4,7 @@
       <h3 :style="{'float': 'left'}">部门管理</h3>
       <Button :style="{'float': 'right'}" type="primary" size="small" @click="createDepartFunc">新建</Button>
       <Button :style="{'float': 'right', 'marginRight': '10px'}" type="primary" size="small" @click="roleManageFunc">角色管理</Button>
+      <Button :style="{'float': 'right', 'marginRight': '10px'}" type="primary" size="small" @click="usersManageFunc">用户管理</Button>
     </div>
     <Divider/>
     <Table border :columns="columns" :data="departLists"></Table>
@@ -76,6 +77,34 @@
         </Col>
       </Row>
     </Modal>
+    <!--编辑部门的用户-->
+    <Modal v-model="userToDepartFlag" fullscreen title="部门用户管理">
+      <Row :style="{'marginTop': '20px'}">
+        <Col span="18" offset="3">
+          <div class="selectDepart">
+            <Row>
+              <Col span="4">
+                <h3>请选择部门：</h3>
+              </Col>
+              <Col span="12">
+                <Select v-model="selectDepart" @on-change="loadRoles">
+                  <Option v-for="item in selectedDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
+                </Select>
+              </Col>
+            </Row>
+          </div>
+          <div class="hasSelectedRoles">
+            <h3>已有的用户列表</h3>
+            <Table border :columns="hasSelectedUserCols" :data="hasSelectedUsers"></Table>
+          </div>
+          <Divider></Divider>
+          <div class="couldSelectedRoles">
+            <h3>可选择用户列表</h3>
+            <Table border :columns="couldSelectedUserCols" :data="couldSelectedUsers"></Table>
+          </div>
+        </Col>
+      </Row>
+    </Modal>
   </div>
 </template>
 
@@ -91,6 +120,7 @@ export default {
       createDepartFlag: false,
       editDepartFlag: false,
       roleToDepartFlag: false,
+      userToDepartFlag: false,
       columns: [
         {
           title: '部门名',
@@ -199,7 +229,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.remove(params.row.id)
+                    this.removeRole(params.row.id)
                   }
                 }
               }, '删除')
@@ -226,7 +256,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.remove(params.row.id)
+                    this.addRole(params.row.id)
                   }
                 }
               }, '添加')
@@ -234,8 +264,12 @@ export default {
           }
         }
       ],
+      hasSelectedUserCols: [],
+      couldSelectedUserCols: [],
       hasSelectedRoles: [],
-      couldSelectedRoles: []
+      couldSelectedRoles: [],
+      hasSelectedUsers: [],
+      couldSelectedUsers: []
     }
   },
   methods: {
@@ -363,7 +397,34 @@ export default {
       if (res.code === 0) {
         this.couldSelectedRoles = res.data
       }
-    }
+    },
+    removeRole (id) { // 删除已添加的角色
+      axios.post('/back/relations', {
+        fid: this.selectDepart,
+        genre: 2,
+        sid: id
+      }).then(this.removeRoleSuccess)
+    },
+    removeRoleSuccess (response) {
+      let res = response.data
+      if (res.code === 0) { // 删除成功
+        this.loadRoles()
+      }
+    },
+    addRole (id) { // 添加角色给指定部门
+      axios.post('/back/relations', {
+        fid: this.selectDepart,
+        genre: 2,
+        sid: id
+      }).then(this.addRoleSuccess)
+    },
+    addRoleSuccess (response) {
+      let res = response.data
+      if (res.code === 0) {
+        this.loadRoles()
+      }
+    },
+    usersManageFunc () {}
   },
   mounted () {
     axios.get('/back/departments').then(this.loadAllDeparts)
