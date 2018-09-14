@@ -400,10 +400,11 @@ def many_to_many():
             for s in f_s_table:
                 data.append(s.to_dict())
         # 未添加子资源
-        s_table = genre_dict['s_table'].query.all()
-        for s in s_table:
-            if s not in f_s_table:
-                data.append(s.to_dict())
+        else:
+            s_table = genre_dict['s_table'].query.all()
+            for s in s_table:
+                if s not in f_s_table:
+                    data.append(s.to_dict())
         return jsonify(response_return(0, u'关系查询成功', data=data))
     # 子级资源id
     sid = request.json.get('sid')
