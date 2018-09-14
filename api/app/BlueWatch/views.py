@@ -381,6 +381,7 @@ def dutys():
     if len(dateStart) != 10 or len(dateEnd) != 10:
         result['msg'] = u'日期格式不规范'
         return jsonify(result)
+    # todo 起线程任务
     # 3 日期列表
     dateList = []
     while dateStart <= dateEnd:
@@ -396,11 +397,18 @@ def dutys():
         if not depart_obj:
             result['msg'] = u'部门不存在'
             return jsonify(result)
-        # 4.1 部门信息
-        departInfo = {}
-        departInfo[depart_obj.id] = depart_obj.alias
+        # 4.1 部门及负责人信息
+        departInfo = defaultdict(dict)
+        # 4.2 部门负责人
+        is_depart_objs = depart_obj.users.all()
+        is_depart_list = []
+        if is_depart_objs:
+            for is_depart_obj in is_depart_objs:
+                if is_depart_obj.is_department:
+                    is_depart_list.append(is_depart_obj.fullname)
+        departInfo[depart_obj.id][depart_obj.alias] = is_depart_list
         result['data']['dapartInfo'] = departInfo
-        # 4.2 部门角色信息
+        # 4.3 部门角色信息
         roleList = {}
         roleLists = {}
         role_objs = depart_obj.roles.all()
@@ -433,14 +441,24 @@ def dutys():
         result['code'] = 0
         return jsonify(result)
     # 5 全部门
-    # 5.1 部门角色信息
-    """{部门id: {角色id: 角色名},}"""
-    departList = {}
+    # 5.1 部门及负责人信息
+    # 5.2 部门角色关系信息
+    """{部门id: {部门名: [负责人名字列表]},}
+        {部门id: {角色id: 角色名},}"""
+    departList = defaultdict(dict)
     depart_roles = defaultdict(dict)
     depart_objs = Department.query.all()
     if depart_objs:
         for depart_obj in depart_objs:
-            departList[depart_obj.id] = depart_obj.alias
+            # 部门负责人
+            is_depart_objs = depart_obj.users.all()
+            is_depart_list = []
+            if is_depart_objs:
+                for is_depart_obj in is_depart_objs:
+                    if is_depart_obj.is_department:
+                        is_depart_list.append(is_depart_obj.fullname)
+            departList[depart_obj.id][depart_obj.alias] = is_depart_list
+            # 部门角色关系
             role_objs = depart_obj.roles.all()
             if role_objs:
                 for role_obj in role_objs:
@@ -484,7 +502,6 @@ def dutys():
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name
                 # count
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role]['count'] = 1
-    # result['data']['dutyList'].keys()
     result['data']['dutyList'] = dutyLists
     result['code'] = 0
     result['msg'] = u'所有部门值班记录'
