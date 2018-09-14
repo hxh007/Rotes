@@ -9,6 +9,7 @@ import DepartManage from '@/pages/backend/DepartManage'
 import RoleManage from '@/pages/backend/RoleManage'
 import OperationManage from '@/pages/backend/OperationManage'
 import PermissionManage from '@/pages/backend/PermissionManage'
+import MessageManage from '@/pages/backend/MessageManage'
 
 Vue.use(Router)
 
@@ -57,6 +58,10 @@ export default new Router({
         path: '/backend/operationManage',
         name: 'OperationManage',
         component: OperationManage
+      }, {
+        path: '/backend/messageManage',
+        name: 'messageManage',
+        component: MessageManage
       }]
     }
   ]

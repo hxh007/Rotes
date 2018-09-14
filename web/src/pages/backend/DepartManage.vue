@@ -3,6 +3,7 @@
     <div class="action-box" :style="{'overflow': 'hidden'}">
       <h3 :style="{'float': 'left'}">部门管理</h3>
       <Button :style="{'float': 'right'}" type="primary" size="small" @click="createDepartFunc">新建</Button>
+      <Button :style="{'float': 'right', 'marginRight': '10px'}" type="primary" size="small">角色管理</Button>
     </div>
     <Divider/>
     <Table border :columns="columns" :data="departLists"></Table>

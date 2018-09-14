@@ -212,10 +212,9 @@ export default {
     },
     show (params) {
       this.curItem = JSON.parse(JSON.stringify(params.row))
-      console.log(this.curItem)
       this.editFormValidate.id = this.curItem.id
       this.selectAction = this.curItem.codename
-      this.selectDepart = this.curItem.derpartment_id
+      this.selectDepart = this.curItem.department_id
       this.editFormValidate.alias = this.curItem.alias
       this.editFormValidate.remark = this.curItem.remark
       this.editFormValidate.status = this.curItem.status
@@ -228,9 +227,27 @@ export default {
     editPermissionOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-
+          axios.put('/back/permissions/' + this.editFormValidate.id, {
+            department_id: this.selectDepart,
+            codename: this.selectAction,
+            alias: this.editFormValidate.alias,
+            remark: this.editFormValidate.remark,
+            status: this.editFormValidate.status
+          }).then(this.editPermissionSuccess)
         }
       })
+    },
+    editPermissionSuccess (response) {
+      let res = response.data
+      if (res.code === 0) { // 编辑成功
+        this.$Message.success('编辑成功！')
+        this.$refs.editFormValidate.resetFields()
+        axios.get('/back/permissions').then(this.loadAllPermissions)
+        this.editPermissionFlag = false
+      } else {
+        this.$Message.error(res.msg)
+        this.editPermissionFlag = true
+      }
     },
     remove (id) {
       let that = this

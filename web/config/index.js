@@ -24,17 +24,18 @@ module.exports = {
           '^/back/admin': '/auth/managements',
           '^/back/users/:id': '/auth/users/:id',
           '^/back/permissions': '/auth/permissions',
+          '^/back/permissions/:id': '/auth/permissions/:id',
           '^/back/departments': '/auth/departments',
           '^/back/departments/:id': '/auth/departments/:id',
           '^/back/actiontypes': '/auth/actiontypes',
-          // '^/back/departments/roles/:id': '/auth/departments/roles/:id',
           '^/back/relations': '/auth/relations',
           '^/back/roles': '/auth/roles',
           '^/back/duty': '/duty',
           '^/back/duties': '/dutys',
           '^/back/dutysCount': '/dutysCount',
           '^/back/duty/:id': '/duty/:id',
-          '^/back/dutyLists': '/dutyLists'
+          '^/back/dutyLists': '/dutyLists',
+          '^/back/tempContent': '/tempContent'
         }
       }
     },
@@ -72,10 +73,10 @@ module.exports = {
 
   build: {
     // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.html'),
+    index: path.resolve(__dirname, '../../dist/index.html'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    assetsRoot: path.resolve(__dirname, '../../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
 

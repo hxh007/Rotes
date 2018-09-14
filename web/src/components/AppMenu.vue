@@ -9,7 +9,7 @@
       </router-link>
     </div>
     <Menu :active-name="activeMenu" theme="dark" width="auto" :open-names="openFlagArray">
-      <MenuItem name="/schedule">
+      <MenuItem name="/schedule" tag="li">
         <router-link tag="li" to="/schedule">
           <Icon type="ios-navigate"></Icon>
           <span>排班记录</span>
@@ -48,6 +48,11 @@
         <MenuItem name="/backend/operationManage">
           <router-link tag="li" to="/backend/operationManage">
             操作管理
+          </router-link>
+        </MenuItem>
+        <MenuItem name="/backend/messageManage">
+          <router-link tag="li" to="/backend/messageManage">
+            短信模板
           </router-link>
         </MenuItem>
       </Submenu>
