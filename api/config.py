@@ -36,6 +36,7 @@ class Config(object):
     CACHE_KEY_PREFIX = conf.get('redis', 'cache_key_prefix')
     REDIS_MAX_CONNECTIONS = conf.get('redis', 'redis_exchange')
 
+    # apscheduler配置项
     SCHEDULER_JOBSTORES = {
         'default':SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)
     }
@@ -47,6 +48,11 @@ class Config(object):
         'max_instances':3
     }
     SCHEDULER_API_ENABLED = False
+
+    # 漫道短信接口配置
+    SMS_SN = conf.get('sms', 'sn')
+    SMS_PW = conf.get('sms', 'pw')                
+    SMS_GW = conf.get('sms', 'gw')
 
 
 class DevelopmentConfig(Config):
