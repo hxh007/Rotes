@@ -96,12 +96,12 @@ export default {
       departOneModal: false,
       fcEvents: [],
       currentDay: '', // 点击的具体某个日期
+      today: '', // 获取今日时间
       curMonthview: new Date().getMonth() + 1, // 获得点击的当月月份，8月,9月...,
-      monthviewFisrt: [new Date().getFullYear(),
-        String(new Date().getMonth() + 1).length === 1 ? '0' + String(new Date().getMonth() + 1) : (new Date().getMonth() + 1), '01'].join('-'),
-      monthviewLast: [new Date().getFullYear(),
-        String(new Date().getMonth() + 1).length < 2 ? '0' + String(new Date().getMonth() + 1) : (new Date().getMonth() + 1),
-        new Date().getDate(new Date().getFullYear(), new Date().getMonth() + 1, 0)].join('-'),
+      monthviewFisrt: this.$root.formatDate('yyyy-MM-dd', new Date([new Date().getFullYear(), new Date().getMonth() + 1, '01'].join('-'))),
+      monthviewLast: this.$root.formatDate('yyyy-MM-dd', new Date([new Date().getFullYear(),
+        new Date().getMonth() + 1,
+        new Date().getDate(new Date().getFullYear(), new Date().getMonth() + 1, 0)].join('-'))),
       toggleShow: Boolean(this.$store.state.userId),
       flag: 0, // 1--所有部门，0--当前用户所属部门
       tableList: [], // 用于渲染modal中的表格数据
@@ -113,6 +113,15 @@ export default {
     changeMonthFunc () {
       if (this.curMonthview !== this.$root.getCurrentMonth(arguments[2])) {
         this.curMonthview = this.$root.getCurrentMonth(arguments[2])
+        this.monthviewFisrt = arguments[2]
+        let year = new Date(arguments[2]).getFullYear()
+        let month = new Date(arguments[2]).getMonth() + 1
+        let days = new Date(year, month, 0).getDate()
+        if (new Date([year, month, days].join('-')) > new Date(this.today)) {
+          this.monthviewLast = this.today
+        } else {
+          this.monthviewLast = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, days].join('-')))
+        }
         this.getDuties()
       }
     },
@@ -136,7 +145,6 @@ export default {
     getDutySucc (data) {
       this.fcEvents = []
       let res = data.data
-      console.log(res)
       if (res.code === 0 && res.data) {
         // this.fcEvents = res.data
         let departId = this.flag === 1 ? undefined : this.$store.state.departId
@@ -273,7 +281,6 @@ export default {
               for (let i in item) {
                 if (i === 'dutyList') {
                   if (item.dutyList.length === 0) { // 某个角色下没有任何值班记录
-                    console.log(1)
                     this.tableList.push({
                       'departName': pData.departName,
                       'col1Rospan': pData.total,
@@ -321,6 +328,10 @@ export default {
   },
   mounted () {
     this.getDuties()
+    this.bus.$on('refreshCalendar', () => {
+      this.$router.go(0)
+    })
+    this.today = this.$root.getNowFormatDate()
   }
 }
 </script>

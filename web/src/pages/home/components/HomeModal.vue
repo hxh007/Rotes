@@ -126,6 +126,9 @@
         </Card>
       </Col>
     </Row>
+    <div slot="footer">
+      <Button type="primary" size="large" @click="cancelModal">确定</Button>
+    </div>
   </Modal>
 </template>
 
@@ -173,10 +176,11 @@ export default {
     },
     createDutySucess (response) {
       let res = response.data
-      console.log(res)
       if (res.code === 0) {
         this.$Message.success('值班记录提交成功！')
         this.getAllDutyRecords()
+      } else {
+        this.$Message.error(res.msg)
       }
     },
     getAllDutyRecords () {
@@ -191,7 +195,6 @@ export default {
     loadAllRelatedDuties (response) {
       let res = response.data
       this.dutyLists = []
-      console.log(res)
       if (res.code === 0) { // 返回正常
         if (this.flag === 0) { // 本部门
           let data = res.data[0]
@@ -273,6 +276,10 @@ export default {
           })
         })
       }
+    },
+    cancelModal () {
+      this.bus.$emit('refreshCalendar')
+      this.departOneModalCopy = false
     }
   },
   mounted () {

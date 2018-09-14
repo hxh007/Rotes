@@ -8,55 +8,44 @@
         <span v-if="isCollapse === true">R</span>
       </router-link>
     </div>
-    <Menu active-name="1-1" theme="dark" width="auto" :open-names="[]">
-      <Submenu name="1">
-        <template slot="title">
+    <Menu :active-name="activeMenu" theme="dark" width="auto" :open-names="openFlagArray">
+      <MenuItem name="/schedule">
+        <router-link tag="li" to="/schedule">
           <Icon type="ios-navigate"></Icon>
-          Item 1
-        </template>
-        <MenuItem name="1-1">Option 1</MenuItem>
-        <MenuItem name="1-2">Option 2</MenuItem>
-        <MenuItem name="1-3">Option 3</MenuItem>
-      </Submenu>
-      <Submenu name="2">
-        <template slot="title">
-          <Icon type="ios-keypad"></Icon>
-          Item 2
-        </template>
-        <MenuItem name="2-1">Option 1</MenuItem>
-        <MenuItem name="2-2">Option 2</MenuItem>
-      </Submenu>
-      <Submenu name="3">
+          <span>排班记录</span>
+        </router-link>
+      </MenuItem>
+      <Submenu name="backend">
         <template slot="title">
           <Icon type="ios-analytics"></Icon>
           后台管理
         </template>
-        <MenuItem name="3-1">
+        <MenuItem name="/backend/adminManage">
           <router-link tag="li" to="/backend/adminManage">
             管理员
           </router-link>
         </MenuItem>
-        <MenuItem name="3-2">
+        <MenuItem name="/backend/userManage">
           <router-link tag="li" to="/backend/userManage">
             用户管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-3">
+        <MenuItem name="/backend/permissionManage">
           <router-link tag="li" to="/backend/permissionManage">
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-4">
+        <MenuItem name="/backend/departManage">
           <router-link tag="li" to="/backend/departManage">
             部门管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-5">
+        <MenuItem name="/backend/roleManage">
           <router-link tag="li" to="/backend/roleManage">
             角色管理
           </router-link>
         </MenuItem>
-        <MenuItem name="3-6">
+        <MenuItem name="/backend/operationManage">
           <router-link tag="li" to="/backend/operationManage">
             操作管理
           </router-link>
@@ -69,8 +58,18 @@
 <script>
 export default {
   name: 'AppMenu',
+  data () {
+    return {
+      subMenus: ['backend']
+    }
+  },
   props: {
     isCollapse: Boolean
+  },
+  watch: {
+    $route (to, from) {
+      console.log(to.path)
+    }
   },
   computed: {
     menuitemClasses () {
@@ -78,6 +77,18 @@ export default {
         'menu-item',
         this.isCollapse ? 'collapsed-menu' : ''
       ]
+    },
+    activeMenu () {
+      return this.$route.path
+    },
+    openFlagArray () {
+      let arr = []
+      this.subMenus.forEach((item, index) => {
+        if (this.$route.path.indexOf(item) !== -1) {
+          arr.push(item)
+        }
+      })
+      return arr
     }
   }
 }
@@ -119,4 +130,17 @@ export default {
     font-size: 22px
   .show
     color #000
+  .ivu-menu-item
+    padding 0!important
+    li
+      padding 14px 24px 14px 24px
+      .ivu-icon
+        margin-right 8px!important
+  .ivu-menu-submenu
+    font-size normal
+    .ivu-menu-item
+      padding 0
+      padding-left 0!important
+      li
+        padding 14px 24px 14px 43px
 </style>
