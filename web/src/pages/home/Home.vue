@@ -119,7 +119,7 @@ export default {
     dayClickFunc () {
       this.currentDay = this.$root.formatDate('yyyy-MM-dd', arguments[0]) // 点击的具体某个日期
       let year = arguments[0].getFullYear() // 当前年
-      let month = arguments[0].getMonth() + 1 // 当前月
+      let month = String(arguments[0].getMonth() + 1).length === 1 ? '0' + (arguments[0].getMonth() + 1) : (arguments[0].getMonth() + 1) // 当前月
       let days = arguments[0].getDate(year, month, 0) // 当前月的天数
       let start = [year, month, '01'].join('-')
       let end = [year, month, days].join('-')
