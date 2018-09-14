@@ -391,8 +391,6 @@ def many_to_many():
         return jsonify(response_return(1, u'数据查询失败'))
     # 返回关系信息
     if request.method == 'GET':
-        if not f_s_table:
-            return jsonify(response_return(0, data=[]))
         # 查询类型
         not_add = request.args.get('not_add', None, type=int)
         data = []
