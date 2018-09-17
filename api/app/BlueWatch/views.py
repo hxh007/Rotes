@@ -5,10 +5,12 @@ from collections import defaultdict
 
 from flask import render_template, request, jsonify
 from sqlalchemy import func, sql
+from flask import send_file, send_from_directory
 
 from . import blue_watch
 from app import db
 from app.models import Duty, TempText, Department, Role, User
+from datas_to_xlsx import data_to_xlsx
 
 
 # 新增单条值班记录
@@ -550,3 +552,41 @@ def smsTemplate():
             result['code'] = 1
             result['msg'] = u'删除失败'
         return jsonify(result)
+
+
+# 转为Excel文件
+@blue_watch.route('/data_to_xlsx', methods=['GET', 'POST'])
+def xlsx():
+    # 1 接收数据
+    result = {'code': 1, 'data': {}, 'msg': u'此部门值班记录'}
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.values
+    # 2 接收参数
+    dateStart = data.get('dateStart')
+    dateEnd = data.get('dateEnd')
+    departId = data.get('departId')
+    # 3 参数校验
+    if not all([dateStart, dateEnd]):
+        result['msg'] = u'参数缺失'
+    if dateStart > dateEnd:
+        result['msg'] = u'日期不合理'
+        return jsonify(result)
+    try:
+        s_day = datetime.strptime(dateStart, '%Y-%m-%d').date()
+        e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
+    except:
+        result['msg'] = u'日期格式不正确'
+        return jsonify(result)
+    if len(dateStart) != 10 or len(dateEnd) != 10:
+        result['msg'] = u'日期格式不规范'
+        return jsonify(result)
+    # 3 调用生成excel函数
+    data_to_xlsx('table.xlsx', dateStart, dateEnd, departId)
+    return u'已生成Excel文件'
+
+
+@blue_watch.route('/send_xlsx', methods=['GET', 'POST'])
+def send_xlsx():
+    return send_file('../table.xlsx', attachment_filename='table.xlsx')
