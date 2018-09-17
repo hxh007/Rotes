@@ -18,7 +18,7 @@ module.exports = {
         }
       },
       '/back':{
-        target : 'http://localhost:5000',
+        target : 'http://172.20.163.65:5000',
         pathRewrite: {
           '^/back/users': '/auth/users',
           '^/back/admin': '/auth/managements',
