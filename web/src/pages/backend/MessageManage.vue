@@ -3,7 +3,16 @@
     <div class="action-box" :style="{'overflow': 'hidden'}">
       <h3 :style="{'float': 'left'}">短信模板</h3>
       <Button :style="{'float': 'right'}" type="primary" size="small" @click="editTemplate">编辑</Button>
+      <Icon type="md-help" @click="showDesc" :style="{'marginLeft': '10px', 'cursor': 'pointer'}" title="说明" />
     </div>
+    <Modal
+      v-model="descModalFlag"
+      title="变量说明">
+      <p>"{TOMORROW}"------该变量为程序的模板语法，切勿修改</p>
+      <div slot="footer">
+        <Button type="primary" size="large" @click="descriptionOk">确定</Button>
+      </div>
+    </Modal>
     <Divider/>
     <Table border :columns="columns" :data="templates"></Table>
     <!--编辑短信模板-->
@@ -43,7 +52,8 @@ export default {
         tempContent: [
           { required: true, message: '请输入模板内容', trigger: 'blur' }
         ]
-      }
+      },
+      descModalFlag: false
     }
   },
   methods: {
@@ -82,6 +92,12 @@ export default {
         this.$Message.error(res.msg)
         this.editFlag = true
       }
+    },
+    descriptionOk () {
+      this.descModalFlag = false
+    },
+    showDesc () {
+      this.descModalFlag = true
     }
   },
   mounted () {
