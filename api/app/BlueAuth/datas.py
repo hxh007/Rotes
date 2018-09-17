@@ -191,8 +191,8 @@ DEFAULT_DEPARTMENT = [
 
     },
     {
-        'name': 'MODULE_VT',
-        'alias': u'三、四线部'
+        'name': 'MODULE_OTHER',
+        'alias': u'其他'
     }
     ]
 # 权限
