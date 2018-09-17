@@ -99,7 +99,7 @@ def append_relation(table, relation, genre):
 # 删除关系
 def remove_relation(table, relation, genre):
     # 添加部门用户、管理组用户
-    if genre == (1 or 3):
+    if genre == [1, 3]:
         table.users.remove(relation)
     # 添加部门角色
     if genre == 2:
