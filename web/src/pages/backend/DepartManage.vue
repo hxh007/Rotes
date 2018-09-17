@@ -420,6 +420,9 @@ export default {
       })
     },
     roleManageFunc () {
+      this.selectDepart = ''
+      this.hasSelectedRoles = []
+      this.couldSelectedRoles = []
       this.roleToDepartFlag = true
     },
     loadRoles () {
@@ -479,6 +482,9 @@ export default {
       }
     },
     usersManageFunc () {
+      this.selectDepart = ''
+      this.hasSelectedUsers = []
+      this.couldSelectedUsers = []
       this.userToDepartFlag = true
     },
     loadUsers () {

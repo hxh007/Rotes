@@ -420,6 +420,9 @@ export default {
       })
     },
     permissionManageFunc () {
+      this.selectAdminGroup = ''
+      this.hasSelectedAdminPermissions = []
+      this.couldSelectedAdminPermissions = []
       this.permissionToGroupFlag = true
     },
     loadGroupsPermissions () {
@@ -481,6 +484,9 @@ export default {
       }
     },
     usersManageFunc () {
+      this.selectAdminGroup = ''
+      this.hasSelectedUsers = []
+      this.couldSelectedUsers = []
       this.userToAdminGroupFlag = true
     },
     loadUsers () {
@@ -519,6 +525,7 @@ export default {
     addUserSuccess (response) {
       let res = response.data
       if (res.code === 0) {
+        this.$Message.success('添加成功！')
         this.loadUsers()
       } else {
         this.$Message.error(res.msg)
