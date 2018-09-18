@@ -11,6 +11,7 @@ import OperationManage from '@/pages/backend/OperationManage'
 import PermissionManage from '@/pages/backend/PermissionManage'
 import MessageManage from '@/pages/backend/MessageManage'
 import Login from '@/pages/login/Login'
+import Register from '@/pages/register/Register'
 
 Vue.use(Router)
 
@@ -68,6 +69,10 @@ export default new Router({
       path: '/login',
       name: 'Login',
       component: Login
+    }, {
+      path: '/register',
+      name: 'Register',
+      component: Register
     }
   ]
 })
