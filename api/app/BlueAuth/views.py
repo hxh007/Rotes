@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import re
-from flask import jsonify, request
+from flask import jsonify, request, g
 from sqlalchemy import or_, and_
 
 from app.models import (User, Department, Role, Management, Permission,
@@ -10,6 +10,13 @@ from app.models import (User, Department, Role, Management, Permission,
 from . import blue_auth
 from .common import (get_table, accept_para, response_return, TableTelationType)
 
+
+# # 权限管理 超级管理才能访问
+# @blue_auth.before_request
+# def auth_supper():
+#     managerList = g.managerList
+#     if 'S_MANAGEMENT' in managerList:
+#         return jsonify(response_return(1, u'没有权限访问'))
 
 # 资源
 # 用户列表查询和用户创建
@@ -239,7 +246,7 @@ def managements():
         return jsonify(result)
 
 
-# 管理员信息查询、修改和删除
+# 管理组信息查询、修改和删除
 @blue_auth.route('/managements/<int:mid>', methods=['GET', 'PUT', 'DELETE'])
 def management(mid):
     result = {'code': 0, 'data': [], 'msg': u'管理员信息查询成功'}
@@ -264,6 +271,10 @@ def management(mid):
         result = db_session_add(management)
         return jsonify(result)
     if request.method == 'DELETE':
+        if management.name == 'S_MANAGEMENT':
+            result['code'] = 1
+            result['msg'] = u'不允许删除超级管理'
+            return jsonify(result)
         result = db_session_delete(management)
         return jsonify(result)
 

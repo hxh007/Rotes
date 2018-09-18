@@ -96,21 +96,21 @@ def __client_login_by_username(paras):
     if Redis.exists('jwt_'+user.mobile):
         return response_return(1, u'用户已登录或在其他设备登录')
     # 获取用户管理身份
-    manager_list = __user_manager_list(user)
-    if isinstance(manager_list, dict):
-        return manager_list
+    group_list = __user_manager_list(user)
+    if isinstance(group_list, dict):
+        return group_list
     # 获取用户部门
     depart_list = __user_depart_list(user)
-    if isinstance(manager_list, dict):
+    if isinstance(group_list, dict):
         return depart_list
     # 生成jwt_token
-    jwt_token = Authentication.encode_jwt_token(user, manager_list)
+    jwt_token = Authentication.encode_jwt_token(user, group_list)
     # 将jwt_token写入redis
     Authentication.set_redis_jwt(user.mobile, jwt_token)
     data = {
         'user': user.to_dict(),
         'jwt_token': jwt_token,
-        'manager_list': manager_list,
+        'group_list': group_list,
         'depart_list': depart_list
     }
     return response_return(0, u'登录成功', data=data)
