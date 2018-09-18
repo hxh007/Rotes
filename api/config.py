@@ -54,6 +54,10 @@ class Config(object):
     SMS_PW = conf.get('sms', 'pw')                
     SMS_GW = conf.get('sms', 'gw')
 
+    # 钉钉建群接口配置
+    DING_GW = conf.get('ding', 'gw')
+    DING_DEFAULT_OWNER = conf.get('ding', 'default_owner')
+
 
 class DevelopmentConfig(Config):
     # 开启调试模式
