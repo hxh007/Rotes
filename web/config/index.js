@@ -35,7 +35,9 @@ module.exports = {
           '^/back/dutysCount': '/dutysCount',
           '^/back/duty/:id': '/duty/:id',
           '^/back/dutyLists': '/dutyLists',
-          '^/back/tempContent': '/tempContent'
+          '^/back/tempContent': '/tempContent',
+          '^/back/register': '/users/register',
+          '^/back/login': '/users/login'
         }
       }
     },
