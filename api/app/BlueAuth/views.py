@@ -2,7 +2,7 @@
 
 import re
 from flask import jsonify, request
-from sqlalchemy import or_, and_, not_
+from sqlalchemy import or_, and_
 
 from app.models import (User, Department, Role, Management, Permission,
                         ActionType, db_session_add, db_session_delete,
@@ -144,7 +144,7 @@ def department(did):
             result['code'] = 1
             result['msg'] = u'参数缺失'
             return jsonify(result)
-        if paras[2] not in [0, 1]:
+        if (paras[2]) not in [0, 1]:
             result['code'] = 1
             result['msg'] = u'参数错误'
             return jsonify(result)
@@ -386,7 +386,7 @@ def many_to_many():
     if isinstance(f_table, dict):
         return jsonify(response_return(1, u'数据查询失败或无此数据'))
     # 子资源
-    f_s_table = get_table(execute='relationship', relationship=query_relation(f_table, genre))
+    f_s_table = get_table(result=response_return(), execute='relationship', relationship=query_relation(f_table, genre))
     if isinstance(f_s_table, dict):
         return jsonify(response_return(1, u'数据查询失败'))
     # 返回关系信息
