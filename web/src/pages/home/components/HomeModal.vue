@@ -291,7 +291,13 @@ export default {
     this.bus.$on('sendDepartData', (param) => {
       this.dutyLists = param
     })
-    axios.get('/back/users').then(this.getAllStaffSuccess)
+    axios.get('/back/relations', {
+      params: {
+        fid: this.$store.state.departId,
+        genre: 1,
+        not_add: 0
+      }
+    }).then(this.getAllStaffSuccess)
     axios.get('/back/relations', {
       params: {
         fid: this.$store.state.departId,

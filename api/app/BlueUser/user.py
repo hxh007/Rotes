@@ -95,19 +95,25 @@ def __client_login_by_username(paras):
     # 查询redis是否有登录用户的jwt_token
     if Redis.exists('jwt_'+user.mobile):
         return response_return(1, u'用户已登录或在其他设备登录')
-    # 查询用户的管理身份， 用于鉴权
-    try:
-        managers = user.u_managements.all()
-    except Exception:
-        return jsonify(1, u'数据查询失败')
-    managerList = []
-    for manager in managers:
-        managerList.append(manager.name)
+    # 获取用户管理身份
+    manager_list = __user_manager_list(user)
+    if isinstance(manager_list, dict):
+        return manager_list
+    # 获取用户部门
+    depart_list = __user_depart_list(user)
+    if isinstance(manager_list, dict):
+        return depart_list
     # 生成jwt_token
-    jwt_token = Authentication.encode_jwt_token(user, managerList)
+    jwt_token = Authentication.encode_jwt_token(user, manager_list)
     # 将jwt_token写入redis
     Authentication.set_redis_jwt(user.mobile, jwt_token)
-    return response_return(0, u'登录成功', jwt_token, manager=managerList)
+    data = {
+        'user': user.to_dict(),
+        'jwt_token': jwt_token,
+        'manager_list': manager_list,
+        'depart_list': depart_list
+    }
+    return response_return(0, u'登录成功', data=data)
 
 
 # 钉钉登录
@@ -124,3 +130,25 @@ def auth_logout(uid):
     '''
     Authentication.del_redis_jwt(uid)
     return jsonify(response_return(0, u'退出成功'))
+
+# 获取用户的管理身份列表
+def __user_manager_list(user):
+    try:
+        managers = user.u_managements.all()
+    except Exception:
+        return response_return(1, u'数据查询失败')
+    manager_list = []
+    for manager in managers:
+        manager_list.append(manager.name)
+    return manager_list
+
+# 获取用户所在部门列表
+def __user_depart_list(user):
+    try:
+        departments = user.departments.all()
+    except Exception:
+        return response_return(1, u'数据查询失败')
+    depart_list = []
+    for department in departments:
+        depart_list.append(department.to_dict())
+    return depart_list

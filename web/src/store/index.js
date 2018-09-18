@@ -7,17 +7,23 @@ export default new Vuex.Store({
   state: {
     userId: 0,
     username: '',
-    roleId: 0,
-    roleName: '',
     departId: 2,
-    departName: '网络安全部'
+    departName: '网络安全部',
+    token: ''
   },
   mutations: {
-    changeUserInfo (state, userInfo) {
-      // 登录或者登出改变用户信息
+    userLogout (state, payload) {
+      // 用户登录
     },
-    changeDepartInfo (state, departInfo) {
-      // 登录或者登出改变部门信息
+    userLogin (state, payload) {
+      // 用户登出
     }
   }
+  //   changeUserInfo (state, userInfo) {
+  //     // 登录或者登出改变用户信息
+  //   },
+  //   changeDepartInfo (state, departInfo) {
+  //     // 登录或者登出改变部门信息
+  //   }
+  // }
 })
