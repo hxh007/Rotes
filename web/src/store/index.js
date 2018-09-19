@@ -5,25 +5,23 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    userId: 0,
-    username: '',
-    departId: 2,
-    departName: '网络安全部',
-    token: ''
+    userId: localStorage.rotasUser ? JSON.parse(localStorage.getItem('rotasUser')).id : 0,
+    username: localStorage.rotasUser ? JSON.parse(localStorage.getItem('rotasUser')).username : '',
+    fullname: localStorage.rotasUser ? JSON.parse(localStorage.getItem('rotasUser')).fullname : '',
+    token: localStorage.token ? localStorage.token : '',
+    myDepartments: localStorage.myDepartments ? localStorage.myDepartments : [],
+    myGroups: localStorage.myGroups ? localStorage.myGroups : []
   },
   mutations: {
-    userLogout (state, payload) {
-      // 用户登录
-    },
     userLogin (state, payload) {
+      // 用户登录
+      localStorage.setItem('rotasUser', JSON.stringify(payload.user))
+      localStorage.token = payload.jwt_token
+      localStorage.myDepartments = payload.depart_list
+      localStorage.myGroups = payload.group_list
+    },
+    userLogout (state, payload) {
       // 用户登出
     }
   }
-  //   changeUserInfo (state, userInfo) {
-  //     // 登录或者登出改变用户信息
-  //   },
-  //   changeDepartInfo (state, departInfo) {
-  //     // 登录或者登出改变部门信息
-  //   }
-  // }
 })

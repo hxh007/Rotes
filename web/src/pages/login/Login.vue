@@ -72,7 +72,8 @@ export default {
     userLoginCallback (response) {
       let res = response.data
       if (res.code === 0) {
-        console.log(res)
+        this.$store.commit('userLogin', res.data)
+        this.$router.push('/')
       } else {
         this.$Message.error(res.msg)
       }

@@ -3,14 +3,16 @@
     <full-calendar :events="fcEvents" locale="en" @changeMonth="changeMonthFunc"
                    @dayClick="dayClickFunc">
       <div slot="fc-header-right">
-        <i-switch size="large" :style="{float: 'right'}" v-model="toggleShow"
-                  @on-change="changeToggleFunc">
-          <span slot="open">所有</span>
-          <span slot="close">本部</span>
-        </i-switch>
+        <Row>
+          <Col>
+            <Select v-model="departSearch" style="width:200px" @on-change="changeOnSelect">
+              <Option v-for="item in myDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
+            </Select>
+          </Col>
+        </Row>
       </div>
     </full-calendar>
-    <home-modal :show="departOneModal" :currentDay="currentDay" :flag="flag"></home-modal>
+    <home-modal :show="departOneModal" :currentDay="currentDay" :departSearch="departSearch"></home-modal>
     <Modal width="60%"
       v-model="departsAllShowDetail"
       title="Common Modal dialog box title"
@@ -102,11 +104,11 @@ export default {
       monthviewLast: this.$root.formatDate('yyyy-MM-dd', new Date([new Date().getFullYear(),
         new Date().getMonth() + 1,
         new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()].join('-'))),
-      toggleShow: Boolean(this.$store.state.userId),
-      flag: 0, // 1--所有部门，0--当前用户所属部门
       tableList: [], // 用于渲染modal中的表格数据
       departsAllShowDetail: false, // 判断是否显示的是所有部门的某一天排班信息
-      pNum: 0
+      pNum: 0,
+      departSearch: '--',
+      myDeparts: []
     }
   },
   methods: {
@@ -131,9 +133,9 @@ export default {
       this.monthviewFisrt = start
       this.monthviewLast = end
       this.departOneModal = true
-      if (this.flag === 1) { // 所有部门
-        this.departsAllShowDetail = true
-      } else if (this.flag === 0 && this.departOneModal) { // 本部门
+      if (this.departSearch === '--') { // 所有部门
+        this.departsAllShowDetail = true // 显示出所有部门的值班记录
+      } else if (this.departSearch !== '--' && this.departOneModal) { // 本部门
         this.bus.$emit('dayClickWatch', this.departOneModal)// 往子组件传递控制模态框显示与否的开关切换
       }
       this.searchDetail()
@@ -143,7 +145,7 @@ export default {
       let res = data.data
       if (res.code === 0 && res.data) {
         // this.fcEvents = res.data
-        let departId = this.flag === 1 ? undefined : this.$store.state.departId
+        let departId = this.departSearch === '--' ? undefined : this.departSearch
         if (departId) { // 某个部门
           res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
             let dutyListData = res.data.dutyList
@@ -211,7 +213,7 @@ export default {
       }
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
-      let departId = this.flag === 1 ? undefined : this.$store.state.departId
+      let departId = this.departSearch === '--' ? undefined : this.departSearch
       axios.get('/back/dutysCount', {
         params: {
           departId: departId,
@@ -220,13 +222,12 @@ export default {
         }
       }).then(this.getDutySucc)
     },
-    changeToggleFunc () {
-      this.flag = this.toggleShow === true ? 1 : 0
+    changeOnSelect () {
       this.getDuties()
     },
     searchDetail () {
       // 先判断当前是显示所有部门的还是本部门的 1---所有部门 0---当前部门
-      let departId = this.flag === 1 ? undefined : this.$store.state.departId
+      let departId = this.departSearch
       let dateStart = departId === 0 ? this.monthviewFisrt : this.currentDay
       let dateEnd = departId === 0 ? this.monthviewLast : this.currentDay
       axios.get('/back/dutyLists', {
@@ -241,7 +242,7 @@ export default {
       this.tableList = []
       let res = response.data
       if (res.code === 0) { // 返回正常
-        if (this.flag === 0) { // 本部门
+        if (this.departSearch !== '--') { // 本部门之一
           let data = res.data[0]
           let count = 0
           let num
@@ -323,6 +324,21 @@ export default {
     HomeModal
   },
   mounted () {
+    // 先根据是否登陆的vuex state信息，动态渲染右上角的查询条件
+    // 为空的话则证明该用户没有登录 | 当前用户不属于任何一个部门 > 权限：只能浏览全部部门的值班信息
+    // ---- 初始化操作
+    this.myDeparts = [{
+      id: '--',
+      label: '所有部门'
+    }]
+    if (this.$store.state.myDepartments.length > 0) { // 说明当前登录用户属于多个部门
+      this.$store.state.myDepartments.forEach((item, index) => {
+        this.myDeparts.push({
+          id: item.id,
+          label: item.name
+        })
+      })
+    }
     this.getDuties()
     this.bus.$on('refreshCalendar', () => {
       this.$router.go(0)

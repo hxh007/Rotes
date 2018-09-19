@@ -13,18 +13,21 @@
               <Icon type="md-notifications-outline" size="24" />
             </div>
             <span>丨</span>
-            <Dropdown>
+            <Dropdown v-if="showFlag">
               <a href="javascript:void(0)" :style="{color: '#666', marginRight: '10px'}">
-                admin
+                {{this.$store.state.username}}
                 <Icon type="ios-arrow-down"></Icon>
               </a>
               <DropdownMenu slot="list">
                 <DropdownItem>我的值班</DropdownItem>
                 <DropdownItem>我的计划</DropdownItem>
-                <DropdownItem>注销</DropdownItem>
+                <DropdownItem>退出</DropdownItem>
               </DropdownMenu>
             </Dropdown>
-            <Avatar icon="ios-person"/>
+            <router-link to="/login" v-else>
+              <Button type="primary" shape="circle">登录</Button>
+            </router-link>
+            <Avatar icon="ios-person" v-if="showFlag"/>
           </div>
         </Header>
         <Content :style="{margin: '88px 20px 20px 20px', background: '#fff', minHeight: '100vh', height: 'auto', marginBottom: '50px'}">
@@ -70,6 +73,13 @@ export default {
         'menu-icon',
         this.isCollapsed ? 'rotate-icon' : ''
       ]
+    },
+    showFlag () {
+      if (this.$store.state.username) { // 用户为登陆状态
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {

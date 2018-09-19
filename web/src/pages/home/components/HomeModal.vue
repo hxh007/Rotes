@@ -157,14 +157,14 @@ export default {
     departOneModal: Boolean,
     currentDay: String,
     tableList: Array,
-    flag: Number
+    departSearch: String
   },
   methods: {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
           axios.post('/back/duty', {
-            departId: this.$store.state.departId,
+            departId: this.departSearch, // 能进来的一定是有部门的
             dutyDate: this.currentDay,
             roleId: this.selectRole,
             staffId: this.selectStaff
@@ -186,7 +186,7 @@ export default {
     getAllDutyRecords () {
       axios.get('/back/dutyLists', {
         params: {
-          departId: this.$store.state.departId,
+          departId: this.departSearch,
           dateStart: this.currentDay,
           dateEnd: this.currentDay
         }
@@ -196,7 +196,7 @@ export default {
       let res = response.data
       this.dutyLists = []
       if (res.code === 0) { // 返回正常
-        if (this.flag === 0) { // 本部门
+        if (this.departSearch !== '--') { // 本部门
           let data = res.data[0]
           let count = 0
           let num
@@ -293,14 +293,14 @@ export default {
     })
     axios.get('/back/relations', {
       params: {
-        fid: this.$store.state.departId,
+        fid: this.departSearch,
         genre: 1,
         not_add: 0
       }
     }).then(this.getAllStaffSuccess)
     axios.get('/back/relations', {
       params: {
-        fid: this.$store.state.departId,
+        fid: this.departSearch,
         genre: 2,
         not_add: 0
       }
