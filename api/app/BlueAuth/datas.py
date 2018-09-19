@@ -20,6 +20,10 @@ DEFAULT_SUPPER_MANAGEMENT = [
         'alias': u'业务管理'
     },
     {
+        'name': 'TF_MANAGEMENT',
+        'alias': u'三、四线部门管理'
+    },
+    {
         'name':"OP_MANAGEMENT",
         'alias': u'系统运维部管理'
     },
@@ -76,11 +80,7 @@ DEFAULT_SUPPER_MANAGEMENT = [
         'name': 'UD_MANAGEMENT',
         'alias': u'用户数据中心管理'
 
-    },
-    # {
-    #     'name': 'TF_MANAGEMENT',
-    #     'alias': u'三、四线部门管理'
-    # }
+    }
 ]
 # 操作类型
 DEFAULT_ACTION = [
@@ -187,6 +187,11 @@ DEFAULT_DEPARTMENT = [
     {
         'name': 'MODULE_UD',
         'alias': u'用户数据中心'
+
+    },
+    {
+        'name': 'MODULE_VT',
+        'alias': u'三、四线部门'
 
     }
     ]
@@ -476,24 +481,24 @@ DEFAULT_PERMISSIONS = [
         'alias': u'用户数据中心排班表：删除'
 
     },
-    # {
-    #     'department': 'MODULE_VT',
-    #     'codename': 'GET',
-    #     'alias': u'三、四线值班表：查看'
-    # },
-    # {
-    #     'department': 'MODULE_VT',
-    #     'codename': 'POST',
-    #     'alias': u'三、四线值班表：创建'
-    # },
-    # {
-    #     'department': 'MODULE_VT',
-    #     'codename': 'PUT',
-    #     'alias': u'三、四线值班表：修改'
-    # },
-    # {
-    #     'department': 'MODULE_VT',
-    #     'codename': 'DELETE',
-    #     'alias': u'三、四线值班表：删除'
-    # },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'GET',
+        'alias': u'三、四线值班表：查看'
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'POST',
+        'alias': u'三、四线值班表：创建'
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'PUT',
+        'alias': u'三、四线值班表：修改'
+    },
+    {
+        'department': 'MODULE_VT',
+        'codename': 'DELETE',
+        'alias': u'三、四线值班表：删除'
+    },
 ]
