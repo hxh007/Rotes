@@ -408,7 +408,7 @@ class Permission(db.Model, BaseModel):
         self.remark = paras[3]
 
     def __repr__(self):
-        return '<Permission %r>' % self.name
+        return '<Permission %r>' % self.codename
 
 
 # 操作类型表
