@@ -1,6 +1,8 @@
 # coding=utf-8
 import re
-from flask import jsonify
+
+import datetime
+from flask import jsonify, g
 
 from app import Redis
 from app.BlueUser.common import ClientType
@@ -51,7 +53,10 @@ def __client_register_by_username(paras):
         return response_return(1, u'该手机号已注册或数据库查询失败')
     # 写入数据库
     user = User()
-    user.add_data(paras)
+    user.username = paras[0]
+    user.fullname = paras[1]
+    user.mobile = paras[2]
+    user.password = paras[3]
     result = db_session_add(user)
     return result
 
@@ -92,19 +97,22 @@ def __client_login_by_username(paras):
     # 检查用户名和密码
     if not (user.check_password(password=paras[1])):
         return response_return(1, u'用户名或密码错误')
-    # 查询redis是否有登录用户的jwt_token
-    if Redis.exists('jwt_'+user.mobile):
-        return response_return(1, u'用户已登录或在其他设备登录')
     # 获取用户管理身份
-    group_list = __user_manager_list(user)
+    group_list = [g.name for g in __user_manager_list(user)]
     if isinstance(group_list, dict):
         return group_list
     # 获取用户部门
     depart_list = __user_depart_list(user)
     if isinstance(group_list, dict):
         return depart_list
+    user.login_time = datetime.datetime.now()
+    res = db_session_add(user)
+    if res['code'] == 1:
+        return jsonify(res)
     # 生成jwt_token
-    jwt_token = Authentication.encode_jwt_token(user, group_list)
+    jwt_token = Authentication.encode_jwt_token(user)
+    if isinstance(jwt_token, dict):
+        return jsonify(jwt_token)
     # 将jwt_token写入redis
     Authentication.set_redis_jwt(user.mobile, jwt_token)
     data = {
@@ -122,24 +130,23 @@ def __client_login_by_ding(paras):
 
 
 # 退出登录
-@blue_user.route('/logout/<int:uid>')
-def auth_logout(uid):
+@blue_user.route('/logout')
+def auth_logout():
     '''
     退出登录：删除redis中的jwt
     :return:
     '''
+    Authentication.jwt_token_verify()
+    uid = g.user_id
     Authentication.del_redis_jwt(uid)
     return jsonify(response_return(0, u'退出成功'))
 
 # 获取用户的管理身份列表
 def __user_manager_list(user):
     try:
-        managers = user.u_managements.all()
+        manager_list = user.u_managements.all()
     except Exception:
         return response_return(1, u'数据查询失败')
-    manager_list = []
-    for manager in managers:
-        manager_list.append(manager.name)
     return manager_list
 
 # 获取用户所在部门列表
@@ -152,3 +159,31 @@ def __user_depart_list(user):
     for department in departments:
         depart_list.append(department.to_dict())
     return depart_list
+
+# 获取用户所有权限
+def __user_permission_list(user):
+    manager_list = __user_manager_list(user)
+    permission_list = []
+    for manager in manager_list:
+        for permission in manager.permissions.all():
+            permission_list.append(permission.to_dict())
+    return permission_list
+
+# 登录用户信息查询
+@blue_user.route('/login_user_info')
+def user_info():
+    # 登录验证
+    response_data = Authentication.jwt_token_verify()
+    if response_data['code']:
+        return jsonify(response_data)
+    user_id = g.user_id
+    user = get_table(result=response_return(), table=User, execute='get', id=user_id)
+    if isinstance(user, dict):
+        return jsonify(user)
+    data = {
+        'user_info': user.to_dict(),
+        'permission_list': __user_permission_list(user),
+        'depart_list': __user_depart_list(user),
+        'group_list':[m.to_dict() for m in __user_manager_list(user)]
+    }
+    return jsonify(response_return(0, u'信息查询成功', data=data))
