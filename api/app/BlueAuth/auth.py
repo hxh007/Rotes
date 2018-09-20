@@ -52,9 +52,9 @@ class Authentication():
             if ('data' in payload and 'id' in payload['data']):
                 return response_return(0, data=payload)
             else:
-                return response_return(1, u'无效token')
+                return response_return(2, u'无效token')
         except Exception:
-            return response_return(1, u'无效token')
+            return response_return(2, u'无效token')
 
     @staticmethod
     def set_redis_jwt(user_mobile, jwt_token):
@@ -101,12 +101,12 @@ class Authentication():
         try:
             auth_header = request.headers.get('Authorization').encode()
         except Exception:
-            return response_return(1, u'获取Authorization失败')
+            return response_return(2, u'获取Authorization失败')
         if not auth_header:
-            return response_return(1, u'没有提供token')
+            return response_return(2, u'没有提供token')
         jwt_tokenArr = auth_header.split(" ")
         if not all([jwt_tokenArr, jwt_tokenArr[0] == 'JWT', len(jwt_tokenArr) ==2]):
-            return response_return(1, u'请传递正确的验证头信息')
+            return response_return(2, u'请传递正确的验证头信息')
         jwt_token = jwt_tokenArr[1]
         response_data =cls.decode_jwt_token(jwt_token)
         payload = response_data.get('data')
@@ -115,7 +115,7 @@ class Authentication():
         try:
             user = User.query.get(payload['data']['id'])
         except Exception:
-            return response_return(1, u'数据查询失败')
+            return response_return(2, u'数据查询失败')
         if not user:
             return response_return(2, u'该用户不存在')
         if (user.login_time.strftime("%Y-%m-%d %H:%M:%S") != payload['data']['login_time']):
