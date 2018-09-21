@@ -77,12 +77,9 @@ export default {
     isLogin () {
       if (localStorage.getItem('userName') && localStorage.getItem('userName') !== 'null' && localStorage.getItem('userToken') && localStorage.getItem('userToken') !== 'null') {
         // 登录
-        // this.$store.commit('setDeparts', JSON.parse(localStorage.getItem('myDeparts')))
-        // this.$store.commit('setGroups', JSON.parse(localStorage.getItem('myGroups')))
         this.$store.commit('userStatus', localStorage.getItem('userName'))
-      } else { // 未登录
-        // this.$store.commit('setDeparts', [])
-        // this.$store.commit('setGroups', [])
+      } else {
+        // 未登录
         this.$store.commit('userStatus', null)
       }
       return this.$store.getters.isLogin
@@ -107,6 +104,9 @@ export default {
             localStorage.setItem('userToken', null)
             this.$store.dispatch('setUser', null)
             this.$store.dispatch('setToken', null)
+            if (this.$route.path.indexOf('/backend') !== -1) { // 在退出前是后台管理页面
+              this.$router.push('/') // 返回首页
+            }
           }
         })
       }

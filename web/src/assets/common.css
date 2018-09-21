@@ -20,3 +20,11 @@
   background: red!important;
   color: #ffffff!important;
 }
+
+.normal{
+  display: inline-block;
+}
+
+.noneStyle{
+  display: none;
+}

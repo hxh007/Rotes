@@ -15,42 +15,42 @@
           <span>排班记录</span>
         </router-link>
       </MenuItem>
-      <Submenu name="backend">
+      <Submenu name="backend" v-if="showBackend">
         <template slot="title">
           <Icon type="ios-analytics"></Icon>
           后台管理
         </template>
-        <MenuItem name="/backend/adminManage">
+        <MenuItem name="/backend/adminManage" v-if="showBackend && !showMessManage">
           <router-link tag="li" to="/backend/adminManage">
             管理组
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/userManage">
+        <MenuItem name="/backend/userManage" v-if="showBackend && !showMessManage">
           <router-link tag="li" to="/backend/userManage">
             用户管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/permissionManage">
+        <MenuItem name="/backend/permissionManage" v-if="showBackend && !showMessManage">
           <router-link tag="li" to="/backend/permissionManage">
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/departManage">
+        <MenuItem name="/backend/departManage" v-if="showBackend && !showMessManage">
           <router-link tag="li" to="/backend/departManage">
             部门管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/roleManage">
+        <MenuItem name="/backend/roleManage" v-if="showBackend && !showMessManage">
           <router-link tag="li" to="/backend/roleManage">
             角色管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/operationManage">
+        <MenuItem name="/backend/operationManage" v-if="showBackend && !showMessManage">
           <router-link tag="li" to="/backend/operationManage">
             操作管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/messageManage">
+        <MenuItem name="/backend/messageManage" v-if="showBackend">
           <router-link tag="li" to="/backend/messageManage">
             短信模板
           </router-link>
@@ -71,11 +71,6 @@ export default {
   props: {
     isCollapse: Boolean
   },
-  watch: {
-    $route (to, from) {
-      console.log(to.path)
-    }
-  },
   computed: {
     menuitemClasses () {
       return [
@@ -94,6 +89,30 @@ export default {
         }
       })
       return arr
+    },
+    showBackend () {
+      if (this.$store.state.isLogin) { // 已登录
+        // 然后再根据角色进行划分
+        if (this.$store.state.myGroups.length > 0) {
+          const admin = this.$root.whetherAdmin()
+          const businessManager = this.$root.whetherBusiManager()
+          console.log(admin, businessManager)
+          if (admin || businessManager) {
+            return true
+          } else {
+            return false
+          }
+        }
+      } else { // 未登录
+        return false
+      }
+    },
+    showMessManage () {
+      const busiManger = this.$root.whetherBusiManager()
+      if (busiManger) {
+        return true
+      }
+      return false
     }
   }
 }

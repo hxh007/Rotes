@@ -40,7 +40,7 @@
           <Input type="text" v-model="editFormValidate.tagName" placeholder="请输入工号"></Input>
         </FormItem>
         <FormItem label="用户名" prop="userName">
-          <Input type="text" v-model="editFormValidate.userName" placeholder="请输入用户名"></Input>
+          <Input type="text" disabled v-model="editFormValidate.userName" placeholder="请输入用户名"></Input>
         </FormItem>
         <FormItem label="姓名" prop="fullName">
           <Input type="text" v-model="editFormValidate.fullName" placeholder="请输入姓名"></Input>
@@ -157,8 +157,8 @@ export default {
           }
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '操作',
+          key: '操作',
           width: 150,
           align: 'center',
           render: (h, params) => {

@@ -27,6 +27,14 @@ router.beforeEach((to, from, next) => {
         store.commit('userStatus', null)
         localStorage.setItem('userName', null)
         localStorage.setItem('userToken', null)
+        console.log(to.path, from.path)
+        if (to.path !== '/login' && to.path !== '/register') {
+          next('/')
+        } else if (to.path === '/register') {
+          next('/register')
+        } else if (to.path === '/login') {
+          next('/login')
+        }
       }
     })
   } else { // 未登录

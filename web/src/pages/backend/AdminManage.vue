@@ -29,7 +29,7 @@
            title="编辑管理员">
       <Form ref="editFormValidate" :model="editFormValidate" :rules="ruleValidate" :label-width="80">
         <FormItem label="用户名" prop="adminName">
-          <Input type="text" v-model="editFormValidate.adminName" placeholder="请输入用户名"></Input>
+          <Input type="text" disabled v-model="editFormValidate.adminName" placeholder="请输入用户名"></Input>
         </FormItem>
         <FormItem label="昵称" prop="adminAlias">
           <Input type="text" v-model="editFormValidate.adminAlias" placeholder="请输入昵称"></Input>
@@ -110,6 +110,7 @@
 
 <script>
 import axios from 'axios'
+// import store from '@/store'
 export default {
   name: 'AdminManage',
   data () {
@@ -154,11 +155,15 @@ export default {
           }
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '操作',
+          key: '操作',
           width: 150,
           align: 'center',
           render: (h, params) => {
+            let cssName = 'normal'
+            if (params.row.name === 'S_MANAGEMENT') { // 超级管理组
+              cssName = 'noneStyle'
+            }
             return h('div', [
               h('Button', {
                 props: {
@@ -179,6 +184,7 @@ export default {
                   type: 'error',
                   size: 'small'
                 },
+                class: cssName,
                 on: {
                   click: () => {
                     this.remove(params.row.id)
@@ -215,8 +221,8 @@ export default {
           key: 'alias'
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '操作',
+          key: '操作',
           width: 150,
           align: 'center',
           render: (h, params) => {
@@ -242,8 +248,8 @@ export default {
           key: 'alias'
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '操作',
+          key: '操作',
           width: 150,
           align: 'center',
           render: (h, params) => {
@@ -273,8 +279,8 @@ export default {
           key: 'fullname'
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '操作',
+          key: '操作',
           width: 150,
           align: 'center',
           render: (h, params) => {
@@ -300,8 +306,8 @@ export default {
           key: 'fullname'
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '操作',
+          key: '操作',
           width: 150,
           align: 'center',
           render: (h, params) => {
@@ -551,6 +557,11 @@ export default {
   mounted () {
     axios.get('/back/admin').then(this.loadAllAdmins)
   }
+  // beforeRouteEnter (to, from, next) {
+  //   // if (!store.state.isLogin || store.state.myGroups) { // 未登录与不具有权限的用户，重定向到首页
+  //   //
+  //   // }
+  // }
 }
 </script>
 
