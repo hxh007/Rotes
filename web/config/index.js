@@ -5,20 +5,15 @@
 const path = require('path');
 
 module.exports = {
+  cookieExpires: 1,
   dev: {
 
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api':{
-        target : 'http://localhost:8080',
-        pathRewrite:{
-          '^/api': '/static/mock'
-        }
-      },
       '/back':{
-        target : 'http://localhost:5000',
+        target : 'http://172.20.163.46:5000',
         pathRewrite: {
           '^/back/users': '/auth/users',
           '^/back/admin': '/auth/managements',
@@ -37,7 +32,9 @@ module.exports = {
           '^/back/dutyLists': '/dutyLists',
           '^/back/tempContent': '/tempContent',
           '^/back/register': '/users/register',
-          '^/back/login': '/users/login'
+          '^/back/login': '/users/login',
+          '^/back/userInfo': '/users/login_user_info',
+          '^/back/logout': '/users/logout'
         }
       }
     },
@@ -102,5 +99,9 @@ module.exports = {
     // `npm run build --report`
     // Set to `true` or `false` to always turn it on or off
     bundleAnalyzerReport: process.env.npm_config_report
+  },
+  baseUrl: {
+    dev: '',
+    pro: ''
   }
 };

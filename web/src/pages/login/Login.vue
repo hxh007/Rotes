@@ -37,6 +37,8 @@
 
 <script>
 import axios from 'axios'
+import { mapMutations } from 'vuex'
+// import store from '@/store'
 export default {
   name: 'Login',
   data () {
@@ -58,26 +60,39 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([
+      'setToken'
+    ]),
     handleSubmit (name) { // 登录
       this.$refs[name].validate((valid) => {
         if (valid) { // 表单验证通过
           axios.post('/back/login', {
-            client_type: 100,
             username: this.formItem.user,
-            password: this.formItem.password
-          }).then(this.userLoginCallback)
+            password: this.formItem.password,
+            client_type: 100
+          }).then(response => {
+            const res = response.data
+            const data = res.data
+            if (res.code === 0) {
+              // 改变vuex 中的状态
+              localStorage.setItem('userName', data.user.username)
+              localStorage.setItem('userToken', data.jwt_token)
+              this.$store.dispatch('setUser', data.user.username)
+              this.$store.dispatch('setToken', data.jwt_token)
+              this.$router.push('/')
+            } else {
+              this.$Message.error(res.msg)
+            }
+          })
         }
       })
-    },
-    userLoginCallback (response) {
-      let res = response.data
-      if (res.code === 0) {
-        this.$store.commit('userLogin', res.data)
-        this.$router.push('/')
-      } else {
-        this.$Message.error(res.msg)
-      }
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    // store.dispatch('setUser', null)
+    // localStorage.setItem('userName', null)
+    // localStorage.setItem('userToken', null)
+    next()
   }
 }
 </script>

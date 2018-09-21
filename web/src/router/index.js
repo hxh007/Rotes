@@ -1,78 +1,54 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Layout from '@/components/Layout'
-import Home from '@/pages/home/Home'
-import Schedule from '@/pages/schedule/Schedule'
-import UserManage from '@/pages/backend/UserManage'
-import AdminManage from '@/pages/backend/AdminManage'
-import DepartManage from '@/pages/backend/DepartManage'
-import RoleManage from '@/pages/backend/RoleManage'
-import OperationManage from '@/pages/backend/OperationManage'
-import PermissionManage from '@/pages/backend/PermissionManage'
-import MessageManage from '@/pages/backend/MessageManage'
-import Login from '@/pages/login/Login'
-import Register from '@/pages/register/Register'
-
+import routes from './routers'
+import axios from 'axios'
+import store from '@/store'
+// import iView from 'iview'
+// import { getToken } from '../../libs/util'
 Vue.use(Router)
-
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Layout',
-      component: Layout,
-      redirect: '/home',
-      children: [{
-        path: '/home',
-        name: 'Home',
-        component: Home
-      }, {
-        path: '/schedule',
-        name: 'Schedule',
-        component: Schedule
-      }]
-    }, {
-      path: '/backend',
-      name: 'Backend',
-      component: Layout,
-      redirect: '/backend/userManage',
-      children: [{
-        path: '/backend/userManage',
-        name: 'UserManage',
-        component: UserManage
-      }, {
-        path: '/backend/permissionManage',
-        name: 'PermissionManage',
-        component: PermissionManage
-      }, {
-        path: '/backend/departManage',
-        name: 'DepartManage',
-        component: DepartManage
-      }, {
-        path: '/backend/roleManage',
-        name: 'RoleManage',
-        component: RoleManage
-      }, {
-        path: '/backend/adminManage',
-        name: 'AdminManage',
-        component: AdminManage
-      }, {
-        path: '/backend/operationManage',
-        name: 'OperationManage',
-        component: OperationManage
-      }, {
-        path: '/backend/messageManage',
-        name: 'messageManage',
-        component: MessageManage
-      }]
-    }, {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    }, {
-      path: '/register',
-      name: 'Register',
-      component: Register
-    }
-  ]
+const router = new Router({
+  routes
 })
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('userToken')
+  if (token) { // 登录-> 查询登录用户信息
+    store.dispatch('setToken', token)
+    axios.get('/back/userInfo', {
+      headers: {
+        Authorization: 'JWT ' + token
+      }
+    }).then((response) => {
+      const res = response.data
+      if (res.code === 0) {
+        store.dispatch('setDeparts', res.data.depart_list)
+        store.dispatch('setGroups', res.data.group_list)
+      } else if (res.code === 2) {
+        // 需要重新登录
+        store.commit('userStatus', null)
+        localStorage.setItem('userName', null)
+        localStorage.setItem('userToken', null)
+      }
+    })
+  } else { // 未登录
+
+  }
+  // if ((token === 'undefined' || !token) && to.name !== 'Login') {
+  //   // 未登录且要跳转的页面不是登录页
+  //   next({
+  //     name: 'Login' // 跳转到登录页
+  //   })
+  // } else if ((token === 'undefined' || !token) && to.name === 'Login') {
+  //   // 未登陆且要跳转的页面是登录页
+  //   next() // 跳转
+  // } else if (token && typeof token !== 'string' && to.name === 'Login') {
+  //   // 已登录且要跳转的页面是登录页
+  //   next({
+  //     name: 'Login' // 跳转到login页
+  //   })
+  // } else { // 已登录且跳转的不是登录页
+  //   next()
+  // }
+  next()
+})
+
+export default router

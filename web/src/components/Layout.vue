@@ -13,21 +13,21 @@
               <Icon type="md-notifications-outline" size="24" />
             </div>
             <span>丨</span>
-            <Dropdown v-if="showFlag">
+            <Dropdown v-if="isLogin"  @on-click="menuAction">
               <a href="javascript:void(0)" :style="{color: '#666', marginRight: '10px'}">
-                {{this.$store.state.username}}
+                {{this.$store.state.currentUser}}
                 <Icon type="ios-arrow-down"></Icon>
               </a>
               <DropdownMenu slot="list">
-                <DropdownItem>我的值班</DropdownItem>
-                <DropdownItem>我的计划</DropdownItem>
-                <DropdownItem>退出</DropdownItem>
+                <DropdownItem name="myDuty">我的值班</DropdownItem>
+                <DropdownItem name="myCenter">个人中心</DropdownItem>
+                <DropdownItem name="exit">退出</DropdownItem>
               </DropdownMenu>
             </Dropdown>
             <router-link to="/login" v-else>
               <Button type="primary" shape="circle">登录</Button>
             </router-link>
-            <Avatar icon="ios-person" v-if="showFlag"/>
+            <Avatar icon="ios-person" v-if="isLogin"/>
           </div>
         </Header>
         <Content :style="{margin: '88px 20px 20px 20px', background: '#fff', minHeight: '100vh', height: 'auto', marginBottom: '50px'}">
@@ -38,6 +38,7 @@
   </div>
 </template>
 <script>
+import axios from 'axios'
 import AppMenu from '@/components/AppMenu'
 export default {
   data () {
@@ -56,7 +57,6 @@ export default {
   },
   watch: {
     isCollapsed (val, oldVal) {
-      console.log('val:' + val)
       if (val !== oldVal && val === true) {
         this.widthFlag = true
       } else {
@@ -74,17 +74,42 @@ export default {
         this.isCollapsed ? 'rotate-icon' : ''
       ]
     },
-    showFlag () {
-      if (this.$store.state.username) { // 用户为登陆状态
-        return true
-      } else {
-        return false
+    isLogin () {
+      if (localStorage.getItem('userName') && localStorage.getItem('userName') !== 'null' && localStorage.getItem('userToken') && localStorage.getItem('userToken') !== 'null') {
+        // 登录
+        // this.$store.commit('setDeparts', JSON.parse(localStorage.getItem('myDeparts')))
+        // this.$store.commit('setGroups', JSON.parse(localStorage.getItem('myGroups')))
+        this.$store.commit('userStatus', localStorage.getItem('userName'))
+      } else { // 未登录
+        // this.$store.commit('setDeparts', [])
+        // this.$store.commit('setGroups', [])
+        this.$store.commit('userStatus', null)
       }
+      return this.$store.getters.isLogin
     }
   },
   methods: {
     collapsedSider () {
       this.bus.$emit('triggerCollapse', this.$refs.side1.toggleCollapse)
+    },
+    menuAction (name) {
+      const token = this.$store.state.token
+      if (name === 'exit') { // 退出
+        axios.get('/back/logout', {
+          headers: {
+            Authorization: 'JWT ' + token
+          }
+        }).then((response) => {
+          let res = response.data
+          if (res.code === 0 || res.code === 2) {
+            // 退出成功
+            localStorage.setItem('userName', null)
+            localStorage.setItem('userToken', null)
+            this.$store.dispatch('setUser', null)
+            this.$store.dispatch('setToken', null)
+          }
+        })
+      }
     }
   },
   mounted () {

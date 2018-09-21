@@ -4,62 +4,21 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
-import axios from 'axios'
 import iView from 'iview'
 import fullCalendar from 'vue-fullcalendar'
 import 'iview/dist/styles/iview.css'
 import '@/assets/common.css'
+
 Vue.config.productionTip = false
 Vue.use(iView)
 Vue.component('full-calendar', fullCalendar)
 Vue.prototype.bus = new Vue()
 
-axios.defaults.timeout = 6000 // 6000的超时验证
-axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
-const instance = axios.create()
-instance.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
-axios.interceptors.request.use = instance.interceptors.request.use
-
-// request拦截器
-instance.interceptors.request.use(
-  config => {
-    // 每次发送请求之前都检测vuex是否存有token,有的话都要放在请求头发送给服务器
-    if (store.state.token) {
-      config.headers.Authorization = `token ${store.state.token}`
-    }
-    return config
-  },
-  err => {
-    return Promise.reject(err)
-  }
-)
-// response拦截器
-instance.interceptors.response.use(
-  response => { // 默认除了200以外的都是错误的，就会走这里
-    return response
-  },
-  error => {
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          store.dispatch('userLogout') // 可能是token过期，清除它
-          router.replace({ // 跳转到登录页面
-            path: '/login',
-            query: {
-              redirect: router.currentRoute.fullPath
-            }
-          })
-      }
-    }
-    return Promise.reject(error.response)
-  }
-)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   store,
-  instance,
   components: {App},
   methods: {
     // 获取当前月的月份

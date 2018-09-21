@@ -1,5 +1,5 @@
 <template>
-  <Modal v-model="departOneModalCopy" fullscreen>
+  <Modal v-model="departOneModalCopy" fullscreen @on-cancel="cancelModal">
     <div slot="header">
       <h3>
         <Icon type="md-briefcase" />
@@ -105,7 +105,7 @@
           <div class="create-box" ref="createBox">
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
               <FormItem label="所属部门">
-                <h3>{{this.$store.state.departName}}</h3>
+                <h3>{{this.departSearchName}}</h3>
               </FormItem>
               <FormItem label="排班角色">
                 <Select v-model="selectRole">
@@ -157,7 +157,33 @@ export default {
     departOneModal: Boolean,
     currentDay: String,
     tableList: Array,
-    departSearch: String
+    departSearch: Number,
+    departSearchName: String
+  },
+  computed: {
+    departSearchComputed () {
+      return this.departSearch
+    }
+  },
+  watch: {
+    departSearchComputed (new_, old_) {
+      if (new_ !== 0) {
+        axios.get('/back/relations', {
+          params: {
+            fid: this.departSearch === 0 ? undefined : this.departSearch,
+            genre: 1,
+            not_add: 0
+          }
+        }).then(this.getAllStaffSuccess)
+        axios.get('/back/relations', {
+          params: {
+            fid: this.departSearch,
+            genre: 2,
+            not_add: 0
+          }
+        }).then(this.getRelatedRoles)
+      }
+    }
   },
   methods: {
     handleSubmit (name) {
@@ -183,6 +209,7 @@ export default {
         this.$Message.error(res.msg)
       }
     },
+    // 获取当前所选部门的值班记录
     getAllDutyRecords () {
       axios.get('/back/dutyLists', {
         params: {
@@ -196,7 +223,7 @@ export default {
       let res = response.data
       this.dutyLists = []
       if (res.code === 0) { // 返回正常
-        if (this.departSearch !== '--') { // 本部门
+        if (this.departSearch !== 0) { // 本部门
           let data = res.data[0]
           let count = 0
           let num
@@ -291,20 +318,6 @@ export default {
     this.bus.$on('sendDepartData', (param) => {
       this.dutyLists = param
     })
-    axios.get('/back/relations', {
-      params: {
-        fid: this.departSearch,
-        genre: 1,
-        not_add: 0
-      }
-    }).then(this.getAllStaffSuccess)
-    axios.get('/back/relations', {
-      params: {
-        fid: this.departSearch,
-        genre: 2,
-        not_add: 0
-      }
-    }).then(this.getRelatedRoles)
   },
   updated () {
     //
