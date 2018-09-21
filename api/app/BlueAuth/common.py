@@ -90,11 +90,10 @@ def accept_para(list):
 
 
 # 响应
-def response_return(code=None, msg=None, data=None, managerList=None):
+def response_return(code=None, msg=None, data=None):
     return {
         'code': code,
         'data': data,
-        'managerList': managerList,
         'msg' : msg
     }
 
