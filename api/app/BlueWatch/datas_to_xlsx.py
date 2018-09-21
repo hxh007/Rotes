@@ -12,6 +12,7 @@ from app.models import Duty, Department
 
 # 生成excel数据
 def data_to_xlsx(filename, dateStart, dateEnd):
+    # data = {}
     list_table_head = [u'部门', u'部门负责人', u'角色',]
     s_day = datetime.strptime(dateStart, '%Y-%m-%d').date()
     e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
@@ -129,8 +130,9 @@ def data_to_xlsx(filename, dateStart, dateEnd):
         if op_sec_count == 1:
             pass
         else:
-            sheet.merge_range(row_depart, 0, row_depart+op_sec_count, 0, op_sec, merge_format)
-            sheet.merge_range(row_depart, 1, row_depart+op_sec_count, 1, op_sec_depart, merge_format)
+            pass
+            # sheet.merge_range(row_depart, 0, row_depart+op_sec_count, 0, op_sec, merge_format)
+            # sheet.merge_range(row_depart, 1, row_depart+op_sec_count, 1, op_sec_depart, merge_format)
         os_roles_list = filter(lambda x: x != 'count', dutyInfo[op_sec].keys())
         # 写角色信息
         if os_roles_list:
@@ -143,7 +145,8 @@ def data_to_xlsx(filename, dateStart, dateEnd):
                 if role_count == 1:
                     pass
                 else:
-                    sheet.merge_range(row_depart, 2, row_depart + role_count, 2, os_role, merge_format)
+                    # sheet.merge_range(row_depart, 2, row_depart + role_count, 2, os_role, merge_format)
+                    pass
                 # 值班日期列表
                 date_list1 = dutyInfo[op_sec][os_role].keys()
                 date_list2 = filter(lambda x: x != 'count', date_list1)
@@ -173,8 +176,9 @@ def data_to_xlsx(filename, dateStart, dateEnd):
         if depart_counts == 1:
             pass
         else:
-            sheet.merge_range(row_depart, 0, row_depart+depart_counts, 0, depart_name, merge_format)
-            sheet.merge_range(row_depart, 1, row_depart+depart_counts, 1, ','.join(departInfo[depart_name]), merge_format)
+            pass
+            # sheet.merge_range(row_depart, 0, row_depart+depart_counts, 0, depart_name, merge_format)
+            # sheet.merge_range(row_depart, 1, row_depart+depart_counts, 1, ','.join(departInfo[depart_name]), merge_format)
         # 2 角色信息写入
         list2 = role_name.keys()
         roleInfo = filter(lambda x: x != 'count', list2)
@@ -192,7 +196,8 @@ def data_to_xlsx(filename, dateStart, dateEnd):
                 if count1 == 1:
                     pass
                 else:
-                    sheet.merge_range(row_depart, 2, row_depart + count1, 2, role1, merge_format)
+                    pass
+                    # sheet.merge_range(row_depart, 2, row_depart + count1, 2, role1, merge_format)
                 for date_day in date_list2:
                     # 日期列数
                     date_line = list_table_head.index(date_day)
