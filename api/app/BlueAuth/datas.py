@@ -127,7 +127,7 @@ DEFAULT_ROLES = [
 DEFAULT_TEMPTEXT = [
     {
         'name': 'SMS',
-        'content': u'央视网技术中心提醒：您大运维值班时间是明天（{TOMORROW}）9:00--9:00+1，谢谢。'
+        'content': u'央视网大运维提醒您：您大运维值班时间是明天({TOMORROW})9:00至次日9:00，在岗时间为9:00至21:00，请务必准时到岗。谢谢~'
     }
 ]
 # 部门
