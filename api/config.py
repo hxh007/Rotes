@@ -17,6 +17,8 @@ class Config(object):
 
     # 数据库连接
     SQLALCHEMY_DATABASE_URI = 'sqlite:///'+os.path.join(basedir, "datas", "app-dev.sqlite3")
+    # Excel文件路径
+    Excel_path = os.path.join(basedir, 'app', 'static')
     # 数据库动态追踪
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
