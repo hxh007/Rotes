@@ -4,6 +4,7 @@ import re
 from flask import jsonify, request, g
 from sqlalchemy import or_, and_
 
+from app.BlueAuth.auth import Authentication
 from app.models import (User, Department, Role, Management, Permission,
                         ActionType, db_session_add, db_session_delete,
                         query_relation, append_relation, remove_relation)
@@ -14,9 +15,14 @@ from .common import (get_table, accept_para, response_return, TableTelationType)
 # # 权限管理 超级管理才能访问
 # @blue_auth.before_request
 # def auth_supper():
+#     # 判断登录用户
+#     response_data = Authentication.jwt_token_verify()
+#     if response_data['code']:
+#         return jsonify(response_data)
+#     # 用户所在管理组
 #     managerList = g.managerList
 #     if 'S_MANAGEMENT' in managerList:
-#         return jsonify(response_return(1, u'没有权限访问'))
+#         return jsonify(response_return(3, u'没有权限访问'))
 
 # 资源
 # 用户列表查询和用户创建
@@ -309,6 +315,13 @@ def permissions():
             return jsonify(permission)
         permission = Permission()
         permission.add_data(paras)
+        try:
+            management = Management.query.filter_by(name='S_MANAGEMENT').first()
+        except Exception:
+            return jsonify(response_return(1, u'数据查询出错'))
+        if not management:
+            return jsonify(response_return(1, '数据不存在'))
+        permission.p_managements.append(management)
         result = db_session_add(permission)
         return jsonify(result)
 

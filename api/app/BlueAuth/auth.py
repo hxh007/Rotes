@@ -124,8 +124,11 @@ class Authentication():
         if (user.lastchange.strftime("%Y-%m-%d %H:%M:%S") != payload['data']['lastchange']):
             return response_return(2, u'用户信息已修改，请重新登录')
         # 查询redis是否有登录用户的jwt_token
-        if not Redis.exists('jwt_' + user.mobile):
-            return response_return(2, u'请登录后访问')
+        try:
+            if not Redis.exists('jwt_' + user.mobile):
+                return response_return(2, u'请登录后访问')
+        except Exception:
+            return response_return(1, u'redis错误')
         g.user_id = payload['data']['id']
         g.managerList = payload['data']['managerList']
         return response_return(0, u'token验证通过')
@@ -154,7 +157,7 @@ class Authentication():
                 # 用户所在管理组
                 managerList = g.managerList
                 if not managerList:
-                    return jsonify(response_return(1, u'没有权限访问'))
+                    return jsonify(response_return(3, u'没有权限访问'))
                 # 超级管理组
                 S_MANAGEMENT = 'S_MANAGEMENT'
                 if S_MANAGEMENT in managerList:
@@ -165,10 +168,10 @@ class Authentication():
                     try:
                         manager = Management.query.filter_by(name=m).first()
                     except Exception:
-                        return jsonify(response_return(1, u'数据查询失败'))
+                        return jsonify(response_return(3, u'数据查询失败'))
                     u_p = get_table(result=response_return(), execute='relationship', relationship=(manager.permissions))
                     if isinstance(u_p, dict) or isinstance(manager, dict):
-                        return jsonify(response_return(1, u'u_p或manager数据查询失败'))
+                        return jsonify(response_return(3, u'u_p或manager数据查询失败'))
                     u_permissions.extend(u_p)
                 # 访问部门资源
                 module_departId = request.values.get('departId')
@@ -178,21 +181,21 @@ class Authentication():
                                               execute='get', id=module_departId
                                               )
                     if isinstance(depart, dict):
-                        return jsonify(response_return(1, u'部门数据查询失败或无部门信息'))
+                        return jsonify(response_return(3, u'部门数据查询失败或无部门信息'))
                     d_permissions = depart.permissions.all()
                     d_u_permissions = [p for p in u_permissions if p in d_permissions]
                     if not d_u_permissions:
-                        return jsonify(response_return(1, u'没有权限访问'))
+                        return jsonify(response_return(3, u'没有权限访问'))
                     allow_method = [ p for p in d_u_permissions if p.codename == request.method]
                     if not allow_method:
-                        return jsonify(response_return(1, u'没有权限访问'))
+                        return jsonify(response_return(3, u'没有权限访问'))
                     return fn(*args, **kwargs)
                 # 访问非部门资源
                 if manager_list:
                     allow_manager = [m for m in manager_list if m in managerList]
                     if not allow_manager:
-                        return jsonify(response_return(1, u'没有权限访问'))
+                        return jsonify(response_return(3, u'没有权限访问'))
                     return fn(*args, **kwargs)
-                return jsonify(response_return(1, u'没有权限访问'))
+                return jsonify(response_return(3, u'没有权限访问'))
             return decorated_view
         return wrapper
