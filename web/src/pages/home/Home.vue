@@ -372,7 +372,6 @@ export default {
     getLoginStatus (new_, old_) {
       console.log(new_, old_)
       if (!new_) { // 退出
-        alert('退出了')
         this.departSearch = 0
         this.getDuties()
       }
