@@ -5,15 +5,18 @@ from collections import defaultdict
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
 import os
+from threading import Thread
+import time
 
 from flask import render_template, request, jsonify
-from flask import send_file
+from flask import send_file, current_app
 
 from . import blue_watch
 from app import db
 from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
 from config import Config
+from app import create_app
 
 
 # 新增单条值班记录
@@ -569,7 +572,9 @@ def xlsx():
         return jsonify(result)
     # 3 调用生成excel函数
     Excel_filename = os.path.join(Config.Excel_path, dateStart+'_' + dateEnd + '.xlsx')
-    data_to_xlsx(Excel_filename, dateList)
+    # 子线程
+    to_xlsx = Thread(target=data_to_xlsx, args=(Excel_filename, dateList, current_app._get_current_object()))
+    to_xlsx.start()
     result['data'] = dateStart+'_' + dateEnd + '.xlsx'
     return jsonify(result)
 
