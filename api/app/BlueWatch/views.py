@@ -490,7 +490,6 @@ def dutys():
                     # count
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                         'count'] = 1
-
             else:
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")] = defaultdict(dict)
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
@@ -550,7 +549,7 @@ def smsTemplate():
 # 转为Excel文件
 @blue_watch.route('/datatoxlsx', methods=['GET'])
 def xlsx():
-    result = {'code': 1, 'msg': u'已生成Excel文件'}
+    result = {'code': 1, 'msg': u'正在生成Excel文件'}
     # 1 接收参数
     if request.is_json:
         data = request.get_json()
@@ -595,5 +594,5 @@ def send_xlsx():
         result = send_file('static/' + fileName1)
         return result
     except:
-        result['msg'] = u'下载失败'
+        result['msg'] = u'正在生成Excel文件'
         return jsonify(result)
