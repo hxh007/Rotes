@@ -570,7 +570,7 @@ def xlsx():
         data = request.values
     dateStart = data.get('dateStart')
     dateEnd = data.get('dateEnd')
-    # 3 参数校验
+    # 2 参数校验
     if not all([dateStart, dateEnd]):
         result['msg'] = u'参数缺失'
     if dateStart > dateEnd:

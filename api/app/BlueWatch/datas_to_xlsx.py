@@ -12,7 +12,6 @@ from app.models import Duty, Department
 
 # 生成excel数据
 def data_to_xlsx(filename, dateStart, dateEnd):
-    # data = {}
     list_table_head = [u'部门', u'部门负责人', u'角色',]
     s_day = datetime.strptime(dateStart, '%Y-%m-%d').date()
     e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
@@ -25,12 +24,14 @@ def data_to_xlsx(filename, dateStart, dateEnd):
     workbook = xlsxwriter.Workbook(filename)
     sheet = workbook.add_worksheet()
     merge_format = workbook.add_format({
+        'bold': True,
         'align': 'center',
         'valign': 'vcenter',
+        'color': '#000000',
     })
     # 1 表头第一行写入
     for i in range(len(list_table_head)):
-        sheet.write(0, i, list_table_head[i])
+        sheet.write(0, i, list_table_head[i], merge_format)
     # # 2 第二行，值班总监，三线值班
     sheet.merge_range(1, 0, 1, 2, u'值班总监', merge_format)
     sheet.merge_range(2, 0, 2, 2, u'三线值班', merge_format)
@@ -78,15 +79,14 @@ def data_to_xlsx(filename, dateStart, dateEnd):
                 else:
                     dutyInfo[duty_obj.depart] = defaultdict(dict)
                     dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')] = [duty_obj.duty_name]
-    # 4.2 没记录的，求差集
-    # 没部门记录的
+    # 4.2 没部门记录的
     departs_lose_list = list(set(departRoles.keys()) - set(dutyInfo.keys()))
     if departs_lose_list:
         for depart_list in departs_lose_list:
             dutyInfo[depart_list] = {}
             for role_name in departRoles[depart_list]:
                 dutyInfo[depart_list][role_name] = {}
-    # 有部门没角色记录的
+    # 4.3 有部门没角色记录的
     for depart_lose_name in dutyInfo.keys():
         role_quan = set(departRoles[depart_lose_name])
         role_lose = set(dutyInfo[depart_lose_name].keys())
@@ -109,45 +109,42 @@ def data_to_xlsx(filename, dateStart, dateEnd):
                 dutyInfo[depart_lose_name][role_list]['count'] = count
                 depart_count += dutyInfo[depart_lose_name][role_list]['count']
         dutyInfo[depart_lose_name]['count'] = depart_count
-    # data['dutyInfo'] = dutyInfo
-    # return jsonify(data)
     # 5 写入整理的数据
     # 第几行
     row_depart = 3
-    # 6 写入系统运维部、网络安全部的信息
+    # 5.1 写入系统运维部、网络安全部的信息
     op_alias = Department.query.filter_by(name='MODULE_OP').first().alias
     sec_alias = Department.query.filter_by(name='MODULE_SEC').first().alias
     op_sec_list = [op_alias, sec_alias]
     for op_sec in op_sec_list:
-        # 部门负责人，数量
+        # 5.2 部门负责人，数量
         op_sec_depart = ','.join(departInfo[op_sec])
         op_sec_count = dutyInfo[op_sec]['count']
         for os_i in range(op_sec_count):
-            # 6.1 部门名，负责人
+            # 5.3 部门名，负责人
             sheet.write(row_depart+os_i, 0, op_sec)
             sheet.write(row_depart+os_i, 1, op_sec_depart)
-        # 合并部门单元格
+        # 5.4 合并部门单元格
         if op_sec_count == 1:
-            pass
+            sheet.write(row_depart, 0, op_sec, merge_format)
+            sheet.write(row_depart, 1, op_sec_depart, merge_format)
         else:
-            pass
-            # sheet.merge_range(row_depart, 0, row_depart+op_sec_count, 0, op_sec, merge_format)
-            # sheet.merge_range(row_depart, 1, row_depart+op_sec_count, 1, op_sec_depart, merge_format)
+            sheet.merge_range(row_depart, 0, row_depart+op_sec_count-1, 0, op_sec, merge_format)
+            sheet.merge_range(row_depart, 1, row_depart+op_sec_count-1, 1, op_sec_depart, merge_format)
         os_roles_list = filter(lambda x: x != 'count', dutyInfo[op_sec].keys())
-        # 写角色信息
+        # 5.5 写角色信息
         if os_roles_list:
             for os_role in os_roles_list:
                 role_count = dutyInfo[op_sec][os_role]['count']
                 for role_i1 in range(role_count):
                     # 写入角色名
                     sheet.write(row_depart + role_i1, 2, os_role)
-                # 合并角色单元格
+                # 5.6 合并角色单元格
                 if role_count == 1:
-                    pass
+                    sheet.write(row_depart, 2, os_role, merge_format)
                 else:
-                    # sheet.merge_range(row_depart, 2, row_depart + role_count, 2, os_role, merge_format)
-                    pass
-                # 值班日期列表
+                    sheet.merge_range(row_depart, 2, row_depart + role_count-1, 2, os_role, merge_format)
+                # 5.7 值班日期列表
                 date_list1 = dutyInfo[op_sec][os_role].keys()
                 date_list2 = filter(lambda x: x != 'count', date_list1)
                 for date_day in date_list2:
@@ -163,23 +160,24 @@ def data_to_xlsx(filename, dateStart, dateEnd):
             row_depart += op_sec_count
         # 清除两个部门
         dutyInfo.pop(op_sec)
-    # 8 其他部门的
+    # 6 其他部门的
     for depart_name, role_name in dutyInfo.items():
-        # 1 部门信息写多少行
+        # 6.1 部门信息写多少行
         depart_counts = dutyInfo[depart_name]['count']
         for i in range(depart_counts):
-            # 1 写入部门名
+            # 写入部门名
             sheet.write(row_depart+i, 0, depart_name)
-            # 2 写入负责人
+            # 写入负责人
             sheet.write(row_depart+i, 1, ','.join(departInfo[depart_name]))
-        # 合并部门单元格
+        # 6.2 合并部门单元格
         if depart_counts == 1:
-            pass
+            sheet.write(row_depart, 0, depart_name, merge_format)
+            sheet.write(row_depart, 1, ','.join(departInfo[depart_name]), merge_format)
         else:
             pass
-            # sheet.merge_range(row_depart, 0, row_depart+depart_counts, 0, depart_name, merge_format)
-            # sheet.merge_range(row_depart, 1, row_depart+depart_counts, 1, ','.join(departInfo[depart_name]), merge_format)
-        # 2 角色信息写入
+            sheet.merge_range(row_depart, 0, row_depart+depart_counts-1, 0, depart_name, merge_format)
+            sheet.merge_range(row_depart, 1, row_depart+depart_counts-1, 1, ','.join(departInfo[depart_name]), merge_format)
+        # 6.3 角色信息写入
         list2 = role_name.keys()
         roleInfo = filter(lambda x: x != 'count', list2)
         if roleInfo:
@@ -192,19 +190,19 @@ def data_to_xlsx(filename, dateStart, dateEnd):
                 for i1 in range(count1):
                     # 写入角色名
                     sheet.write(row_depart+i1, 2, role1)
-                # 合并角色单元格
+                # 6.4 合并角色单元格
                 if count1 == 1:
-                    pass
+                    sheet.write(row_depart, 2, role1, merge_format)
                 else:
                     pass
-                    # sheet.merge_range(row_depart, 2, row_depart + count1, 2, role1, merge_format)
+                    sheet.merge_range(row_depart, 2, row_depart + count1-1, 2, role1, merge_format)
                 for date_day in date_list2:
                     # 日期列数
                     date_line = list_table_head.index(date_day)
                     # 当天值班人列表
                     duty_names = role_name[role1][date_day]
                     for duty_namer in duty_names:
-                        # 3 写入值班人
+                        # 6.5 写入值班人
                         sheet.write(row_depart+duty_names.index(duty_namer), date_line, duty_namer)
                 row_depart += count1
         else:
