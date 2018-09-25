@@ -1,26 +1,18 @@
 # coding=utf-8
 
-import dateutil.rrule
-from datetime import datetime, timedelta
 from collections import defaultdict
 import xlsxwriter
-
-from flask import jsonify
 
 from app.models import Duty, Department
 
 
 # 生成excel数据
-def data_to_xlsx(filename, dateStart, dateEnd):
+def data_to_xlsx(filename, dateList):
     list_table_head = [u'部门', u'部门负责人', u'角色',]
-    s_day = datetime.strptime(dateStart, '%Y-%m-%d').date()
-    e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
-    while dateStart <= dateEnd:
-        list_table_head.append(dateStart)
-        day_date = datetime.strptime(dateStart, '%Y-%m-%d').date()
-        day_date += timedelta(days=1)
-        dateStart = day_date.strftime('%Y-%m-%d')
-        continue
+    s_day = dateList[0].strftime('%Y-%m-%d')
+    e_day = dateList[-1].strftime('%Y-%m-%d')
+    for datedate in dateList:
+        list_table_head.append(datedate.strftime('%Y-%m-%d'))
     workbook = xlsxwriter.Workbook(filename)
     sheet = workbook.add_worksheet()
     merge_format = workbook.add_format({
