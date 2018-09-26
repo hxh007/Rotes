@@ -6,7 +6,7 @@
       </div>
       <div class="form-detail">
         <div class="form-login">
-          <Form ref="formItem" :model="formItem" :rules="ruleFormItem" @keyup.enter="handleSubmit('formItem')">
+          <Form ref="formItem" :model="formItem" :rules="ruleFormItem">
             <FormItem prop="user">
               <Input type="text" v-model="formItem.user" placeholder="用户名">
                 <Icon type="ios-person-outline" slot="prepend"></Icon>
@@ -93,6 +93,14 @@ export default {
     // localStorage.setItem('userName', null)
     // localStorage.setItem('userToken', null)
     next()
+  },
+  mounted () {
+    document.onkeydown = (ev) => {
+      let key = ev.key
+      if (key === 'Enter') {
+        this.handleSubmit('formItem')
+      }
+    }
   }
 }
 </script>

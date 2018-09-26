@@ -6,7 +6,7 @@
         <Row>
           <Col>
             <Select v-model.number="departSearch" style="width:200px" @on-change="changeOnSelect">
-              <Option v-for="item in myDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
+              <Option v-for="item in myDeparts" :value="item.id" :key="item.id" :disabled="item.disabled">{{ item.label }}</Option>
             </Select>
           </Col>
         </Row>
@@ -110,7 +110,11 @@ export default {
       // 如果用户登录拥有所属部门，则筛选条件默认为所属部门之一;若未登录或登陆后并不属于任何部门，此处默认显示所有部门的值班记录
       myDeparts: [],
       departSearch: 0,
-      departSearchName: ''
+      departSearchName: '',
+      calendarYear: '',
+      calendarMonth: '',
+      thisYear: '',
+      thisMonth: ''
     }
   },
   methods: {
@@ -118,12 +122,41 @@ export default {
       if (this.curMonthview !== this.$root.getCurrentMonth(arguments[2])) {
         this.curMonthview = this.$root.getCurrentMonth(arguments[2])
         this.monthviewFisrt = arguments[2]
-        let year = new Date(arguments[2]).getFullYear()
-        let month = new Date(arguments[2]).getMonth() + 1
-        let days = new Date(year, month, 0).getDate()
-        this.monthviewLast = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, days].join('-')))
+        this.calendarYear = new Date(arguments[2]).getFullYear()
+        this.calendarMonth = new Date(arguments[2]).getMonth() + 1
+        let days = new Date(this.calendarYear, this.calendarMonth, 0).getDate()
+        this.monthviewLast = this.$root.formatDate('yyyy-MM-dd', new Date([this.calendarYear, this.calendarMonth, days].join('-')))
+        this.thisYear = new Date().getFullYear()
+        this.thisMonth = new Date().getMonth() + 1
+        if (this.thisYear === this.calendarYear) { // 年份一样，比月份
+          if (this.thisMonth > this.calendarMonth) {
+            this.departSearch = 0
+            this.disableDepartSearch()
+          } else {
+            this.enabledDepartSearch()
+          }
+        } else if (this.thisYear > this.calendarYear) { //
+          this.departSearch = 0
+          this.disableDepartSearch()
+        } else {
+          alert(2)
+          this.enabledDepartSearch()
+        }
         this.getDuties()
       }
+    },
+    enabledDepartSearch () {
+      this.myDeparts.forEach((item, index) => {
+        item.disabled = false
+      })
+      console.log(this.myDeparts)
+    },
+    disableDepartSearch () {
+      this.myDeparts.forEach((item, index) => {
+        if (item.id !== 0) { // 要被禁掉的下拉选项
+          item.disabled = true
+        }
+      })
     },
     dayClickFunc () {
       this.currentDay = this.$root.formatDate('yyyy-MM-dd', arguments[0]) // 点击的具体某个日期
@@ -347,7 +380,8 @@ export default {
           this.$store.state.myDepartments.forEach((item, index) => {
             this.myDeparts.push({
               id: item.id,
-              label: item.alias
+              label: item.alias,
+              disabled: false
             })
           })
         }
@@ -384,7 +418,8 @@ export default {
     // ---- 初始化操作
     this.myDeparts = [{
       id: 0,
-      label: '所有部门'
+      label: '所有部门',
+      disabled: false
     }]
     this.getDuties()
     this.bus.$on('refreshCalendar', () => {
