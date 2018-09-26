@@ -20,32 +20,32 @@
           <Icon type="ios-analytics"></Icon>
           后台管理
         </template>
-        <MenuItem name="/backend/adminManage" v-if="showBackend && !showMessManage">
+        <MenuItem name="/backend/adminManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/backend/adminManage">
             管理组
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/userManage" v-if="showBackend && !showMessManage">
+        <MenuItem name="/backend/userManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/backend/userManage">
             用户管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/permissionManage" v-if="showBackend && !showMessManage">
+        <MenuItem name="/backend/permissionManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/backend/permissionManage">
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/departManage" v-if="showBackend && !showMessManage">
+        <MenuItem name="/backend/departManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/backend/departManage">
             部门管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/roleManage" v-if="showBackend && !showMessManage">
+        <MenuItem name="/backend/roleManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/backend/roleManage">
             角色管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/operationManage" v-if="showBackend && !showMessManage">
+        <MenuItem name="/backend/operationManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/backend/operationManage">
             操作管理
           </router-link>

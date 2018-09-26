@@ -284,6 +284,7 @@ export default {
     },
     getAllStaffSuccess (response) {
       let res = response.data
+      this.staffLists = []
       if (res.code === 0) {
         res.data.forEach((item, index) => {
           this.staffLists.push({
@@ -295,6 +296,7 @@ export default {
     },
     getRelatedRoles (response) {
       let res = response.data
+      this.roleLists = []
       if (res.code === 0) {
         res.data.forEach((item, index) => {
           this.roleLists.push({

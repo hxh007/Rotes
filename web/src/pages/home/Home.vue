@@ -146,6 +146,7 @@ export default {
             let dutyListData = res.data.dutyList
             if (dutyListData[item]) { // 该日有值班记录
               for (let dutyName in dutyListData[item]) {
+                console.log(dutyListData[item][dutyName])
                 this.fcEvents.push({
                   'title': dutyName + '——' + dutyListData[item][dutyName] + '条记录',
                   'start': item,
