@@ -63,15 +63,15 @@ def data_to_xlsx(filename, dateList, capp):
                         if duty_obj.role in dutyInfo[duty_obj.depart].keys():
                             # 判时间
                             if duty_obj.duty_time.strftime('%Y-%m-%d') in dutyInfo[duty_obj.depart][duty_obj.role].keys():
-                                dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')].append(duty_obj.duty_name)
+                                dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')].append(duty_obj.duty_name + duty_obj.mobile)
                             else:
                                 dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')] = [
-                                    duty_obj.duty_name]
+                                    duty_obj.duty_name + duty_obj.mobile]
                         else:
-                            dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')] = [duty_obj.duty_name]
+                            dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')] = [duty_obj.duty_name + duty_obj.mobile]
                     else:
                         dutyInfo[duty_obj.depart] = defaultdict(dict)
-                        dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')] = [duty_obj.duty_name]
+                        dutyInfo[duty_obj.depart][duty_obj.role][duty_obj.duty_time.strftime('%Y-%m-%d')] = [duty_obj.duty_name + duty_obj.mobile]
         # 4.2 没部门记录的
         departs_lose_list = list(set(departRoles.keys()) - set(dutyInfo.keys()))
         if departs_lose_list:

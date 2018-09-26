@@ -473,27 +473,27 @@ def dutys():
                     if duty_obj.role in dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart].keys():
                         # 存在则数量+1
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            duty_obj.id] = duty_obj.duty_name
+                            duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                         # count
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                             'count'] += 1
                     else:
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            duty_obj.id] = duty_obj.duty_name
+                            duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                         # count
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                             'count'] = 1
                 else:
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                        duty_obj.id] = duty_obj.duty_name
+                        duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                     # count
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                         'count'] = 1
             else:
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")] = defaultdict(dict)
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
-                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name
+                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                 # count
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role]['count'] = 1
     result['data']['dutyList'] = dutyLists
