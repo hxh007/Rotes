@@ -5,17 +5,18 @@ from collections import defaultdict
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
 import os
-import xlsxwriter
+from threading import Thread
+import time
 
 from flask import render_template, request, jsonify
-from sqlalchemy import func, sql
-from flask import send_file, send_from_directory
+from flask import send_file, current_app
 
 from . import blue_watch
 from app import db
 from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
 from config import Config
+from app import create_app
 
 
 # 新增单条值班记录
@@ -265,22 +266,16 @@ def dutysCount():
         result['msg'] = u'日期不合理'
         return jsonify(result)
     try:
-        s_day = datetime.strptime(dateStart, '%Y-%m-%d').date()
-        e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
+        datelist = list(rrule(DAILY, dtstart=parse(dateStart), until=parse(dateEnd)))
     except:
         result['msg'] = u'日期格式不正确'
         return jsonify(result)
-    if len(dateStart) != 10 or len(dateEnd) != 10:
-        result['msg'] = u'日期格式不规范'
-        return jsonify(result)
+    s_day = datelist[0].strftime('%Y-%m-%d')
+    e_day = datelist[-1].strftime('%Y-%m-%d')
     # 3 日期列表
     dateList = []
-    while dateStart <= dateEnd:
-        dateList.append(dateStart)
-        day_date = datetime.strptime(dateStart, '%Y-%m-%d').date()
-        day_date += timedelta(days=1)
-        dateStart = day_date.strftime('%Y-%m-%d')
-        continue
+    for date_01 in datelist:
+        dateList.append(date_01.strftime('%Y-%m-%d'))
     result['data']['dateList'] = dateList
     # 4 单部门
     if departId:
@@ -380,23 +375,16 @@ def dutys():
         result['msg'] = u'日期不合理'
         return jsonify(result)
     try:
-        s_day = datetime.strptime(dateStart, '%Y-%m-%d').date()
-        e_day = datetime.strptime(dateEnd, '%Y-%m-%d').date()
+        datelist = list(rrule(DAILY, dtstart=parse(dateStart), until=parse(dateEnd)))
     except:
         result['msg'] = u'日期格式不正确'
         return jsonify(result)
-    if len(dateStart) != 10 or len(dateEnd) != 10:
-        result['msg'] = u'日期格式不规范'
-        return jsonify(result)
-    # todo 起线程任务
+    s_day = datelist[0].strftime('%Y-%m-%d')
+    e_day = datelist[-1].strftime('%Y-%m-%d')
     # 3 日期列表
     dateList = []
-    while dateStart <= dateEnd:
-        dateList.append(dateStart)
-        day_date = datetime.strptime(dateStart, '%Y-%m-%d').date()
-        day_date += timedelta(days=1)
-        dateStart = day_date.strftime('%Y-%m-%d')
-        continue
+    for date_01 in datelist:
+        dateList.append(date_01.strftime('%Y-%m-%d'))
     result['data']['dateList'] = dateList
     # 4 单部门
     if departId:
@@ -502,7 +490,6 @@ def dutys():
                     # count
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                         'count'] = 1
-
             else:
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")] = defaultdict(dict)
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
@@ -562,7 +549,7 @@ def smsTemplate():
 # 转为Excel文件
 @blue_watch.route('/datatoxlsx', methods=['GET'])
 def xlsx():
-    result = {'code': 1, 'msg': u'已生成Excel文件'}
+    result = {'code': 1, 'msg': u'正在生成Excel文件'}
     # 1 接收参数
     if request.is_json:
         data = request.get_json()
@@ -570,24 +557,23 @@ def xlsx():
         data = request.values
     dateStart = data.get('dateStart')
     dateEnd = data.get('dateEnd')
-    # 3 参数校验
+    # 2 参数校验
     if not all([dateStart, dateEnd]):
         result['msg'] = u'参数缺失'
+        return jsonify(result)
     if dateStart > dateEnd:
         result['msg'] = u'日期不合理'
         return jsonify(result)
     try:
-        datetime.strptime(dateStart, '%Y-%m-%d').date()
-        datetime.strptime(dateEnd, '%Y-%m-%d').date()
+        dateList = list(rrule(DAILY, dtstart=parse(dateStart), until=parse(dateEnd)))
     except:
         result['msg'] = u'日期格式不正确'
         return jsonify(result)
-    if len(dateStart) != 10 or len(dateEnd) != 10:
-        result['msg'] = u'日期格式不规范'
-        return jsonify(result)
     # 3 调用生成excel函数
     Excel_filename = os.path.join(Config.Excel_path, dateStart+'_' + dateEnd + '.xlsx')
-    data_to_xlsx(Excel_filename, dateStart, dateEnd)
+    # 子线程
+    to_xlsx = Thread(target=data_to_xlsx, args=(Excel_filename, dateList, current_app._get_current_object()))
+    to_xlsx.start()
     result['data'] = dateStart+'_' + dateEnd + '.xlsx'
     return jsonify(result)
 
@@ -608,5 +594,5 @@ def send_xlsx():
         result = send_file('static/' + fileName1)
         return result
     except:
-        result['msg'] = u'下载失败'
+        result['msg'] = u'正在生成Excel文件'
         return jsonify(result)
