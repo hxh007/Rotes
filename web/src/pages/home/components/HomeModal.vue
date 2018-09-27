@@ -133,7 +133,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../../libs/axios'
 export default {
   name: 'HomeModal',
   data () {
@@ -169,14 +169,14 @@ export default {
   watch: {
     departSearchComputed (new_, old_) {
       if (new_ !== 0) {
-        axios.get('/back/relations', {
+        instance.get('/back/relations', {
           params: {
             fid: this.departSearch === 0 ? undefined : this.departSearch,
             genre: 1,
             not_add: 0
           }
         }).then(this.getAllStaffSuccess)
-        axios.get('/back/relations', {
+        instance.get('/back/relations', {
           params: {
             fid: this.departSearch,
             genre: 2,
@@ -190,7 +190,7 @@ export default {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.post('/back/duty', {
+          instance.post('/back/duty', {
             departId: this.departSearch, // 能进来的一定是有部门的
             dutyDate: this.currentDay,
             roleId: this.selectRole,
@@ -212,7 +212,7 @@ export default {
     },
     // 获取当前所选部门的值班记录
     getAllDutyRecords () {
-      axios.get('/back/dutyLists', {
+      instance.get('/back/dutyLists', {
         params: {
           departId: this.departSearch,
           dateStart: this.currentDay,
@@ -272,7 +272,7 @@ export default {
         title: '删除排班记录',
         content: '确认要删除该排班记录？',
         onOk: function () {
-          axios.delete('/back/duty/' + dutyId).then(function (response) {
+          instance.delete('/back/duty/' + dutyId).then(function (response) {
             if (response.data.code === 0) {
               that.getAllDutyRecords()
               that.$Message.success('删除成功！')

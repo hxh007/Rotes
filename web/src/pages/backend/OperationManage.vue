@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 export default {
   name: 'OperationManage',
   data () {
@@ -96,7 +96,7 @@ export default {
     createOperationOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.post('/back/actiontypes', {
+          instance.post('/back/actiontypes', {
             codename: this.formValidate.operationName,
             alias: this.formValidate.operationAlias
           }).then(this.createOperationCallback)
@@ -109,7 +109,7 @@ export default {
         this.$Message.success('操作创建成功！')
         this.$refs.formValidate.resetFields()
         this.createOperationFlag = false
-        axios.get('/back/actiontypes').then(this.getAllOperations)
+        instance.get('/back/actiontypes').then(this.getAllOperations)
       }
     },
     remove (id) {
@@ -118,10 +118,10 @@ export default {
         title: '删除操作',
         content: '确认要删除该操作？',
         onOk: function () {
-          axios.delete('/back/actiontypes/' + id).then(function (response) {
+          instance.delete('/back/actiontypes/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('操作删除成功！')
-              axios.get('/back/actiontypes').then(that.getAllOperations)
+              instance.get('/back/actiontypes').then(that.getAllOperations)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -131,7 +131,7 @@ export default {
     }
   },
   mounted () {
-    axios.get('/back/actiontypes').then(this.getAllOperations)
+    instance.get('/back/actiontypes').then(this.getAllOperations)
   }
 }
 </script>

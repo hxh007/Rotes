@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 export default {
   name: 'Register',
   data () {
@@ -114,7 +114,7 @@ export default {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.post('/back/register', {
+          instance.post('/back/register', {
             client_type: 100,
             fullname: this.formItem.fullname,
             username: this.formItem.username,

@@ -96,7 +96,6 @@ export default {
         if (this.$store.state.myGroups.length > 0) {
           const admin = this.$root.whetherAdmin()
           const businessManager = this.$root.whetherBusiManager()
-          console.log(admin, businessManager)
           if (admin || businessManager) {
             return true
           } else {

@@ -26,4 +26,17 @@ export const loadLoginUserInfo = () => {
     })
   }
 }
+// export const axiosRequest = (url, method, paramObj, success, error) => { // 添加公共头部
+//   const token = localStorage.getItem('userToken')
+//   if (method === 'GET' || method === 'get') {
+//     axios.get(url, {
+//       headers: {
+//         Authorization: 'JWT ' + token
+//       },
+//       params: paramObj
+//     }).then(success)
+//   } else {
+//     axios.method
+//   }
+// }
 

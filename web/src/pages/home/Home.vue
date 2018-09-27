@@ -89,7 +89,7 @@
 </template>
 <script>
 import FullCalendar from 'vue-fullcalendar'
-import axios from 'axios'
+import instance from '../../../libs/axios'
 import HomeModal from './components/HomeModal'
 export default {
   name: 'home',
@@ -253,7 +253,7 @@ export default {
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
       let departId = parseInt(this.departSearch) === 0 ? undefined : parseInt(this.departSearch)
-      axios.get('/back/dutysCount', {
+      instance.get('/back/dutysCount', {
         params: {
           departId: departId,
           dateStart: this.monthviewFisrt,
@@ -263,7 +263,7 @@ export default {
     },
     changeOnSelect () {
       if (this.departSearch !== undefined && this.departSearch !== 0) {
-        axios.get('/back/departments/' + this.departSearch).then((response) => {
+        instance.get('/back/departments/' + this.departSearch).then((response) => {
           const res = response.data
           if (res.code === 0) { // 查询成功
             this.departSearchName = res.data[0].alias
@@ -280,7 +280,7 @@ export default {
       // 查询具体的某一天的全部部门或者所有部门
       let dateStart = this.currentDay
       let dateEnd = this.currentDay
-      axios.get('/back/dutyLists', {
+      instance.get('/back/dutyLists', {
         params: {
           departId: departId,
           dateStart: dateStart,
@@ -389,7 +389,7 @@ export default {
       if (old_ !== new_) {
         if (new_ > 1) {
           this.departSearch = this.myDeparts[1].id
-          axios.get('/back/departments/' + this.departSearch).then((response) => {
+          instance.get('/back/departments/' + this.departSearch).then((response) => {
             const res = response.data
             if (res.code === 0) { // 查询成功
               this.departSearchName = res.data[0].alias

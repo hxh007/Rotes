@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 import { loadLoginUserInfo } from '../../../libs/util'
 
 export default {
@@ -355,7 +355,7 @@ export default {
     createAdminOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.post('/back/admin', {
+          instance.post('/back/admin', {
             name: this.formValidate.adminName,
             alias: this.formValidate.adminAlias
           }).then(this.createAdminCallback)
@@ -368,7 +368,7 @@ export default {
         // 创建成功
         this.$Message.success('管理员创建成功！')
         this.$refs.formValidate.resetFields()
-        axios.get('/back/admin').then(this.loadAllAdmins)
+        instance.get('/back/admin').then(this.loadAllAdmins)
         this.createAdminFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -390,7 +390,7 @@ export default {
     editAdminOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.put('/back/admin/' + this.curItem.id, {
+          instance.put('/back/admin/' + this.curItem.id, {
             name: this.editFormValidate.adminName,
             alias: this.editFormValidate.adminAlias,
             remark: this.editFormValidate.remark,
@@ -404,7 +404,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('管理员信息编辑成功！')
         this.$refs.editFormValidate.resetFields()
-        axios.get('/back/admin').then(this.loadAllAdmins)
+        instance.get('/back/admin').then(this.loadAllAdmins)
         this.editAdminFlag = false
       } else {
         this.editAdminFlag = true
@@ -416,10 +416,10 @@ export default {
         title: '删除管理员',
         content: '确认要删除该管理员？',
         onOk: function () {
-          axios.delete('/back/admin/' + id).then(function (response) {
+          instance.delete('/back/admin/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('管理员删除成功！')
-              axios.get('/back/admin').then(that.loadAllAdmins)
+              instance.get('/back/admin').then(that.loadAllAdmins)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -434,14 +434,14 @@ export default {
       this.permissionToGroupFlag = true
     },
     loadGroupsPermissions () {
-      axios.get('/back/relations', { // 已添加关系
+      instance.get('/back/relations', { // 已添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 4,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedPermissions)
-      axios.get('/back/relations', { // 未添加关系
+      instance.get('/back/relations', { // 未添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 4,
@@ -462,7 +462,7 @@ export default {
       }
     },
     addPermission (id) { // 添加权限给指定的管理组
-      axios.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
+      instance.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
         sid: id
       }).then(this.addPermissionSuccess)
     },
@@ -476,7 +476,7 @@ export default {
       }
     },
     removePermissions (id) { // 删除已添加的用户
-      axios.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
+      instance.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
         data: {
           sid: id
         }
@@ -498,14 +498,14 @@ export default {
       this.userToAdminGroupFlag = true
     },
     loadUsers () {
-      axios.get('/back/relations', { // 已添加关系
+      instance.get('/back/relations', { // 已添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 3,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedUsers)
-      axios.get('/back/relations', { // 未添加关系
+      instance.get('/back/relations', { // 未添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 3,
@@ -528,7 +528,7 @@ export default {
     addUser (id) { // 添加用户给指定管理组
       if (this.$store.state.currentUserId === id) this.isEditGroup = 1
       else this.isEditGroup = 0
-      axios.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
+      instance.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         sid: id
       }).then(this.addUserSuccess)
     },
@@ -547,7 +547,7 @@ export default {
     removeUser (id) { // 删除已添加的用户
       if (this.$store.state.currentUserId === id) this.isEditGroup = 1
       else this.isEditGroup = 0
-      axios.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
+      instance.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         data: {
           sid: id
         }
@@ -567,7 +567,7 @@ export default {
     }
   },
   mounted () {
-    axios.get('/back/admin').then(this.loadAllAdmins)
+    instance.get('/back/admin').then(this.loadAllAdmins)
   }
 }
 </script>

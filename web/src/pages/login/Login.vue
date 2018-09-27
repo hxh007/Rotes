@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 import { mapMutations } from 'vuex'
 // import store from '@/store'
 export default {
@@ -66,7 +66,7 @@ export default {
     handleSubmit (name) { // 登录
       this.$refs[name].validate((valid) => {
         if (valid) { // 表单验证通过
-          axios.post('/back/login', {
+          instance.post('/back/login', {
             username: this.formItem.user,
             password: this.formItem.password,
             client_type: 100

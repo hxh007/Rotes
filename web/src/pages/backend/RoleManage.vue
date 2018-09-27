@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 export default {
   name: 'RoleManage',
   data () {
@@ -166,7 +166,7 @@ export default {
     createRoleOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.post('/back/roles', {
+          instance.post('/back/roles', {
             name: this.formValidate.roleName,
             alias: this.formValidate.roleAlias
           }).then(this.createRoleCallback)
@@ -178,7 +178,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('角色创建成功！')
         this.$refs.formValidate.resetFields()
-        axios.get('/back/roles').then(this.loadAllRoles)
+        instance.get('/back/roles').then(this.loadAllRoles)
         this.createRoleFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -200,7 +200,7 @@ export default {
     editRoleOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.put('/back/roles/' + this.curItem.id, {
+          instance.put('/back/roles/' + this.curItem.id, {
             name: this.editFormValidate.roleName,
             alias: this.editFormValidate.roleAlias,
             remark: this.editFormValidate.remark,
@@ -215,7 +215,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('角色编辑成功！')
         this.$refs.editFormValidate.resetFields()
-        axios.get('/back/roles').then(this.loadAllRoles)
+        instance.get('/back/roles').then(this.loadAllRoles)
         this.editRoleFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -227,10 +227,10 @@ export default {
         title: '删除角色',
         content: '确认要删除该角色？',
         onOk: function () {
-          axios.delete('/back/roles/' + id).then(function (response) {
+          instance.delete('/back/roles/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('角色删除成功！')
-              axios.get('/back/roles').then(that.loadAllRoles)
+              instance.get('/back/roles').then(that.loadAllRoles)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -240,7 +240,7 @@ export default {
     }
   },
   mounted () {
-    axios.get('/back/roles').then(this.loadAllRoles)
+    instance.get('/back/roles').then(this.loadAllRoles)
   }
 }
 </script>

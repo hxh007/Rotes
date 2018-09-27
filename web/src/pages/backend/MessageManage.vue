@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 export default {
   name: 'MessageManage',
   data () {
@@ -75,7 +75,7 @@ export default {
     editSMSOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.put('/back/tempContent', {
+          instance.put('/back/tempContent', {
             tempContent: this.editFormValidate.tempContent
           }).then(this.editSMSSuccess)
         }
@@ -86,7 +86,7 @@ export default {
       let res = response.data
       if (res.code === 0) { // 修改成功
         this.$Message.success('修改成功！')
-        axios.get('/back/tempContent').then(this.loadAllTemplates)
+        instance.get('/back/tempContent').then(this.loadAllTemplates)
         this.editFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -101,7 +101,7 @@ export default {
     }
   },
   mounted () {
-    axios.get('/back/tempContent').then(this.loadAllTemplates)
+    instance.get('/back/tempContent').then(this.loadAllTemplates)
   }
 }
 </script>

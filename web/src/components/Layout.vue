@@ -38,7 +38,7 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
+import instance from '../../libs/axios'
 import AppMenu from '@/components/AppMenu'
 export default {
   data () {
@@ -92,7 +92,7 @@ export default {
     menuAction (name) {
       const token = this.$store.state.token
       if (name === 'exit') { // 退出
-        axios.get('/back/logout', {
+        instance.get('/back/logout', {
           headers: {
             Authorization: 'JWT ' + token
           }

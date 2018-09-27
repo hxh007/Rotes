@@ -35,6 +35,7 @@
 </template>
 
 <script>
+// import instance from  '../../../libs/axios'
 export default {
   name: 'Schedule',
   data () {

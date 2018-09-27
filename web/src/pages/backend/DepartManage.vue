@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import instance from '../../../libs/axios'
 export default {
   name: 'DepartManage',
   data () {
@@ -348,7 +348,7 @@ export default {
     createDepartOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.post('/back/departments', {
+          instance.post('/back/departments', {
             name: this.formValidate.departName,
             alias: this.formValidate.departAlias
           }).then(this.createDepartCallback)
@@ -361,7 +361,7 @@ export default {
         this.$Message.success('部门创建成功！')
         this.createDepartFlag = false
         this.$refs.formValidate.resetFields()
-        axios.get('/back/departments').then(this.loadAllDeparts)
+        instance.get('/back/departments').then(this.loadAllDeparts)
       }
     },
     editDepartCancel (name) {
@@ -371,7 +371,7 @@ export default {
     editDepartOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          axios.put('/back/departments/' + this.editFormValidate.id, {
+          instance.put('/back/departments/' + this.editFormValidate.id, {
             name: this.editFormValidate.departName,
             alias: this.editFormValidate.departAlias,
             remark: this.editFormValidate.remark,
@@ -387,7 +387,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('部门信息编辑成功！')
         this.editDepartFlag = false
-        axios.get('/back/departments').then(this.loadAllDeparts)
+        instance.get('/back/departments').then(this.loadAllDeparts)
       } else {
         this.$Message.error('部门信息编辑失败！')
         this.editDepartFlag = true
@@ -408,10 +408,10 @@ export default {
         title: '删除部门',
         content: '确认要删除该部门？',
         onOk: function () {
-          axios.delete('/back/departments/' + id).then(function (response) {
+          instance.delete('/back/departments/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('部门删除成功！')
-              axios.get('/back/departments').then(that.loadAllDeparts)
+              instance.get('/back/departments').then(that.loadAllDeparts)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -426,14 +426,14 @@ export default {
       this.roleToDepartFlag = true
     },
     loadRoles () {
-      axios.get('/back/relations', { // 已添加关系
+      instance.get('/back/relations', { // 已添加关系
         params: {
           fid: this.selectDepart,
           genre: 2,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedRoles)
-      axios.get('/back/relations', { // 未添加关系
+      instance.get('/back/relations', { // 未添加关系
         params: {
           fid: this.selectDepart,
           genre: 2,
@@ -454,7 +454,7 @@ export default {
       }
     },
     removeRole (id) { // 删除已添加的角色
-      axios.delete('/back/relations?fid=' + this.selectDepart + '&genre=' + 2, {
+      instance.delete('/back/relations?fid=' + this.selectDepart + '&genre=' + 2, {
         data: {
           sid: id
         }
@@ -469,7 +469,7 @@ export default {
       }
     },
     addRole (id) { // 添加角色给指定部门
-      axios.post('/back/relations?fid=' + this.selectDepart + '&genre=' + 2, {
+      instance.post('/back/relations?fid=' + this.selectDepart + '&genre=' + 2, {
         sid: id
       }).then(this.addRoleSuccess)
     },
@@ -488,14 +488,14 @@ export default {
       this.userToDepartFlag = true
     },
     loadUsers () {
-      axios.get('/back/relations', { // 已添加关系
+      instance.get('/back/relations', { // 已添加关系
         params: {
           fid: this.selectDepart,
           genre: 1,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedUsers)
-      axios.get('/back/relations', { // 未添加关系
+      instance.get('/back/relations', { // 未添加关系
         params: {
           fid: this.selectDepart,
           genre: 1,
@@ -516,7 +516,7 @@ export default {
       }
     },
     addUser (id) { // 添加用户给指定部门
-      axios.post('/back/relations?fid=' + this.selectDepart + '&genre=' + 1, {
+      instance.post('/back/relations?fid=' + this.selectDepart + '&genre=' + 1, {
         sid: id
       }).then(this.addUserSuccess)
     },
@@ -529,7 +529,7 @@ export default {
       }
     },
     removeUser (id) { // 删除已添加的用户
-      axios.delete('/back/relations?fid=' + this.selectDepart + '&genre=' + 1, {
+      instance.delete('/back/relations?fid=' + this.selectDepart + '&genre=' + 1, {
         data: {
           sid: id
         }
@@ -545,7 +545,7 @@ export default {
     }
   },
   mounted () {
-    axios.get('/back/departments').then(this.loadAllDeparts)
+    instance.get('/back/departments').then(this.loadAllDeparts)
   }
 }
 </script>

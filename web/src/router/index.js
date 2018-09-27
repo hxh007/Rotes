@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import routes from './routers'
-import axios from 'axios'
+import instance from '../../libs/axios'
 import store from '@/store'
 
 Vue.use(Router)
@@ -12,14 +12,13 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
   if (token) { // 登录-> 查询登录用户信息
     store.dispatch('setToken', token)
-    axios.get('/back/userInfo', {
+    instance.get('/back/userInfo', {
       headers: {
         Authorization: 'JWT ' + token
       }
     }).then((response) => {
       const res = response.data
       if (res.code === 0) {
-        console.log(res.data)
         store.dispatch('setUserId', res.data.user_info.id)
         store.dispatch('setUser', res.data.user_info.name)
         // store.dispatch('setToken', data.jwt_token)
