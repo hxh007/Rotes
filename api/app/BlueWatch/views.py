@@ -549,7 +549,7 @@ def send_xlsx():
         return jsonify(result)
     fileName1 = str(fileName)
     try:
-        result1 = send_file('static/' + fileName1)
+        result1 = send_file('static/' + fileName1, as_attachment=True)
         return result1
     except:
         result['msg'] = u'正在生成Excel文件'
