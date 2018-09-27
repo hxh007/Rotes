@@ -12,7 +12,7 @@ from . import blue_auth
 from .common import (get_table, accept_para, response_return, TableTelationType)
 
 
-# # 权限管理 超级管理才能访问
+# 权限管理 超级管理才能访问
 # @blue_auth.before_request
 # def auth_supper():
 #     # 判断登录用户
@@ -21,8 +21,9 @@ from .common import (get_table, accept_para, response_return, TableTelationType)
 #         return jsonify(response_data)
 #     # 用户所在管理组
 #     managerList = g.managerList
-#     if 'S_MANAGEMENT' in managerList:
+#     if 'S_MANAGEMENT' not in managerList:
 #         return jsonify(response_return(3, u'没有权限访问'))
+
 
 # 资源
 # 用户列表查询和用户创建
@@ -392,6 +393,7 @@ def action_type(aid):
         return jsonify(action)
     result = db_session_delete(action)
     return jsonify(result)
+
 
 # 关系查询、添加、删除
 @blue_auth.route('/relations', methods=['GET', 'POST', 'DELETE'])

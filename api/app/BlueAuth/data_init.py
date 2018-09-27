@@ -84,13 +84,15 @@ def data_init():
             new_permission.alias = p['alias']
             department_wanted = Department.query.filter_by(name=p.get('department', 'UNKNOW')).first()
             management_wanted = Management.query.filter_by(name=p.get('management', 'UNKNOW')).first()
+            d_management_wanted = Management.query.filter_by(name=p.get('d_management', 'UNKNOW')).first()
             if department_wanted:
                 management_wanted.permissions.append(new_permission)
                 department_wanted.permissions.append(new_permission)
+                d_management_wanted.permissions.append(new_permission)
             else:
                 del new_permission
                 continue
-            db.session.add_all([new_permission, department_wanted, management_wanted])
+            db.session.add_all([new_permission, department_wanted, management_wanted, d_management_wanted])
         try:
             db.session.commit()
         except Exception as e:

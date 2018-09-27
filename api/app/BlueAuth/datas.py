@@ -200,318 +200,371 @@ DEFAULT_PERMISSIONS = [
     {
         'department': 'MODULE_OP',
         'management': 'S_MANAGEMENT',
+        'd_management': "OP_MANAGEMENT",
         'codename': 'GET',
         'alias': u'系统运维部值班表：查询'
     },
     {
         'department': 'MODULE_OP',
         'management': 'S_MANAGEMENT',
+        'd_management': "OP_MANAGEMENT",
         'codename': 'POST',
         'alias': u'系统运维部值班表：创建'
     },
     {
         'department': 'MODULE_OP',
         'management': 'S_MANAGEMENT',
+        'd_management': "OP_MANAGEMENT",
         'codename': 'PUT',
         'alias': u'系统运维部值班表：修改'
     },
     {
         'department': 'MODULE_OP',
         'management': 'S_MANAGEMENT',
+        'd_management': "OP_MANAGEMENT",
         'codename': 'DELETE',
         'alias': u'系统运维部值班表：删除'
     },
     {
         'department': 'MODULE_SEC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'SEC_MANAGEMENT',
         'codename': 'GET',
         'alias': u'网络安全部值班表：查询'
     },
     {
         'department': 'MODULE_SEC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'SEC_MANAGEMENT',
         'codename': 'POST',
         'alias': u'网络安全部值班表：创建'
     },
     {
         'department': 'MODULE_SEC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'SEC_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'网络安全部值班表：修改'
     },
     {
         'department': 'MODULE_SEC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'SEC_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'网络安全部值班表：删除'
     },
     {
         'department': 'MODULE_PLDEV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'PLDEV_MANAGEMENT',
         'codename': 'GET',
         'alias': u'平台开发部值班表：查询'
     },
     {
         'department': 'MODULE_PLDEV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'PLDEV_MANAGEMENT',
         'codename': 'POST',
         'alias': u'平台开发部值班表：创建'
     },
     {
         'department': 'MODULE_PLDEV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'PLDEV_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'平台开发部值班表：修改'
     },
     {
         'department': 'MODULE_PLDEV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'PLDEV_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'平台开发部值班表：删除'
     },
     {
         'department': 'MODULE_VSOURCE',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VSOURCE_MANAGEMENT',
         'codename': 'GET',
         'alias': u'视频技术中心信源技术部值班表：查询'
     },
     {
         'department': 'MODULE_VSOURCE',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VSOURCE_MANAGEMENT',
         'codename': 'POST',
         'alias': u'视频技术中心信源技术部值班表：创建'
     },
     {
         'department': 'MODULE_VSOURCE',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VSOURCE_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'视频技术中心信源技术部值班表：修改'
     },
     {
         'department': 'MODULE_VSOURCE',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VSOURCE_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'视频技术中心信源技术部值班表：删除'
     },
     {
         'department': 'MODULE_VAPP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VAPP_MANAGEMENT',
         'codename': 'GET',
         'alias': u'视频技术中心应用开发部值班表：查询'
     },
     {
         'department': 'MODULE_VAPP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VAPP_MANAGEMENT',
         'codename': 'POST',
         'alias': u'视频技术中心应用开发部值班表：创建'
     },
     {
         'department': 'MODULE_VAPP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VAPP_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'视频技术中心应用开发部值班表：修改'
     },
     {
         'department': 'MODULE_VAPP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VAPP_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'视频技术中心应用开发部值班表：删除'
     },
     {
         'department': 'MODULE_VDATA',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VDATA_MANAGEMENT',
         'codename': 'GET',
         'alias': u'视频技术中心数据技术部值班表：查询'
     },
     {
         'department': 'MODULE_VDATA',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VDATA_MANAGEMENT',
         'codename': 'POST',
         'alias': u'视频技术中心数据技术部值班表：创建'
     },
     {
         'department': 'MODULE_VDATA',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VDATA_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'视频技术中心数据技术部值班表：修改'
     },
     {
         'department': 'MODULE_VDATA',
         'management': 'S_MANAGEMENT',
+        'd_management': 'VDATA_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'视频技术中心数据技术部值班表：删除'
     },
     {
         'department': 'MODULE_APP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'APP_MANAGEMENT',
         'codename': 'GET',
         'alias': u'应用开发部排班表：查询'
     },
     {
         'department': 'MODULE_APP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'APP_MANAGEMENT',
         'codename': 'POST',
         'alias': u'应用开发部排班表：创建'
     },
     {
         'department': 'MODULE_APP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'APP_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'应用开发部排班表：修改'
     },
     {
         'department': 'MODULE_APP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'APP_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'应用开发部排班表：删除'
     },
     {
         'department': 'MODULE_IDC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IDC_MANAGEMENT',
         'codename': 'GET',
         'alias': u'基础设施部排班表：查询'
     },
     {
         'department': 'MODULE_IDC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IDC_MANAGEMENT',
         'codename': 'POST',
         'alias': u'基础设施部排班表：创建'
     },
     {
         'department': 'MODULE_IDC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IDC_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'基础设施部排班表：修改'
     },
     {
         'department': 'MODULE_IDC',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IDC_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'基础设施部排班表：删除'
     },
     {
         'department': 'MODULE_MUTUAL',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MUTUAL_MANAGEMENT',
         'codename': 'GET',
         'alias': u'新媒体创新孵化中心\互动融合中心排班表：查询'
     },
     {
         'department': 'MODULE_MUTUAL',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MUTUAL_MANAGEMENT',
         'codename': 'POST',
         'alias': u'新媒体创新孵化中心\互动融合中心排班表：创建'
     },
     {
         'department': 'MODULE_MUTUAL',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MUTUAL_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'新媒体创新孵化中心\互动融合中心排班表：修改'
     },
     {
         'department': 'MODULE_MUTUAL',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MUTUAL_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'新媒体创新孵化中心\互动融合中心排班表：删除'
     },
     {
         'department': 'MODULE_IPTV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IPTV_MANAGEMENT',
         'codename': 'GET',
         'alias': u'IP电视事业部排班表：查询'
     },
     {
         'department': 'MODULE_IPTV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IPTV_MANAGEMENT',
         'codename': 'POST',
         'alias': u'IP电视事业部排班表：创建'
     },
     {
         'department': 'MODULE_IPTV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IPTV_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'IP电视事业部排班表：修改'
     },
     {
         'department': 'MODULE_IPTV',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IPTV_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'IP电视事业部排班表：删除'
     },
     {
         'department': 'MODULE_CCP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'CCP_MANAGEMENT',
         'codename': 'GET',
         'alias': u'共产党员网排班表：查询'
     },
     {
         'department': 'MODULE_CCP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'CCP_MANAGEMENT',
         'codename': 'POST',
         'alias': u'共产党员网排班表：创建'
     },
     {
         'department': 'MODULE_CCP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'CCP_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'共产党员网排班表：修改'
     },
     {
         'department': 'MODULE_CCP',
         'management': 'S_MANAGEMENT',
+        'd_management': 'CCP_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'共产党员网排班表：删除'
     },
     {
         'department': 'MODULE_MD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MD_MANAGEMENT',
         'codename': 'GET',
         'alias': u'移动开发中心排班表：查询'
     },
     {
         'department': 'MODULE_MD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MD_MANAGEMENT',
         'codename': 'POST',
         'alias': u'移动开发中心排班表：创建'
     },
     {
         'department': 'MODULE_MD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MD_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'移动开发中心排班表：修改'
     },
     {
         'department': 'MODULE_MD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'MD_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'移动开发中心排班表：删除'
     },
     {
         'department': 'MODULE_IT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IT_MANAGEMENT',
         'codename': 'GET',
         'alias': u'IT支持组排班表：查询'
     },
     {
         'department': 'MODULE_IT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IT_MANAGEMENT',
         'codename': 'POST',
         'alias': u'IT支持组排班表：创建'
     },
     {
         'department': 'MODULE_IT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IT_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'IT支持组排班表：修改'
     },
     {
         'department': 'MODULE_IT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'IT_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'IT支持组排班表：删除'
     },
     {
         'department': 'MODULE_UD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'UD_MANAGEMENT',
         'codename': 'GET',
         'alias': u'用户数据中心排班表：查询'
 
@@ -519,6 +572,7 @@ DEFAULT_PERMISSIONS = [
     {
         'department': 'MODULE_UD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'UD_MANAGEMENT',
         'codename': 'POST',
         'alias': u'用户数据中心排班表：创建'
 
@@ -526,6 +580,7 @@ DEFAULT_PERMISSIONS = [
     {
         'department': 'MODULE_UD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'UD_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'用户数据中心排班表：修改'
 
@@ -533,6 +588,7 @@ DEFAULT_PERMISSIONS = [
     {
         'department': 'MODULE_UD',
         'management': 'S_MANAGEMENT',
+        'd_management': 'UD_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'用户数据中心排班表：删除'
 
@@ -540,24 +596,28 @@ DEFAULT_PERMISSIONS = [
     {
         'department': 'MODULE_VT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'TF_MANAGEMENT',
         'codename': 'GET',
         'alias': u'三、四线值班表：查看'
     },
     {
         'department': 'MODULE_VT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'TF_MANAGEMENT',
         'codename': 'POST',
         'alias': u'三、四线值班表：创建'
     },
     {
         'department': 'MODULE_VT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'TF_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'三、四线值班表：修改'
     },
     {
         'department': 'MODULE_VT',
         'management': 'S_MANAGEMENT',
+        'd_management': 'TF_MANAGEMENT',
         'codename': 'DELETE',
         'alias': u'三、四线值班表：删除'
     },

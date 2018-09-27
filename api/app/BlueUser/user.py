@@ -2,11 +2,13 @@
 import re
 
 import datetime
+
+from collections import defaultdict
 from flask import jsonify, g
 
 from app import Redis
 from app.BlueUser.common import ClientType
-from app.models import User, db_session_add
+from app.models import User, db_session_add, Department
 from app.BlueUser import blue_user
 from app.BlueAuth.common import accept_para, response_return, get_table
 from app.BlueAuth.auth import Authentication
@@ -163,11 +165,20 @@ def __user_depart_list(user):
 # 获取用户所有权限
 def __user_permission_list(user):
     manager_list = __user_manager_list(user)
-    permission_list = []
+    permission_list = defaultdict(dict)
     for manager in manager_list:
         for permission in manager.permissions.all():
-            permission_list.append(permission.to_dict())
+            try:
+                department = Department.query.get(int(permission.department_id))
+            except Exception:
+                return dict()
+            if not permission_list.get(department.id):
+                permission_list[department.id]['departName'] = department.name
+                permission_list[department.id]['departAlias'] = department.alias
+                permission_list[department.id]['pLists'] = list()
+            permission_list[department.id]['pLists'].append(permission.codename)
     return permission_list
+
 
 # 登录用户信息查询
 @blue_user.route('/login_user_info')
