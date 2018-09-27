@@ -6,7 +6,6 @@ from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
 import os
 from threading import Thread
-import time
 
 from flask import render_template, request, jsonify
 from flask import send_file, current_app
@@ -16,7 +15,6 @@ from app import db
 from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
 from config import Config
-from app import create_app
 
 
 # 新增单条值班记录
@@ -76,8 +74,8 @@ def duty_add():
         return jsonify(result)
 
 
-# 单条值班记录编辑
-@blue_watch.route('/duty/<int:duty_id>', methods=['GET', 'PUT', 'DELETE'])
+# 单条值班记录编辑(查询、删除)
+@blue_watch.route('/duty/<int:duty_id>', methods=['GET', 'DELETE'])
 def duty_edit(duty_id):
     # duty_id  值班记录id
     result = {'code': 0, 'data': {}, 'msg': u'查询值班记录成功'}
@@ -93,46 +91,6 @@ def duty_edit(duty_id):
         result['data']['staffName'] = duty_change.duty_name
         result['data']['dutyDate'] = duty_change.duty_time.strftime("%Y-%m-%d")
         return jsonify(result)
-    elif request.method == 'PUT':
-        if request.is_json:
-            data = request.get_json()
-            departId = data.get('departId')
-            roleId = data.get('roleId')
-            staffId = data.get('staffId')
-            date = data.get('dutyDate')
-            if not all([departId, roleId, staffId, date]):
-                result['code'] = 1
-                result['msg'] = u'参数不完整'
-                return jsonify(result)
-            # 数据是否存在，时间格式
-            try:
-                duty_time = datetime.strptime(date, '%Y-%m-%d').date()
-                depart = Department.query.filter_by(id=departId, status=1).first().alias
-                role = Role.query.filter_by(id=roleId, status=1).first().alias
-                user = User.query.filter_by(id=staffId, status=1).first()
-            except:
-                result['code'] = 1
-                result['msg'] = u'参数不正确'
-                return jsonify(result)
-            if not user:
-                result['code'] = 1
-                result['msg'] = u'无此用户'
-                return jsonify(result)
-            duty_name = user.fullname
-            mobile = user.mobile
-            ding_id = user.ding_id
-            duty_change.depart = depart
-            duty_change.role = role
-            duty_change.duty_name = duty_name
-            duty_change.duty_time = duty_time
-            duty_change.mobile = mobile
-            duty_change.ding_id = ding_id
-            result = duty_change.add(duty_change)
-            return jsonify(result)
-        else:
-            result['code'] = 1
-            result['msg'] = u'接收不到参数'
-            return jsonify(result)
     elif request.method == 'DELETE':
         db.session.delete(duty_change)
         db.session.commit()
@@ -356,7 +314,7 @@ def dutysCount():
     return jsonify(result)
 
 
-# 值班记录及数量统计
+# 值班记录
 @blue_watch.route('/dutys', methods=['GET'])
 def dutys():
     result = {'code': 1, 'data': {}, 'msg': u'此部门值班记录'}
@@ -473,27 +431,27 @@ def dutys():
                     if duty_obj.role in dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart].keys():
                         # 存在则数量+1
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            duty_obj.id] = duty_obj.duty_name
+                            duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                         # count
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                             'count'] += 1
                     else:
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            duty_obj.id] = duty_obj.duty_name
+                            duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                         # count
                         dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                             'count'] = 1
                 else:
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                        duty_obj.id] = duty_obj.duty_name
+                        duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                     # count
                     dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
                         'count'] = 1
             else:
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")] = defaultdict(dict)
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
-                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name
+                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
                 # count
                 dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role]['count'] = 1
     result['data']['dutyList'] = dutyLists
@@ -547,7 +505,7 @@ def smsTemplate():
 
 
 # 转为Excel文件
-@blue_watch.route('/datatoxlsx', methods=['GET'])
+@blue_watch.route('/datatoxlsx', methods=['POST'])
 def xlsx():
     result = {'code': 1, 'msg': u'正在生成Excel文件'}
     # 1 接收参数
@@ -591,8 +549,8 @@ def send_xlsx():
         return jsonify(result)
     fileName1 = str(fileName)
     try:
-        result = send_file('static/' + fileName1)
-        return result
+        result1 = send_file('static/' + fileName1, as_attachment=True)
+        return result1
     except:
         result['msg'] = u'正在生成Excel文件'
         return jsonify(result)
