@@ -78,7 +78,11 @@ export default {
               localStorage.setItem('userName', data.user.username)
               localStorage.setItem('userToken', data.jwt_token)
               this.$store.dispatch('setUser', data.user.username)
+              this.$store.dispatch('setUserId', data.user.id)
               this.$store.dispatch('setToken', data.jwt_token)
+              this.$store.dispatch('setPermissions', data.permission_list)
+              this.$store.dispatch('setDeparts', data.depart_list)
+              this.$store.dispatch('setGroups', data.group_list)
               this.$router.push('/')
             } else {
               this.$Message.error(res.msg)

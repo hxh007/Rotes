@@ -13,7 +13,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/back':{
-        target : 'http://localhost:5000',
+        target : 'http://172.20.163.23:5000',
         pathRewrite: {
           '^/back/users': '/auth/users',
           '^/back/admin': '/auth/managements',

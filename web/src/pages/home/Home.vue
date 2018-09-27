@@ -6,7 +6,7 @@
         <Row>
           <Col>
             <Select v-model.number="departSearch" style="width:200px" @on-change="changeOnSelect">
-              <Option v-for="item in myDeparts" :value="item.id" :key="item.id" :disabled="item.disabled">{{ item.label }}</Option>
+              <Option v-for="item in myDeparts" :pLists="item.pLists" :value="item.id" :key="item.id" :disabled="item.disabled">{{ item.label }}</Option>
             </Select>
           </Col>
         </Row>
@@ -109,12 +109,15 @@ export default {
       pNum: 0,
       // 如果用户登录拥有所属部门，则筛选条件默认为所属部门之一;若未登录或登陆后并不属于任何部门，此处默认显示所有部门的值班记录
       myDeparts: [],
+      myPermissions: {},
       departSearch: 0,
       departSearchName: '',
       calendarYear: '',
       calendarMonth: '',
       thisYear: '',
-      thisMonth: ''
+      thisMonth: '',
+      dutyPost: false,
+      dutyDelete: false
     }
   },
   methods: {
@@ -139,7 +142,6 @@ export default {
           this.departSearch = 0
           this.disableDepartSearch()
         } else {
-          alert(2)
           this.enabledDepartSearch()
         }
         this.getDuties()
@@ -149,7 +151,6 @@ export default {
       this.myDeparts.forEach((item, index) => {
         item.disabled = false
       })
-      console.log(this.myDeparts)
     },
     disableDepartSearch () {
       this.myDeparts.forEach((item, index) => {
@@ -160,10 +161,18 @@ export default {
     },
     dayClickFunc () {
       this.currentDay = this.$root.formatDate('yyyy-MM-dd', arguments[0]) // 点击的具体某个日期
-      this.departOneModal = true
       if (this.departSearch === 0) { // 所有部门
         this.departsAllShowDetail = true // 显示出所有部门的值班记录
-      } else if (this.departSearch !== 0 && this.departOneModal) { // 本部门
+      } else if (this.departSearch !== 0) { // 本部门
+        if (this.$store.state.myPermissions[this.departSearch].pLists.indexOf('POST') < 0) {
+          this.dutyPost = true
+          this.bus.$emit('postPermission', this.dutyPost)
+        }
+        if (this.$store.state.myPermissions[this.departSearch].pLists.indexOf('DELETE') < 0) {
+          this.dutyDelete = true
+          this.bus.$emit('deletePermission', this.dutyDelete)
+        }
+        this.departOneModal = true
         this.bus.$emit('dayClickWatch', this.departOneModal)// 往子组件传递控制模态框显示与否的开关切换
       }
       this.searchDetail()
@@ -179,12 +188,13 @@ export default {
             let dutyListData = res.data.dutyList
             if (dutyListData[item]) { // 该日有值班记录
               for (let dutyName in dutyListData[item]) {
-                console.log(dutyListData[item][dutyName])
-                this.fcEvents.push({
-                  'title': dutyName + '——' + dutyListData[item][dutyName] + '条记录',
-                  'start': item,
-                  'end': item
-                })
+                if (typeof dutyListData[item][dutyName] === 'number') {
+                  this.fcEvents.push({
+                    'title': dutyName + '——' + dutyListData[item][dutyName] + '条记录',
+                    'start': item,
+                    'end': item
+                  })
+                }
               }
             } else { // 该日没有值班记录
               this.fcEvents.push({
@@ -242,7 +252,7 @@ export default {
       }
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
-      let departId = this.departSearch === 0 ? undefined : this.departSearch
+      let departId = parseInt(this.departSearch) === 0 ? undefined : parseInt(this.departSearch)
       axios.get('/back/dutysCount', {
         params: {
           departId: departId,
@@ -252,19 +262,21 @@ export default {
       }).then(this.getDutySucc)
     },
     changeOnSelect () {
-      if (this.departSearch) {
+      if (this.departSearch !== undefined && this.departSearch !== 0) {
         axios.get('/back/departments/' + this.departSearch).then((response) => {
           const res = response.data
           if (res.code === 0) { // 查询成功
             this.departSearchName = res.data[0].alias
           }
         })
+        this.getDuties()
+      } else if (this.departSearch === 0) {
+        this.getDuties()
       }
-      this.getDuties()
     },
     searchDetail () {
       // 先判断当前是显示所有部门的还是本部门的
-      let departId = this.departSearch === 0 ? undefined : this.departSearch
+      let departId = parseInt(this.departSearch) === 0 ? undefined : parseInt(this.departSearch)
       // 查询具体的某一天的全部部门或者所有部门
       let dateStart = this.currentDay
       let dateEnd = this.currentDay
@@ -280,7 +292,7 @@ export default {
       this.tableList = []
       let res = response.data
       if (res.code === 0) { // 返回正常
-        if (this.departSearch !== 0) { // 本部门之一
+        if (parseInt(this.departSearch) !== 0) { // 本部门之一
           let data = res.data[0]
           let count = 0
           let num
@@ -362,32 +374,17 @@ export default {
     HomeModal
   },
   computed: {
-    getMyDeparts () {
-      return this.$store.state.myDepartments
-    },
     departSearchFunc () {
       return this.myDeparts.length
     },
     getLoginStatus () {
       return this.$store.state.isLogin
+    },
+    getMyPermissions () {
+      return this.$store.state.myPermissions
     }
   },
   watch: {
-    getMyDeparts (new_, old_) {
-      if (old_ !== new_) {
-        this.myDeparts.splice(1, this.myDeparts.length - 1) // 初始化筛选条件的下拉菜单
-        if (this.$store.state.myDepartments.length > 0) { // 说明当前登录用户属于多个部门
-          this.$store.state.myDepartments.forEach((item, index) => {
-            this.myDeparts.push({
-              id: item.id,
-              label: item.alias,
-              disabled: false
-            })
-          })
-        }
-        this.getDuties()
-      }
-    },
     departSearchFunc (new_, old_) {
       if (old_ !== new_) {
         if (new_ > 1) {
@@ -405,10 +402,45 @@ export default {
       }
     },
     getLoginStatus (new_, old_) {
-      console.log(new_, old_)
       if (!new_) { // 退出
         this.departSearch = 0
         this.getDuties()
+      }
+    },
+    getMyPermissions (new_, old_) {
+      if (new_ !== old_) {
+        // 监测到当前登录用户的权限列表发生变化
+        let whetherAdmin = this.$root.whetherAdmin()
+        let whetherBusiness = this.$root.whetherBusiManager()
+        if (whetherAdmin) { // 当前登录用户是超级管理员(可能既是业务管理员又是部门管理员)
+          // 可以编辑所有部门的值班记录
+          this.myDeparts.splice(1, this.myDeparts.length - 1) // 初始化筛选条件的下拉菜单
+          for (let key in this.$store.state.myPermissions) {
+            this.myDeparts.push({
+              id: parseInt(key),
+              label: this.$store.state.myPermissions[key].departAlias,
+              disabled: false,
+              name: this.$store.state.myPermissions[key].departName,
+              pLists: this.$store.state.myPermissions[key].pLists
+            })
+          }
+          this.getDuties()
+        } else if (!whetherAdmin && whetherBusiness) {
+          // 业务管理员只可以查看所有部门的排班记录
+          this.myDeparts.splice(1, this.myDeparts.length - 1)
+        } else if (!whetherAdmin && !whetherBusiness && this.$store.state.isLogin) {
+          // 部门管理员---------只看权限
+          this.myDeparts.splice(1, this.myDeparts.length - 1)
+          for (let departId in this.$store.state.myPermissions) {
+            this.myDeparts.push({
+              id: parseInt(departId),
+              label: this.$store.state.myPermissions[departId].departAlias,
+              disabled: false,
+              name: this.$store.state.myPermissions[departId].departName,
+              pLists: this.$store.state.myPermissions[departId].pLists
+            })
+          }
+        }
       }
     }
   },
@@ -419,7 +451,9 @@ export default {
     this.myDeparts = [{
       id: 0,
       label: '所有部门',
-      disabled: false
+      disabled: false,
+      name: '00_00',
+      pLists: ['GET', 'PUT', 'POST', 'DELETE']
     }]
     this.getDuties()
     this.bus.$on('refreshCalendar', () => {

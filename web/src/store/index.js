@@ -13,7 +13,8 @@ export default new Vuex.Store({
     isLogin: false,
     token: '',
     myDepartments: [],
-    myGroups: []
+    myGroups: [],
+    myPermissions: {}
   },
   mutations,
   actions,

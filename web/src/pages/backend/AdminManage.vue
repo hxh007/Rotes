@@ -110,7 +110,8 @@
 
 <script>
 import axios from 'axios'
-// import store from '@/store'
+import { loadLoginUserInfo } from '../../../libs/util'
+
 export default {
   name: 'AdminManage',
   data () {
@@ -326,7 +327,8 @@ export default {
             ])
           }
         }
-      ]
+      ],
+      isEditGroup: 0 // 是否修改当前用户所在组 1---是 0---否
     }
   },
   methods: {
@@ -523,7 +525,9 @@ export default {
         this.couldSelectedUsers = res.data
       }
     },
-    addUser (id) { // 添加用户给指定部门
+    addUser (id) { // 添加用户给指定管理组
+      if (this.$store.state.currentUserId === id) this.isEditGroup = 1
+      else this.isEditGroup = 0
       axios.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         sid: id
       }).then(this.addUserSuccess)
@@ -531,6 +535,9 @@ export default {
     addUserSuccess (response) {
       let res = response.data
       if (res.code === 0) {
+        if (this.isEditGroup === 1) { // 修改当前登录用户所在的组
+          loadLoginUserInfo()
+        }
         this.$Message.success('添加成功！')
         this.loadUsers()
       } else {
@@ -538,6 +545,8 @@ export default {
       }
     },
     removeUser (id) { // 删除已添加的用户
+      if (this.$store.state.currentUserId === id) this.isEditGroup = 1
+      else this.isEditGroup = 0
       axios.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         data: {
           sid: id
@@ -547,6 +556,9 @@ export default {
     removeUserSuccess (response) {
       let res = response.data
       if (res.code === 0) { // 删除成功
+        if (this.isEditGroup === 1) { // 修改当前登录用户所在的组
+          loadLoginUserInfo()
+        }
         this.$Message.success('删除成功！')
         this.loadUsers()
       } else {
@@ -557,11 +569,6 @@ export default {
   mounted () {
     axios.get('/back/admin').then(this.loadAllAdmins)
   }
-  // beforeRouteEnter (to, from, next) {
-  //   // if (!store.state.isLogin || store.state.myGroups) { // 未登录与不具有权限的用户，重定向到首页
-  //   //
-  //   // }
-  // }
 }
 </script>
 

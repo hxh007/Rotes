@@ -11,6 +11,9 @@ export const userStatus = (state, user) => {
     state.token = ''
   }
 }
+export const setUserId = (state, userId) => {
+  state.currentUserId = userId
+}
 export const setToken = (state, token) => {
   state.token = token
 }
@@ -19,4 +22,7 @@ export const setDeparts = (state, departs) => {
 }
 export const setGroups = (state, groups) => {
   state.myGroups = groups
+}
+export const setPermissions = (state, permissions) => {
+  state.myPermissions = permissions
 }

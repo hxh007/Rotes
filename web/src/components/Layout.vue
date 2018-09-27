@@ -104,6 +104,10 @@ export default {
             localStorage.setItem('userToken', null)
             this.$store.dispatch('setUser', null)
             this.$store.dispatch('setToken', null)
+            this.$store.dispatch('setUserId', null)
+            this.$store.dispatch('setDeparts', [])
+            this.$store.dispatch('setGroups', [])
+            this.$store.dispatch('setPermissions', {})
             if (this.$route.path.indexOf('/backend') !== -1) { // 在退出前是后台管理页面
               this.$router.push('/') // 返回首页
             }

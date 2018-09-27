@@ -64,22 +64,32 @@ new Vue({
     },
     whetherAdmin () {
       const myGroups = store.state.myGroups
+      let flag = 0
       if (myGroups.length > 0) { // 当前用户拥有最少一个所属部门
         for (let i = 0; i < myGroups.length; i++) {
-          if (myGroups[i].name === 'S_MANAGEMENT') return true
-          else return false
+          if (myGroups[i].name === 'S_MANAGEMENT') {
+            flag += 1
+          }
         }
+      }
+      if (flag > 0) { // 为超级管理员
+        return true
       } else {
         return false
       }
     },
     whetherBusiManager () {
       const myGroups = store.state.myGroups
+      let flag = 0
       if (myGroups.length > 0) { // 当前用户拥有最少一个所属部门
         for (let i = 0; i < myGroups.length; i++) {
-          if (myGroups[i].name === 'BU_MANAGEMENT') return true
-          else return false
+          if (myGroups[i].name === 'BU_MANAGEMENT') {
+            flag += 1
+          }
         }
+      }
+      if (flag > 0) { // 为业务管理员
+        return true
       } else {
         return false
       }

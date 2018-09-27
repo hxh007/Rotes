@@ -76,7 +76,7 @@
                     <td>
                       <div class="ivu-table-cell">
                       <span>
-                        <Button type="error" size="small" @click="deleteDutyRecord(item.dutyId)">删除</Button>
+                        <Button type="error" size="small" :disabled="dutyDelete" @click="deleteDutyRecord(item.dutyId)">删除</Button>
                       </span>
                       </div>
                     </td>
@@ -118,7 +118,7 @@
                 </Select>
               </FormItem>
               <FormItem>
-                <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
+                <Button type="primary" :disabled="dutyPost" @click="handleSubmit('formValidate')">提交</Button>
                 <Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
               </FormItem>
             </Form>
@@ -138,7 +138,6 @@ export default {
   name: 'HomeModal',
   data () {
     return {
-      childTableList: [],
       formValidate: {
         role: '',
         staff: ''
@@ -150,14 +149,16 @@ export default {
       roleLists: [],
       selectStaff: '',
       selectRole: '',
-      dutyLists: []
+      dutyLists: [],
+      dutyPost: false,
+      dutyDelete: false
     }
   },
   props: {
     departOneModal: Boolean,
     currentDay: String,
     tableList: Array,
-    departSearch: Number,
+    departSearch: [Number, String],
     departSearchName: String
   },
   computed: {
@@ -319,6 +320,12 @@ export default {
     })
     this.bus.$on('sendDepartData', (param) => {
       this.dutyLists = param
+    })
+    this.bus.$on('postPermission', (flag) => {
+      this.dutyPost = flag
+    })
+    this.bus.$on('deletePermission', (flag) => {
+      this.dutyDelete = flag
     })
   },
   updated () {

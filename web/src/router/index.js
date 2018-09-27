@@ -3,8 +3,7 @@ import Router from 'vue-router'
 import routes from './routers'
 import axios from 'axios'
 import store from '@/store'
-// import iView from 'iview'
-// import { getToken } from '../../libs/util'
+
 Vue.use(Router)
 const router = new Router({
   routes
@@ -20,14 +19,22 @@ router.beforeEach((to, from, next) => {
     }).then((response) => {
       const res = response.data
       if (res.code === 0) {
+        console.log(res.data)
+        store.dispatch('setUserId', res.data.user_info.id)
+        store.dispatch('setUser', res.data.user_info.name)
+        // store.dispatch('setToken', data.jwt_token)
         store.dispatch('setDeparts', res.data.depart_list)
         store.dispatch('setGroups', res.data.group_list)
+        store.dispatch('setPermissions', res.data.permission_list)
       } else if (res.code === 2) {
         // 需要重新登录
+        store.commit('setUserId', null)
         store.commit('userStatus', null)
+        store.commit('setDeparts', [])
+        store.commit('setPermissions', {})
+        store.commit('setGroups', [])
         localStorage.setItem('userName', null)
         localStorage.setItem('userToken', null)
-        console.log(to.path, from.path)
         if (to.path !== '/login' && to.path !== '/register') {
           next('/')
         } else if (to.path === '/register') {
