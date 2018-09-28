@@ -15,10 +15,12 @@ from app import db
 from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
 from config import Config
+from app.BlueAuth.auth import Authentication
 
 
 # 新增单条值班记录
 @blue_watch.route('/duty', methods=['POST'])
+@Authentication.required()
 def duty_add():
     result = {'code': 0, 'msg': u'新增值班记录成功'}
     if request.is_json:
@@ -76,6 +78,7 @@ def duty_add():
 
 # 单条值班记录编辑(查询、删除)
 @blue_watch.route('/duty/<int:duty_id>', methods=['GET', 'DELETE'])
+@Authentication.required(endpoint='blue_watch.duty_edit')
 def duty_edit(duty_id):
     # duty_id  值班记录id
     result = {'code': 0, 'data': {}, 'msg': u'查询值班记录成功'}
@@ -101,6 +104,7 @@ def duty_edit(duty_id):
 
 # 某天值班记录
 @blue_watch.route('/dutyLists', methods=['GET'])
+@Authentication.required(endpoint='blue_watch.dutyLists')
 def dutyLists():
     result = {'code': 1, 'data': {}, 'msg': u'参数缺失'}
     # 1 接收参数
@@ -207,6 +211,7 @@ def dutyLists():
 
 # 排班数量统计
 @blue_watch.route('/dutysCount', methods=['GET'])
+@Authentication.required(endpoint='blue_watch.dutysCount')
 def dutysCount():
     result = {'code': 1, 'data': {}, 'msg': u'统计此部门值班数量成功'}
     if request.is_json:
@@ -316,6 +321,7 @@ def dutysCount():
 
 # 值班记录
 @blue_watch.route('/dutys', methods=['GET'])
+@Authentication.required(endpoint='blue_watch.dutys')
 def dutys():
     result = {'code': 1, 'data': {}, 'msg': u'此部门值班记录'}
     if request.is_json:
@@ -462,6 +468,7 @@ def dutys():
 
 # 编辑短信内容模板
 @blue_watch.route('/tempContent', methods=['GET', 'PUT', 'DELETE'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def smsTemplate():
     result = {'code': 0, 'data': {}, 'msg': u'暂无模板数据'}
     if request.method == 'GET':
@@ -506,6 +513,7 @@ def smsTemplate():
 
 # 转为Excel文件
 @blue_watch.route('/datatoxlsx', methods=['POST'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
     result = {'code': 1, 'msg': u'正在生成Excel文件'}
     # 1 接收参数
@@ -538,6 +546,7 @@ def xlsx():
 
 # 发送Excel文件
 @blue_watch.route('/sendxlsx', methods=['POST'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def send_xlsx():
     result = {'code': 1, 'msg': u'参数缺失'}
     if request.is_json:
