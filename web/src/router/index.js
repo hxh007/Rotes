@@ -10,7 +10,7 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
-  if (token) { // 登录-> 查询登录用户信息
+  if (token && token !== 'null') { // 登录-> 查询登录用户信息
     store.dispatch('setToken', token)
     instance.get('/back/userInfo', {
       headers: {
@@ -34,17 +34,18 @@ router.beforeEach((to, from, next) => {
         store.commit('setGroups', [])
         localStorage.setItem('userName', null)
         localStorage.setItem('userToken', null)
-        if (to.path !== '/login' && to.path !== '/register') {
-          next('/')
-        } else if (to.path === '/register') {
-          next('/register')
-        } else if (to.path === '/login') {
-          next('/login')
+        switch (to.path) {
+          case '/' || '/home' || '/schedule' || '/login' || '/register':
+            next()
+            break
+          case to.path.indexOf('/backend') > -1:
+            next('/')
+            break
+          default:
+            next()
         }
       }
     })
-  } else { // 未登录
-
   }
   next()
 })
