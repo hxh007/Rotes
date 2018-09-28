@@ -11,11 +11,11 @@
     <div class="ivu-table-wrapper">
       <div class="ivu-table ivu-table-default ivu-table-border">
         <div class="ivu-table-header" style="overflow-x: scroll">
-          <table cellspacing="0" cellpadding="0" border="0">
+          <table cellspacing="0" cellpadding="0" border="0" :style="{width: tableWidth}">
             <colgroup>
-              <col>
-              <col>
-              <col>
+              <col :width="colWidth">
+              <col :width="colWidth">
+              <col :width="colWidth">
             </colgroup>
             <thead>
             <tr>
@@ -59,12 +59,24 @@ export default {
   data () {
     return {
       tableList: [],
-      dateRange: []
+      dateRange: [],
+      colWidth: '35%',
+      tableWidth: '100%'
     }
   },
   methods: {
     changeDateRange () {
       console.log(arguments)
+    },
+    loadDefaultDuties (response) {
+      let res = response.data
+      console.log(res)
+      if (res.code === 0) {
+        alert(888)
+        this.colWidth = 2000 / (res.data.dateList.length + 2)
+      } else {
+        this.$Message.error(res.msg)
+      }
     }
   },
   mounted () {
@@ -74,7 +86,12 @@ export default {
     const dateStart = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, '01'].join('-')))
     const dateEnd = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, new Date(year, month, 0).getDate()].join('-')))
     this.dateRange = [dateStart, dateEnd]
-    instance.get('')
+    instance.get('/back/dutyinfo', {
+      params: {
+        dateStart: this.dateRange[0],
+        dateEnd: this.dateRange[1]
+      }
+    }).then(this.loadDefaultDuties)
   }
 }
 </script>
