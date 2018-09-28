@@ -514,7 +514,7 @@ def smsTemplate():
 
 # 转为Excel文件
 @blue_watch.route('/datatoxlsx', methods=['POST'])
-# @Authentication.required(manager_list=['BU_MANAGEMENT'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
     result = {'code': 1, 'msg': u'正在生成Excel文件'}
     # 1 接收参数
@@ -541,13 +541,14 @@ def xlsx():
     # 子线程
     to_xlsx = Thread(target=data_to_xlsx, args=(Excel_filename, dateList, current_app._get_current_object()))
     to_xlsx.start()
+    result['code'] = 0
     result['data'] = dateStart+'_' + dateEnd + '.xlsx'
     return jsonify(result)
 
 
 # 发送Excel文件
 @blue_watch.route('/sendxlsx', methods=['POST'])
-# @Authentication.required(manager_list=['BU_MANAGEMENT'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def send_xlsx():
     result = {'code': 1, 'msg': u'参数缺失'}
     if request.is_json:
@@ -562,12 +563,14 @@ def send_xlsx():
         result1 = send_file('static/' + fileName1, as_attachment=True)
         return result1
     except:
+        result['code'] = 0
         result['msg'] = u'正在生成Excel文件'
         return jsonify(result)
 
 
 # 导出排班表
-@blue_watch.route('/dutyinfo', methods=['GET', 'POST'])
+@blue_watch.route('/dutyinfo', methods=['GET'])
+@Authentication.required(endpoint='blue_watch.exportduty')
 def exportduty():
     result = {'code': 1, 'msg': u'导出排班表'}
     # 1 接收参数
@@ -590,5 +593,6 @@ def exportduty():
         result['msg'] = u'日期格式不正确'
         return jsonify(result)
     dataResult = exportdutyinfo(dateList, current_app._get_current_object())
+    result['code'] = 0
     result['data'] = dataResult
     return jsonify(result)
