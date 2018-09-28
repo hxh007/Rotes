@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from '@/store'
+import router from '@/router'
 export const loadLoginUserInfo = () => {
   const token = localStorage.getItem('userToken')
   if (token) { // 登录-> 查询登录用户信息
@@ -26,17 +27,19 @@ export const loadLoginUserInfo = () => {
     })
   }
 }
-// export const axiosRequest = (url, method, paramObj, success, error) => { // 添加公共头部
-//   const token = localStorage.getItem('userToken')
-//   if (method === 'GET' || method === 'get') {
-//     axios.get(url, {
-//       headers: {
-//         Authorization: 'JWT ' + token
-//       },
-//       params: paramObj
-//     }).then(success)
-//   } else {
-//     axios.method
-//   }
-// }
+export const exitLogin = (response) => {
+  // 退出成功
+  localStorage.setItem('userName', null)
+  localStorage.setItem('userToken', null)
+  store.dispatch('setUser', null)
+  store.dispatch('setToken', null)
+  store.dispatch('setUserId', null)
+  store.dispatch('setDeparts', [])
+  store.dispatch('setGroups', [])
+  store.dispatch('setPermissions', {})
+  const url = window.location.pathname
+  if (url.indexOf('/backend') !== -1) { // 在退出前是后台管理页面
+    router.push('/') // 返回首页
+  }
+}
 

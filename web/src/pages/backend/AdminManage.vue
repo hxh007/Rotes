@@ -110,7 +110,7 @@
 
 <script>
 import instance from '../../../libs/axios'
-import { loadLoginUserInfo } from '../../../libs/util'
+import { loadLoginUserInfo, exitLogin } from '../../../libs/util'
 
 export default {
   name: 'AdminManage',
@@ -370,6 +370,8 @@ export default {
         this.$refs.formValidate.resetFields()
         instance.get('/back/admin').then(this.loadAllAdmins)
         this.createAdminFlag = false
+      } else if (res.code === 2) { // 此时需要退出登录
+        exitLogin()
       } else {
         this.$Message.error(res.msg)
       }
