@@ -46,22 +46,6 @@ router.beforeEach((to, from, next) => {
   } else { // 未登录
 
   }
-  // if ((token === 'undefined' || !token) && to.name !== 'Login') {
-  //   // 未登录且要跳转的页面不是登录页
-  //   next({
-  //     name: 'Login' // 跳转到登录页
-  //   })
-  // } else if ((token === 'undefined' || !token) && to.name === 'Login') {
-  //   // 未登陆且要跳转的页面是登录页
-  //   next() // 跳转
-  // } else if (token && typeof token !== 'string' && to.name === 'Login') {
-  //   // 已登录且要跳转的页面是登录页
-  //   next({
-  //     name: 'Login' // 跳转到login页
-  //   })
-  // } else { // 已登录且跳转的不是登录页
-  //   next()
-  // }
   next()
 })
 
