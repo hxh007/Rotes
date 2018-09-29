@@ -12,11 +12,7 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
   if (token && token !== 'null') { // 登录-> 查询登录用户信息
     store.dispatch('setToken', token)
-    instance.get('/back/userInfo', {
-      headers: {
-        Authorization: 'JWT ' + token
-      }
-    }).then((response) => {
+    instance.get('/back/userInfo').then((response) => {
       const res = response.data
       if (res.code === 0) {
         store.dispatch('setUserId', res.data.user_info.id)
