@@ -171,7 +171,9 @@ def __user_permission_list(user):
             try:
                 department = Department.query.get(int(permission.department_id))
             except Exception:
-                return dict()
+                continue
+            if not department:
+                continue
             if not permission_list.get(department.id):
                 permission_list[department.id]['departName'] = department.name
                 permission_list[department.id]['departAlias'] = department.alias
