@@ -30,6 +30,36 @@ def data_to_xlsx(filename, dateList, capp):
         # # 4 第二行，值班总监，三线值班
         sheet.merge_range(1, 0, 1, 2, u'值班总监', merge_format)
         sheet.merge_range(2, 0, 2, 2, u'三线值班', merge_format)
+        row_depart = 1
+        tf_alias = Department.query.filter_by(name='MODULE_VT').first().alias
+        tf_roles_list = filter(lambda x: x not in ['count', 'managerList'], dutyInfo[tf_alias].keys())
+        if tf_roles_list:
+            for os_role in tf_roles_list:
+                if os_role == u'四线值班':
+                    sheet.merge_range(1, 0, 1, 2, u'值班总监', merge_format)
+                    date_list2 = filter(lambda x: x != 'count', dutyInfo[tf_alias][os_role].keys())
+                    for date_day in date_list2:
+                        # 日期列数
+                        date_line = list_table_head.index(date_day)
+                        # 当天值班人列表
+                        duty_names = dutyInfo[tf_alias][os_role][date_day]
+                        for duty_namer in duty_names:
+                            # 3 写入值班人
+                            sheet.write(row_depart, date_line, duty_namer)
+                elif os_role == u'三线值班':
+                    sheet.merge_range(2, 0, 2, 2, u'三线值班', merge_format)
+                    date_list2 = filter(lambda x: x != 'count', dutyInfo[tf_alias][os_role].keys())
+                    for date_day in date_list2:
+                        # 日期列数
+                        date_line = list_table_head.index(date_day)
+                        # 当天值班人列表
+                        duty_names = dutyInfo[tf_alias][os_role][date_day]
+                        for duty_namer in duty_names:
+                            # 3 写入值班人
+                            sheet.write(row_depart, date_line, duty_namer)
+                row_depart += 1
+        # 清除三四线部门
+        dutyInfo.pop(tf_alias)
         row_depart = 3
         # 5.1 写入系统运维部、网络安全部的信息
         op_alias = Department.query.filter_by(name='MODULE_OP').first().alias
