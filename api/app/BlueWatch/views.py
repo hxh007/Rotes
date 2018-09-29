@@ -16,6 +16,7 @@ from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
 from config import Config
 from app.BlueAuth.auth import Authentication
+from exportdutyinfo import exportdutyinfo
 
 
 # 新增单条值班记录
@@ -540,6 +541,7 @@ def xlsx():
     # 子线程
     to_xlsx = Thread(target=data_to_xlsx, args=(Excel_filename, dateList, current_app._get_current_object()))
     to_xlsx.start()
+    result['code'] = 0
     result['data'] = dateStart+'_' + dateEnd + '.xlsx'
     return jsonify(result)
 
@@ -561,5 +563,36 @@ def send_xlsx():
         result1 = send_file('static/' + fileName1, as_attachment=True)
         return result1
     except:
+        result['code'] = 0
         result['msg'] = u'正在生成Excel文件'
         return jsonify(result)
+
+
+# 导出排班表
+@blue_watch.route('/dutyinfo', methods=['GET'])
+@Authentication.required(endpoint='blue_watch.exportduty')
+def exportduty():
+    result = {'code': 1, 'msg': u'导出排班表'}
+    # 1 接收参数
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.values
+    dateStart = data.get('dateStart')
+    dateEnd = data.get('dateEnd')
+    # 2 参数校验
+    if not all([dateStart, dateEnd]):
+        result['msg'] = u'参数缺失'
+        return jsonify(result)
+    if dateStart > dateEnd:
+        result['msg'] = u'日期不合理'
+        return jsonify(result)
+    try:
+        dateList = list(rrule(DAILY, dtstart=parse(dateStart), until=parse(dateEnd)))
+    except:
+        result['msg'] = u'日期格式不正确'
+        return jsonify(result)
+    dataResult = exportdutyinfo(dateList, current_app._get_current_object())
+    result['code'] = 0
+    result['data'] = dataResult
+    return jsonify(result)
