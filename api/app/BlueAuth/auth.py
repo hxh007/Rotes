@@ -48,7 +48,7 @@ class Authentication():
         :return:用户信息
         '''
         try:
-            payload = jwt.decode(jwt_token, config.Config.SECRET_KEY)
+            payload = jwt.decode(jwt_token, config.Config.SECRET_KEY, algorithms=['HS256'])
             if ('data' in payload and 'id' in payload['data']):
                 return response_return(0, data=payload)
             else:
