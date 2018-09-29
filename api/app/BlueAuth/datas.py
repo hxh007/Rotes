@@ -190,7 +190,7 @@ DEFAULT_DEPARTMENT = [
 
     },
     {
-        'name': 'MODULE_VT',
+        'name': 'MODULE_TF',
         'alias': u'三、四线部门'
 
     }
@@ -594,28 +594,28 @@ DEFAULT_PERMISSIONS = [
 
     },
     {
-        'department': 'MODULE_VT',
+        'department': 'MODULE_TF',
         'management': 'S_MANAGEMENT',
         'd_management': 'TF_MANAGEMENT',
         'codename': 'GET',
         'alias': u'三、四线值班表：查看'
     },
     {
-        'department': 'MODULE_VT',
+        'department': 'MODULE_TF',
         'management': 'S_MANAGEMENT',
         'd_management': 'TF_MANAGEMENT',
         'codename': 'POST',
         'alias': u'三、四线值班表：创建'
     },
     {
-        'department': 'MODULE_VT',
+        'department': 'MODULE_TF',
         'management': 'S_MANAGEMENT',
         'd_management': 'TF_MANAGEMENT',
         'codename': 'PUT',
         'alias': u'三、四线值班表：修改'
     },
     {
-        'department': 'MODULE_VT',
+        'department': 'MODULE_TF',
         'management': 'S_MANAGEMENT',
         'd_management': 'TF_MANAGEMENT',
         'codename': 'DELETE',
