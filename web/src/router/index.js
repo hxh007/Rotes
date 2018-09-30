@@ -11,8 +11,8 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
-  if (store.state.token && token && token !== 'null' && store.state.isLogin) { // 登录-> 查询登录用户信息
-    store.commit('setToken', 'JWT ' + token)
+  store.commit('setToken', 'JWT ' + token)
+  if (store.state.token && token && token !== 'null') { // 登录-> 查询登录用户信息
     instance.get('/back/userInfo').then((response) => {
       const res = response.data
       if (res.code === 0) {
@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
           case '/' || '/home' || '/schedule' || '/login' || '/register':
             next()
             break
-          case to.path.indexOf('/backend') > -1:
+          case to.path.indexOf('/backend') > -1 && to.path !== '/schedule':
             next('/')
             break
           default:
@@ -45,6 +45,7 @@ router.beforeEach((to, from, next) => {
     })
   } else {
     exitLogin()
+    next()
   }
   next()
 })

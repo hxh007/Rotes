@@ -121,7 +121,7 @@ export default {
     getMyGroups (new_, old_) {
       if (new_ !== old_) {
         let whetherAdmin = this.$root.whetherAdmin()
-        if (!whetherAdmin && this.$route.path.indexOf('backend')) {
+        if (!whetherAdmin && this.$route.path.indexOf('backend') > 0) {
           this.$router.push('/')
         }
       }
