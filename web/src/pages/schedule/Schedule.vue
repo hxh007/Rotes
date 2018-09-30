@@ -10,61 +10,54 @@
     <Divider/>
     <div class="ivu-table-wrapper">
       <div class="ivu-table ivu-table-default ivu-table-border">
-        <div class="ivu-table-header" style="overflow-x: scroll">
-          <table cellspacing="0" cellpadding="0" border="0" :style="{width: tableWidth}">
-            <colgroup>
-              <col :width="colWidth" v-for="(item, index) in tableHead" :key="index">
-            </colgroup>
-            <thead>
-            <tr>
-              <th v-for="(item, index) in tableHead" :key="index">
-                <div class="ivu-table-cell">
-                  <span class="">{{item}}</span>
-                </div>
-              </th>
-            </tr>
-            </thead>
-          </table>
-        </div>
-        <div class="ivu-table-body ivu-table-overflowY" style="height: 100%">
-          <table cellspacing="0" cellpadding="0" border="0">
-            <colgroup>
-              <col :width="colWidth" v-for="(item, index) in tableHead" :key="index">
-            </colgroup>
-          </table>
-        </div>
-        <div class="ivu-table-body ivu-table-overflowY" style="height: 100%">
-          <table cellspacing="0" cellpadding="0" border="0">
-            <colgroup>
-              <col :width="colWidth" v-for="(item, index) in tableHead" :key="index">
-            </colgroup>
-            <tbody class="ivu-table-tbody">
-            <tr class="ivu-table-row"  v-for="(item, index) in tableList" :key="index">
-              <td :rowspan="item.departNameRowspan" :colspan="item.departNameColspan" v-if="item.departNameShow">
-                <div class="ivu-table-cell">
-                  <span>{{item.departName}}</span>
-                </div>
-              </td>
-              <td :rowspan="item.managersRowspan" :colspan="item.managersColspan" v-if="item.managersShow">
-                <div class="ivu-table-cell">
-                  <span>{{item.managers}}</span>
-                </div>
-              </td>
-              <td :rowspan="item.roleNameRowspan" v-if="item.roleNameShow">
-                <div class="ivu-table-cell">
-                  <span>{{item.managers}}</span>
-                </div>
-              </td>
-              <div :style="{disabled: 'none'}" v-for="(innerItem, index) in item.dates" :key="index">
-                <td>
+        <div class="ivu-table-overflowY ivu-table-overflowX">
+          <div class="ivu-table-header" :style="{width: tableWidth}">
+            <table cellspacing="0" cellpadding="0" border="0">
+              <colgroup>
+                <col :width="colWidth" v-for="(item, index) in tableHead" :key="index">
+              </colgroup>
+              <thead>
+              <tr>
+                <th v-for="(item, index) in tableHead" :key="index">
                   <div class="ivu-table-cell">
-                    <span>{{innerItem}}</span>
+                    <span class="">{{item}}</span>
+                  </div>
+                </th>
+              </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="ivu-table-body" style="height: 100%">
+            <table cellspacing="0" cellpadding="0" border="0" :style="{width: tableWidth}">
+              <colgroup>
+                <col :width="colWidth" v-for="(item, index) in tableHead" :key="index">
+              </colgroup>
+              <tbody class="ivu-table-tbody">
+              <tr class="ivu-table-row"  v-for="(item, index) in tableList" :key="index">
+                <td :rowspan="item.departNameRowspan" :colspan="item.departNameColspan" v-if="item.departNameShow">
+                  <div class="ivu-table-cell">
+                    <span>{{item.departName}}</span>
                   </div>
                 </td>
-              </div>
-            </tr>
-            </tbody>
-          </table>
+                <td :rowspan="item.managersRowspan" :colspan="item.managersColspan" v-if="item.managersShow">
+                  <div class="ivu-table-cell">
+                    <span>{{item.managers}}</span>
+                  </div>
+                </td>
+                <td :rowspan="item.roleNameRowspan" v-if="item.roleNameShow">
+                  <div class="ivu-table-cell">
+                    <span>{{item.roleName}}</span>
+                  </div>
+                </td>
+                <td v-for="(innerItem, key, index) in item.dates" :key="index">
+                  <div class="ivu-table-cell" v-for="(ite,ind) in innerItem" :key="ind">
+                    <span>{{ite}}</span>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -79,14 +72,19 @@ export default {
     return {
       tableList: [],
       dateRange: [],
-      colWidth: '35%',
-      tableWidth: '100%',
+      colWidth: '',
+      tableWidth: '',
       tableHead: ['部门', '部门负责人', '角色']
     }
   },
   methods: {
     changeDateRange () {
-      console.log(arguments)
+      instance.get('/back/dutyinfo', {
+        params: {
+          dateStart: this.dateRange[0],
+          dateEnd: this.dateRange[1]
+        }
+      }).then(this.loadDefaultDuties)
     },
     loadDefaultDuties (response) {
       let res = response.data
@@ -103,7 +101,7 @@ export default {
         } else {
           let len = res.data.dateList.length + 3
           this.tableWidth = '100%'
-          this.colWidth = parseInt((100 / len) + '%')
+          this.colWidth = parseInt(100 / len) + '%'
         }
         // 渲染表格体数据
         this.loadDefaultTbody(res.data.dateList, res.data.dutyInfo)
@@ -117,7 +115,7 @@ export default {
       for (let departItem in dutyInfo) {
         if (departItem === '三、四线部门') {
           for (let dutyItem in dutyInfo[departItem]) {
-            if (dutyItem !== 'count' && dutyItem !== 'managerList') {
+            if (Object.keys(dutyInfo[departItem]).length > 2) {
               if (dutyItem === '四线值班' || dutyItem === '三线值班') {
                 let obj = {
                   departName: dutyItem === '四线值班' ? '值班总监' : '三线值班',
@@ -140,26 +138,46 @@ export default {
                     obj.dates.push(piece)
                   } else {
                     let piece2 = {}
-                    piece2[date] = ''
+                    piece2[date] = '--'
                     obj.dates.push(piece2)
                   }
                 })
                 this.tableList.push(obj)
               }
-            } else {
-
+            } else { // = 2 只有count和managerList
+              let obj2 = {
+                departName: '三、四线值班',
+                departNameRowspan: 1,
+                departNameShow: true,
+                departNameColspan: 3,
+                managers: '',
+                managersRowspan: 1,
+                managersShow: false,
+                managersColspan: 3,
+                roleName: '',
+                roleNameRowspan: 1,
+                roleNameShow: false,
+                dates: []
+              }
+              dateList.forEach((date, index) => {
+                let emptyPiece = {}
+                emptyPiece[date] = '--'
+                obj2.dates.push(emptyPiece)
+              })
+              this.tableList.push(obj2)
             }
           }
         }
       }
       for (let departItem in dutyInfo) {
-        let departCount = dutyInfo[departItem].count
-        for (let detailItem in dutyInfo[departItem]) {
-          if (Object.keys(dutyInfo[departItem] > 2)) {
-            // 当前部门有相应的角色
-            if (detailItem !== 'count' && detailItem !== 'managerList') { // 筛选出部门下面的排班角色
-              let dutyRoleCount = dutyInfo[departItem][detailItem].count
-              for (let i = 0; i < dutyInfo[departItem][detailItem].count - 1; i++) { // 遍历每一条值班记录
+        if (departItem !== '三、四线部门') {
+          let departCount = dutyInfo[departItem].count
+          let countFlag = 0
+          for (let detailItem in dutyInfo[departItem]) {
+            if (Object.keys(dutyInfo[departItem]).length > 2) {
+              // 当前部门有相应的角色
+              if (detailItem !== 'count' && detailItem !== 'managerList') { // 筛选出部门下面的排班角色
+                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 1
                 let dataObj = {
                   departName: departItem,
                   departNameRowspan: dutyInfo[departItem].count,
@@ -170,58 +188,57 @@ export default {
                   managersShow: departCount === dutyInfo[departItem].count,
                   managersColspan: 1,
                   roleName: detailItem,
-                  roleNameRowspan: dutyInfo[departItem][departItem].count,
-                  roleNameShow: dutyRoleCount === dutyInfo[departItem][departItem].count,
+                  roleNameRowspan: dutyInfo[departItem][detailItem]['count'],
+                  roleNameShow: dutyRoleCount === dutyInfo[departItem][detailItem]['count'],
                   dates: []
                 }
-                dateList.forEach((date, index) => {
-                  if (!dutyInfo[departItem][detailItem][date]) {
-                    // 如果这一天该值班角色没有值班记录
-                    for (let i = 0; i < dutyInfo[departItem][departItem].count - 1; i++) {
+                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每一条值班记录
+                  dateList.forEach((date, index) => {
+                    if (!dutyInfo[departItem][detailItem][date]) {
+                      // 如果这一天该值班角色没有值班记录
                       let piece = {}
                       piece[date] = '--'
                       dataObj.dates.push(piece)
-                    }
-                  } else { // 有值班记录
-                    for (let i = 0; i < dutyInfo[departItem][departItem].count - 1; i++) {
+                    } else { // 有值班记录
                       let piece2 = {}
-                      piece2[date] = dutyInfo[departItem][departItem][date][i] ? dutyInfo[departItem][departItem][date][i] : '--'
+                      piece2[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
                       dataObj.dates.push(piece2)
                     }
-                  }
+                  })
+                  this.tableList.push(dataObj)
+                  dutyRoleCount -= 1
+                }
+              }
+            } else { // 当前部门没有相应的角色
+              if ((detailItem === 'count' || detailItem === 'managerList') && countFlag === 0) {
+                // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
+                let emptyRoleObj = {
+                  departName: departItem,
+                  departNameRowspan: 1,
+                  departNameShow: true,
+                  departNameColspan: 1,
+                  managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
+                  managersRowspan: 1,
+                  managersShow: true,
+                  managersColspan: 1,
+                  roleName: '',
+                  roleNameRowspan: 1,
+                  roleNameShow: true,
+                  dates: []
+                }
+                dateList.forEach((date, index) => {
+                  let piece = {}
+                  piece[date] = dutyInfo[departItem][detailItem][date] ? dutyInfo[departItem][detailItem][date] : ''
+                  emptyRoleObj.dates.push(piece)
                 })
-                this.tableList.push(dataObj)
-                dutyRoleCount -= 1
-              }
-            }
-          } else { // 当前部门没有相应的角色
-            if (Object.keys(dutyInfo[departItem]).length === 2) {
-              // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
-              let emptyRoleObj = {
-                departName: departItem,
-                departNameRowspan: 1,
-                departNameShow: true,
-                departNameColspan: 1,
-                managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
-                managersRowspan: 1,
-                managersShow: true,
-                managersColspan: 1,
-                roleName: '',
-                roleNameRowspan: 1,
-                roleNameShow: true
-              }
-              dateList.forEach((date, index) => {
-                emptyRoleObj[date] = dutyInfo[departItem][detailItem].date ? dutyInfo[departItem][detailItem].date : ''
                 this.tableList.push(emptyRoleObj)
-              })
-            } else { // <2表示后端数据有问题
-              this.$Message.error('获取数据有问题!')
+                countFlag++
+              }
             }
+            departCount -= 1
           }
-          departCount -= 1
         }
       }
-      console.log(this.tableList)
     }
   },
   mounted () {
