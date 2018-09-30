@@ -512,11 +512,11 @@ def smsTemplate():
         return jsonify(result)
 
 
-# 转为Excel文件
+# 导出Excel文件
 @blue_watch.route('/datatoxlsx', methods=['POST'])
 @Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
-    result = {'code': 1, 'msg': u'正在生成Excel文件'}
+    result = {'code': 1}
     # 1 接收参数
     if request.is_json:
         data = request.get_json()
@@ -541,31 +541,10 @@ def xlsx():
     # 子线程
     to_xlsx = Thread(target=data_to_xlsx, args=(Excel_filename, dateList, current_app._get_current_object()))
     to_xlsx.start()
-    result['code'] = 0
-    result['data'] = dateStart+'_' + dateEnd + '.xlsx'
-    return jsonify(result)
-
-
-# 发送Excel文件
-@blue_watch.route('/sendxlsx', methods=['POST'])
-@Authentication.required(manager_list=['BU_MANAGEMENT'])
-def send_xlsx():
-    result = {'code': 1, 'msg': u'参数缺失'}
-    if request.is_json:
-        data = request.get_json()
-    else:
-        data = request.values
-    fileName = data.get('fileName')
-    if not fileName:
-        return jsonify(result)
-    fileName1 = str(fileName)
-    try:
-        result1 = send_file('static/' + fileName1, as_attachment=True)
-        return result1
-    except:
-        result['code'] = 0
-        result['msg'] = u'正在生成Excel文件'
-        return jsonify(result)
+    to_xlsx.join()
+    # 4 发送Excel文件
+    file_content = send_file(Excel_filename, as_attachment=True)
+    return file_content
 
 
 # 导出排班表
