@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import routes from './routers'
 import instance from '../../libs/axios'
 import store from '@/store'
+import { exitLogin } from '../../libs/util'
 
 Vue.use(Router)
 const router = new Router({
@@ -10,8 +11,8 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
-  if (token && token !== 'null') { // 登录-> 查询登录用户信息
-    store.dispatch('setToken', token)
+  if (store.state.token && token && token !== 'null' && store.state.isLogin) { // 登录-> 查询登录用户信息
+    store.commit('setToken', 'JWT ' + token)
     instance.get('/back/userInfo').then((response) => {
       const res = response.data
       if (res.code === 0) {
@@ -42,6 +43,8 @@ router.beforeEach((to, from, next) => {
         }
       }
     })
+  } else {
+    exitLogin()
   }
   next()
 })

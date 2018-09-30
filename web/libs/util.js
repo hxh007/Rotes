@@ -31,12 +31,12 @@ export const exitLogin = (response) => {
   // 退出成功
   localStorage.setItem('userName', null)
   localStorage.setItem('userToken', null)
-  store.dispatch('setUser', null)
-  store.dispatch('setToken', null)
-  store.dispatch('setUserId', null)
-  store.dispatch('setDeparts', [])
-  store.dispatch('setGroups', [])
-  store.dispatch('setPermissions', {})
+  store.commit('userStatus', null)
+  store.commit('setToken', null)
+  store.commit('setUserId', '')
+  store.commit('setDeparts', [])
+  store.commit('setGroups', [])
+  store.commit('setPermissions', {})
   const url = window.location.pathname
   if (url.indexOf('/backend') !== -1) { // 在退出前是后台管理页面
     router.push('/') // 返回首页

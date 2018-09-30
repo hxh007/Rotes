@@ -92,18 +92,18 @@ export default {
     },
     menuAction (name) {
       const token = this.$store.state.token
-      if (name === 'exit') { // 退出
-        instance.get('/back/logout', {
-          headers: {
-            Authorization: 'JWT ' + token
-          }
-        }).then((response) => {
-          let res = response.data
-          if (res.code === 0 || res.code === 2) {
-            // 退出成功
-            exitLogin()
-          }
-        })
+      if (token) { // 当前用户处于登录状态
+        if (name === 'exit') { // 退出
+          instance.get('/back/logout').then((response) => {
+            let res = response.data
+            if (res.code === 0 || res.code === 2) {
+              // 退出成功
+              exitLogin()
+            }
+          })
+        }
+      } else {
+        exitLogin()
       }
     }
   },
