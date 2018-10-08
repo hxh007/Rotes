@@ -57,7 +57,8 @@ export default {
           { required: true, message: '请输入密码.', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度不得低于6位', trigger: 'blur' }
         ]
-      }
+      },
+      urlCommon: ''
     }
   },
   methods: {
@@ -94,21 +95,39 @@ export default {
     },
     ddLogin () {
       // 初始化钉钉登录
+      if (typeof window.addEventListener !== 'undefined') {
+        window.addEventListener('message', this.handleMessage, false)
+      } else if (typeof window.attachEvent !== 'undefined') {
+        window.attachEvent('onmessage', this.handleMessage)
+      }
+      this.$Spin.show()
       let host = document.domain
       let port = window.location.port
       let urlHead = port ? host + ':' + port : host
       instance.get('/back/dd_login_params').then((response) => {
         let res = response.data
         let url = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=' + res.appid +
-          '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=' + urlHead + '&redirect_uri=' + urlHead + '/oauth_callback'
-        console.log(url)
+          '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=http://' + urlHead + '&redirect_uri=http://' + urlHead + res.redirect_uri
+        this.urlCommon = url
+        this.$Spin.hide()
         DDLogin({
           id: 'login-form', // 这里需要你在自己的页面定义一个HTML标签并设置id，例如<div id="login_container"></div>或<span id="login_container"></span>
-          goto: url,
+          goto: encodeURIComponent(url),
           width: '400',
           height: '400'
         })
       })
+    },
+    handleMessage () {
+      let origin = event.origin
+      console.log('origin', event.origin)
+      if (origin === 'https://login.dingtalk.com') { // 判断是否来自ddLogin扫码事件。
+        let loginTmpCode = event.data // 拿到loginTmpCode后就可以在这里构造跳转链接进行跳转了
+        if (loginTmpCode) {
+          console.log('loginTmpCode', loginTmpCode)
+          window.location.href = this.urlCommon + '&loginTmpCode=' + loginTmpCode
+        }
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
