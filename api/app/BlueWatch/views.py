@@ -8,7 +8,7 @@ import os
 from threading import Thread
 
 from flask import render_template, request, jsonify
-from flask import send_file, current_app
+from flask import send_file, current_app, send_from_directory
 
 from . import blue_watch
 from app import db
@@ -17,6 +17,7 @@ from datas_to_xlsx import data_to_xlsx
 from config import Config
 from app.BlueAuth.auth import Authentication
 from exportdutyinfo import exportdutyinfo
+import xlrd
 
 
 # 新增单条值班记录
@@ -514,7 +515,7 @@ def smsTemplate():
 
 # 导出Excel文件
 @blue_watch.route('/datatoxlsx', methods=['POST'])
-@Authentication.required(manager_list=['BU_MANAGEMENT'])
+# @Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
     result = {'code': 1}
     # 1 接收参数
@@ -538,12 +539,9 @@ def xlsx():
         return jsonify(result)
     # 3 调用生成excel函数
     Excel_filename = os.path.join(Config.Excel_path, dateStart+'_' + dateEnd + '.xlsx')
-    # 子线程
-    to_xlsx = Thread(target=data_to_xlsx, args=(Excel_filename, dateList, current_app._get_current_object()))
-    to_xlsx.start()
-    to_xlsx.join()
+    file_con = data_to_xlsx(Excel_filename, dateList, current_app._get_current_object())
     # 4 发送Excel文件
-    file_content = send_file(Excel_filename, as_attachment=True)
+    file_content = send_file(file_con, attachment_filename = 'Rotas_'+ dateStart+'_' + dateEnd + '.xlsx', as_attachment=True)
     return file_content
 
 
