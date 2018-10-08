@@ -12,7 +12,14 @@ from app.models import User, db_session_add, Department
 from app.BlueUser import blue_user
 from app.BlueAuth.common import accept_para, response_return, get_table
 from app.BlueAuth.auth import Authentication
+from .oauth import OAuthDD
 
+# 返回钉钉扫码参数
+@blue_user.route('/dd_login_params')
+def dd_login_params():
+    oauth = OAuthDD()
+    dd_login_params = oauth.get_dd_login_params()
+    return jsonify(dd_login_params)
 
 # 注册
 @blue_user.route('/register', methods=['POST'])
