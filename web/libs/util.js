@@ -1,6 +1,5 @@
 import instance from 'axios'
 import store from '@/store'
-import router from '@/router'
 export const loadLoginUserInfo = () => {
   const token = localStorage.getItem('userToken')
   if (token) { // 登录-> 查询登录用户信息
@@ -22,7 +21,7 @@ export const loadLoginUserInfo = () => {
     })
   }
 }
-export const exitLogin = (response) => {
+export const exitLogin = ( params ) => {
   // 退出成功
   localStorage.setItem('userName', null)
   localStorage.setItem('userToken', null)
@@ -32,10 +31,20 @@ export const exitLogin = (response) => {
   store.commit('setDeparts', [])
   store.commit('setGroups', [])
   store.commit('setPermissions', {})
-  const url = window.location.pathname
-  // if (url.indexOf('/backend') !== -1 && url !== '/schedule') { // 在退出前是后台管理页面
-  //   alert('yo')
-  //   router.push('/') // 返回首页
-  // }
+}
+export const DDLogin = (a) => {
+  var e, c = document.createElement("iframe"),
+  d = "https://login.dingtalk.com/login/qrcode.htm?goto=" + a.goto ;
+  d += a.style ? "&style=" + encodeURIComponent(a.style) : "",
+  d += a.href ? "&href=" + a.href : "",
+  c.src = d,
+  c.frameBorder = "0",
+  c.allowTransparency = "true",
+  c.scrolling = "no",
+  c.width =  a.width ? a.width + 'px' : "365px",
+  c.height = a.height ? a.height + 'px' : "400px",
+  e = document.getElementById(a.id),
+  e.innerHTML = "",
+  e.appendChild(c)
 }
 

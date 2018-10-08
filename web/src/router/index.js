@@ -33,9 +33,11 @@ router.beforeEach((to, from, next) => {
         localStorage.setItem('userToken', null)
         switch (to.path) {
           case '/' || '/home' || '/schedule' || '/login' || '/register':
+            console.log(1)
             next()
             break
           case to.path.indexOf('/backend') > -1 && to.path !== '/schedule':
+            console.log(2)
             next('/')
             break
           default:

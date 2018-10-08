@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <div class="login-form">
+    <div class="login-form" id="login-form">
       <div class="logo-title">
         <h1>Rotas</h1>
       </div>
@@ -22,7 +22,7 @@
                 <Button type="primary" @click="handleSubmit('formItem')" :class="[loginBtn]">登录</Button>
               </Col>
               <Col span="12">
-                <a href="#" class="scanLogin">二维码登录</a>
+                <a class="scanLogin" @click="ddLogin">钉钉扫码登录</a>
               </Col>
             </FormItem>
             <FormItem>
@@ -38,6 +38,7 @@
 <script>
 import instance from '../../../libs/axios'
 import { mapMutations } from 'vuex'
+import { DDLogin } from '../../../libs/util'
 // import store from '@/store'
 export default {
   name: 'Login',
@@ -90,12 +91,27 @@ export default {
           })
         }
       })
+    },
+    ddLogin () {
+      // 初始化钉钉登录
+      let host = document.domain
+      let port = window.location.port
+      let urlHead = port ? host + ':' + port : host
+      instance.get('/back/dd_login_params').then((response) => {
+        let res = response.data
+        let url = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=' + res.appid +
+          '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=' + urlHead + '&redirect_uri=' + urlHead + '/oauth_callback'
+        console.log(url)
+        DDLogin({
+          id: 'login-form', // 这里需要你在自己的页面定义一个HTML标签并设置id，例如<div id="login_container"></div>或<span id="login_container"></span>
+          goto: url,
+          width: '400',
+          height: '400'
+        })
+      })
     }
   },
   beforeRouteEnter (to, from, next) {
-    // store.dispatch('setUser', null)
-    // localStorage.setItem('userName', null)
-    // localStorage.setItem('userToken', null)
     next()
   },
   mounted () {

@@ -99,11 +99,17 @@ export default {
             if (res.code === 0 || res.code === 2) {
               // 退出成功
               exitLogin()
+              if (this.$route.path.indexOf('/backend') !== -1) {
+                this.$router.push('/')
+              }
             }
           })
         }
       } else {
         exitLogin()
+        if (this.$route.path.indexOf('/backend') !== -1) {
+          this.$router.push('/')
+        }
       }
     }
   },

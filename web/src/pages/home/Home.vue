@@ -410,41 +410,17 @@ export default {
     getMyPermissions (new_, old_) {
       if (new_ !== old_) {
         // 监测到当前登录用户的权限列表发生变化
-        let whetherAdmin = this.$root.whetherAdmin()
-        let whetherBusiness = this.$root.whetherBusiManager()
-        if (this.$store.state.isLogin) {
-          if (whetherAdmin) { // 当前登录用户是超级管理员(可能既是业务管理员又是部门管理员)
-            // 可以编辑所有部门的值班记录
-            this.myDeparts.splice(1, this.myDeparts.length - 1) // 初始化筛选条件的下拉菜单
-            for (let key in this.$store.state.myPermissions) {
-              this.myDeparts.push({
-                id: parseInt(key),
-                label: this.$store.state.myPermissions[key].departAlias,
-                disabled: false,
-                name: this.$store.state.myPermissions[key].departName,
-                pLists: this.$store.state.myPermissions[key].pLists
-              })
-            }
-            this.getDuties()
-          } else if (!whetherAdmin && whetherBusiness) {
-            // 业务管理员只可以查看所有部门的排班记录
-            this.myDeparts.splice(1, this.myDeparts.length - 1)
-          } else if (!whetherAdmin && !whetherBusiness) {
-            // 部门管理员---------只看权限
-            this.myDeparts.splice(1, this.myDeparts.length - 1)
-            for (let departId in this.$store.state.myPermissions) {
-              this.myDeparts.push({
-                id: parseInt(departId),
-                label: this.$store.state.myPermissions[departId].departAlias,
-                disabled: false,
-                name: this.$store.state.myPermissions[departId].departName,
-                pLists: this.$store.state.myPermissions[departId].pLists
-              })
-            }
-          }
-        } else {
-          this.myDeparts.splice(1, this.myDeparts.length - 1) // 初始化筛选条件的下拉菜单
+        this.myDeparts.splice(1, this.myDeparts.length - 1)
+        for (let departId in this.$store.state.myPermissions) {
+          this.myDeparts.push({
+            id: parseInt(departId),
+            label: this.$store.state.myPermissions[departId].departAlias,
+            disabled: false,
+            name: this.$store.state.myPermissions[departId].departName,
+            pLists: this.$store.state.myPermissions[departId].pLists
+          })
         }
+        this.getDuties()
       }
     }
   },

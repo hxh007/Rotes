@@ -25,7 +25,7 @@
             管理组
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/userManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/backend/userManage" v-if="showBackend">
           <router-link tag="li" to="/backend/userManage">
             用户管理
           </router-link>
@@ -35,7 +35,7 @@
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/departManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/backend/departManage" v-if="showBackend">
           <router-link tag="li" to="/backend/departManage">
             部门管理
           </router-link>
@@ -112,21 +112,19 @@ export default {
         return true
       }
       return false
-    },
-    getMyGroups () {
-      return this.$store.state.myGroups
-    }
-  },
-  watch: {
-    getMyGroups (new_, old_) {
-      if (new_ !== old_) {
-        let whetherAdmin = this.$root.whetherAdmin()
-        if (!whetherAdmin && this.$route.path.indexOf('backend') > 0) {
-          this.$router.push('/')
-        }
-      }
     }
   }
+  // watch: {
+  //   getMyGroups (new_, old_) {
+  //     if (new_ !== old_) {
+  //       let whetherAdmin = this.$root.whetherAdmin()
+  //       let whetherBusiManager = this.$root.whetherBusiManager()
+  //       if (!whetherAdmin && !whetherBusiManager && this.$route.path.indexOf('backend') > 0) {
+  //         this.$router.push('/')
+  //       }
+  //     }
+  //   }
+  // }
 }
 </script>
 

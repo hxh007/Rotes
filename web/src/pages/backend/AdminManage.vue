@@ -372,6 +372,9 @@ export default {
         this.createAdminFlag = false
       } else if (res.code === 2) { // 此时需要退出登录
         exitLogin()
+        if (this.$route.path.indexOf('/backend') !== -1) {
+          this.$router.push('/')
+        }
       } else {
         this.$Message.error(res.msg)
       }
