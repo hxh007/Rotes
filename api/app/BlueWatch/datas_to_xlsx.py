@@ -1,5 +1,6 @@
 # coding=utf-8
 
+from io import BytesIO
 import xlsxwriter
 
 from app.models import Duty, Department
@@ -16,7 +17,9 @@ def data_to_xlsx(filename, dateList, capp):
         list_table_head = [u'部门', u'部门负责人', u'角色', ]
         list_table_head.extend(dateList)
         # 2 写入信息
-        workbook = xlsxwriter.Workbook(filename)
+        output = BytesIO()
+        output.name = filename
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
         merge_format = workbook.add_format({
             'bold': True,
@@ -156,4 +159,7 @@ def data_to_xlsx(filename, dateList, capp):
                     row_depart += count1
             else:
                 row_depart += depart_counts
+        # sheet.set_column('D:E', 20)
         workbook.close()
+        output.seek(0)
+        return output
