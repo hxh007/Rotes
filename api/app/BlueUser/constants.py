@@ -7,10 +7,12 @@
 # STATE = 'state'
 # SCOPE = 'snsapi_login',
 # APPID = 'dingoarzgcktudlqsgvyjn'
+# https://oapi.dingtalk.com/connect/qrconnect?appid=dingoarzgcktudlqsgvyjn&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=http://127.0.0.1
   # 应用2
 APPSECRET = '8ldo_RfsZmCg1CFem_-rbdtA9_6aXH-BO4kC1US1q2idRxcZbVuQJPTVDHNY2Hep'
-REDIRECT_URI = '/oauth_callback.html'
+REDIRECT_URI = '/oauth_callback'
 STATE = '/'
 SCOPE = 'snsapi_login',
 APPID = 'dingoagyiurxsqapujsvfq'
-# https://oapi.dingtalk.com/connect/qrconnect?appid=dingoarzgcktudlqsgvyjn&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=http://127.0.0.1
+# https://oapi.dingtalk.com/connect/qrconnect?appid=dingoagyiurxsqapujsvfq&response_type=code&scope=snsapi_login&state=127.0.0.1&redirect_uri=127.0.0.1
+
