@@ -9,6 +9,7 @@ import OperationManage from '@/pages/backend/OperationManage'
 import PermissionManage from '@/pages/backend/PermissionManage'
 import MessageManage from '@/pages/backend/MessageManage'
 import Login from '@/pages/login/Login'
+import oauthCB from '@/pages/login/oauth_callback'
 import Register from '@/pages/register/Register'
 
 export default [
@@ -68,5 +69,9 @@ export default [
     path: '/register',
     name: 'Register',
     component: Register
+  }, {
+    path: '/oauth_callback',
+    name: 'oauth_callback',
+    component: oauthCB
   }
 ]
