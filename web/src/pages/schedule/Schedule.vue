@@ -49,9 +49,9 @@
                     <span>{{item.roleName}}</span>
                   </div>
                 </td>
-                <td v-for="(innerItem, key, index) in item.dates" :key="index">
-                  <div class="ivu-table-cell" v-for="(ite,ind) in innerItem" :key="ind">
-                    <span>{{ite}}</span>
+                <td v-for="(innerItem, index) in item.dates" :key="index">
+                  <div class="ivu-table-cell">
+                    <span>{{innerItem}}</span>
                   </div>
                 </td>
               </tr>
@@ -129,19 +129,11 @@ export default {
                   roleName: '',
                   roleNameRowspan: 1,
                   roleNameShow: false,
-                  dates: [],
+                  dates: {},
                   isCenter: true
                 }
                 dateList.forEach((date, index) => {
-                  if (dutyInfo[departItem][dutyItem][date]) {
-                    let piece = {}
-                    piece[date] = dutyInfo[departItem][dutyItem][date][0]
-                    obj.dates.push(piece)
-                  } else {
-                    let piece2 = {}
-                    piece2[date] = '--'
-                    obj.dates.push(piece2)
-                  }
+                  obj.dates[date] = dutyInfo[departItem][dutyItem][date] ? dutyInfo[departItem][dutyItem][date][0] : '--'
                 })
                 this.tableList.push(obj)
               }
@@ -158,12 +150,10 @@ export default {
                 roleName: '',
                 roleNameRowspan: 1,
                 roleNameShow: false,
-                dates: []
+                dates: {}
               }
               dateList.forEach((date, index) => {
-                let emptyPiece = {}
-                emptyPiece[date] = '--'
-                obj2.dates.push(emptyPiece)
+                obj2.dates[date] = '--'
               })
               this.tableList.push(obj2)
             }
@@ -174,19 +164,17 @@ export default {
       for (let departItem in dutyInfo) {
         if (departItem === '系统运维部') {
           let departCount = dutyInfo[departItem].count
-          let countFlag = 0
-          for (let detailItem in dutyInfo[departItem]) {
-            if (Object.keys(dutyInfo[departItem]).length > 2) {
-              // 当前部门有相应的角色
-              if (detailItem !== 'count' && detailItem !== 'managerList') { // 筛选出部门下面的排班角色
-                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 1
-                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每一条值班记录
+          if (Object.keys(dutyInfo[departItem]).length > 2) { // 当前部门已经安排有角色 ： 一线， 二线 ...
+            for (let detailItem in dutyInfo[departItem]) {
+              if (detailItem !== 'count' && detailItem !== 'managerList') {
+                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 每个部门所对应角色应有的值班记录条数
+                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每个角色的值班人员
                   let dataObj = {
                     departName: departItem,
                     departNameRowspan: dutyInfo[departItem].count,
                     departNameShow: departCount === dutyInfo[departItem].count,
                     departNameColspan: 1,
-                    managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
+                    managers: dutyInfo[departItem]['managerList'].length > 0 ? dutyInfo[departItem]['managerList'].join(' ') : '',
                     managersRowspan: dutyInfo[departItem].count,
                     managersShow: departCount === dutyInfo[departItem].count,
                     managersColspan: 1,
@@ -194,52 +182,43 @@ export default {
                     roleNameRowspan: dutyInfo[departItem][detailItem]['count'],
                     roleNameShow: dutyRoleCount === dutyInfo[departItem][detailItem]['count'],
                     isCenter: false,
-                    dates: []
+                    dates: {}
                   }
                   dateList.forEach((date, index) => {
                     if (!dutyInfo[departItem][detailItem][date]) {
                       // 如果这一天该值班角色没有值班记录
-                      let piece = {}
-                      piece[date] = '--'
-                      dataObj.dates.push(piece)
+                      dataObj.dates[date] = '--'
                     } else { // 有值班记录
-                      let piece2 = {}
-                      piece2[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
-                      dataObj.dates.push(piece2)
+                      dataObj.dates[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
                     }
                   })
                   this.tableList.push(dataObj)
-                  dutyRoleCount -= 1
+                  dutyRoleCount--
+                  departCount--
                 }
-              }
-            } else { // 当前部门没有相应的角色
-              if ((detailItem === 'count' || detailItem === 'managerList') && countFlag === 0) {
-                // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
-                let emptyRoleObj = {
-                  departName: departItem,
-                  departNameRowspan: 1,
-                  departNameShow: true,
-                  departNameColspan: 1,
-                  managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
-                  managersRowspan: 1,
-                  managersShow: true,
-                  managersColspan: 1,
-                  roleName: '',
-                  roleNameRowspan: 1,
-                  roleNameShow: true,
-                  isCenter: false,
-                  dates: []
-                }
-                dateList.forEach((date, index) => {
-                  let piece = {}
-                  piece[date] = dutyInfo[departItem][detailItem][date] ? dutyInfo[departItem][detailItem][date] : ''
-                  emptyRoleObj.dates.push(piece)
-                })
-                this.tableList.push(emptyRoleObj)
-                countFlag++
               }
             }
-            departCount -= 1
+          } else { // 当前部门并没有安排角色，只有count和managerList
+            // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
+            let emptyRoleObj = {
+              departName: departItem,
+              departNameRowspan: 1,
+              departNameShow: true,
+              departNameColspan: 1,
+              managers: dutyInfo[departItem]['managerList'].length > 0 ? dutyInfo[departItem]['managerList'].join(' ') : '',
+              managersRowspan: 1,
+              managersShow: true,
+              managersColspan: 1,
+              roleName: '',
+              roleNameRowspan: 1,
+              roleNameShow: true,
+              isCenter: false,
+              dates: {}
+            }
+            dateList.forEach((date, index) => {
+              emptyRoleObj.dates[date] = '--'
+            })
+            this.tableList.push(emptyRoleObj)
           }
         }
       }
@@ -247,19 +226,17 @@ export default {
       for (let departItem in dutyInfo) {
         if (departItem === '网络安全部') {
           let departCount = dutyInfo[departItem].count
-          let countFlag = 0
-          for (let detailItem in dutyInfo[departItem]) {
-            if (Object.keys(dutyInfo[departItem]).length > 2) {
-              // 当前部门有相应的角色
-              if (detailItem !== 'count' && detailItem !== 'managerList') { // 筛选出部门下面的排班角色
-                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 1
-                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每一条值班记录
-                  let dataObj = {
+          if (Object.keys(dutyInfo[departItem]).length > 2) { // 当前部门已经安排有角色 ： 一线， 二线 ...
+            for (let detailItem in dutyInfo[departItem]) {
+              if (detailItem !== 'count' && detailItem !== 'managerList') {
+                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 每个部门所对应角色应有的值班记录条数
+                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每个角色的值班人员
+                  let netDataObj = {
                     departName: departItem,
                     departNameRowspan: dutyInfo[departItem].count,
                     departNameShow: departCount === dutyInfo[departItem].count,
                     departNameColspan: 1,
-                    managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
+                    managers: dutyInfo[departItem]['managerList'].length > 0 ? dutyInfo[departItem]['managerList'].join(' ') : '',
                     managersRowspan: dutyInfo[departItem].count,
                     managersShow: departCount === dutyInfo[departItem].count,
                     managersColspan: 1,
@@ -267,67 +244,56 @@ export default {
                     roleNameRowspan: dutyInfo[departItem][detailItem]['count'],
                     roleNameShow: dutyRoleCount === dutyInfo[departItem][detailItem]['count'],
                     isCenter: false,
-                    dates: []
+                    dates: {}
                   }
                   dateList.forEach((date, index) => {
                     if (!dutyInfo[departItem][detailItem][date]) {
                       // 如果这一天该值班角色没有值班记录
-                      let piece = {}
-                      piece[date] = '--'
-                      dataObj.dates.push(piece)
+                      netDataObj.dates[date] = '--'
                     } else { // 有值班记录
-                      let piece2 = {}
-                      piece2[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
-                      dataObj.dates.push(piece2)
+                      netDataObj.dates[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
                     }
                   })
-                  this.tableList.push(dataObj)
-                  dutyRoleCount -= 1
+                  this.tableList.push(netDataObj)
+                  dutyRoleCount--
+                  departCount--
                 }
-              }
-            } else { // 当前部门没有相应的角色
-              if ((detailItem === 'count' || detailItem === 'managerList') && countFlag === 0) {
-                // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
-                let emptyRoleObj = {
-                  departName: departItem,
-                  departNameRowspan: 1,
-                  departNameShow: true,
-                  departNameColspan: 1,
-                  managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
-                  managersRowspan: 1,
-                  managersShow: true,
-                  managersColspan: 1,
-                  roleName: '',
-                  roleNameRowspan: 1,
-                  roleNameShow: true,
-                  isCenter: false,
-                  dates: []
-                }
-                dateList.forEach((date, index) => {
-                  let piece = {}
-                  piece[date] = dutyInfo[departItem][detailItem][date] ? dutyInfo[departItem][detailItem][date] : '--'
-                  emptyRoleObj.dates.push(piece)
-                })
-                this.tableList.push(emptyRoleObj)
-                countFlag++
               }
             }
-            departCount -= 1
+          } else { // 当前部门并没有安排角色，只有count和managerList
+            // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
+            let netEmptyRoleObj = {
+              departName: departItem,
+              departNameRowspan: 1,
+              departNameShow: true,
+              departNameColspan: 1,
+              managers: dutyInfo[departItem]['managerList'].length > 0 ? dutyInfo[departItem]['managerList'].join(' ') : '',
+              managersRowspan: 1,
+              managersShow: true,
+              managersColspan: 1,
+              roleName: '',
+              roleNameRowspan: 1,
+              roleNameShow: true,
+              isCenter: false,
+              dates: {}
+            }
+            dateList.forEach((date, index) => {
+              netEmptyRoleObj.dates[date] = '--'
+            })
+            this.tableList.push(netEmptyRoleObj)
           }
         }
       }
-      // 再排其他部门的
+      // 再排其他部门
       for (let departItem in dutyInfo) {
         if (departItem !== '三、四线部门' && departItem !== '系统运维部' && departItem !== '网络安全部') {
           let departCount = dutyInfo[departItem].count
-          let countFlag = 0
-          for (let detailItem in dutyInfo[departItem]) {
-            if (Object.keys(dutyInfo[departItem]).length > 2) {
-              // 当前部门有相应的角色
-              if (detailItem !== 'count' && detailItem !== 'managerList') { // 筛选出部门下面的排班角色
-                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 1
-                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每一条值班记录
-                  let dataObj = {
+          if (Object.keys(dutyInfo[departItem]).length > 2) { // 当前部门已经安排有角色 ： 一线， 二线 ...
+            for (let detailItem in dutyInfo[departItem]) {
+              if (detailItem !== 'count' && detailItem !== 'managerList') {
+                let dutyRoleCount = dutyInfo[departItem][detailItem]['count'] // 每个部门所对应角色应有的值班记录条数
+                for (let i = 0; i <= dutyInfo[departItem][detailItem]['count'] - 1; i++) { // 遍历每个角色的值班人员
+                  let otherDataObj = {
                     departName: departItem,
                     departNameRowspan: dutyInfo[departItem].count,
                     departNameShow: departCount === dutyInfo[departItem].count,
@@ -340,52 +306,43 @@ export default {
                     roleNameRowspan: dutyInfo[departItem][detailItem]['count'],
                     roleNameShow: dutyRoleCount === dutyInfo[departItem][detailItem]['count'],
                     isCenter: false,
-                    dates: []
+                    dates: {}
                   }
                   dateList.forEach((date, index) => {
                     if (!dutyInfo[departItem][detailItem][date]) {
                       // 如果这一天该值班角色没有值班记录
-                      let piece = {}
-                      piece[date] = '--'
-                      dataObj.dates.push(piece)
+                      otherDataObj.dates[date] = '--'
                     } else { // 有值班记录
-                      let piece2 = {}
-                      piece2[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
-                      dataObj.dates.push(piece2)
+                      otherDataObj.dates[date] = dutyInfo[departItem][detailItem][date][i] ? dutyInfo[departItem][detailItem][date][i] : '--'
                     }
                   })
-                  this.tableList.push(dataObj)
-                  dutyRoleCount -= 1
+                  this.tableList.push(otherDataObj)
+                  dutyRoleCount--
+                  departCount--
                 }
-              }
-            } else { // 当前部门没有相应的角色
-              if ((detailItem === 'count' || detailItem === 'managerList') && countFlag === 0) {
-                // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
-                let emptyRoleObj = {
-                  departName: departItem,
-                  departNameRowspan: 1,
-                  departNameShow: true,
-                  departNameColspan: 1,
-                  managers: dutyInfo[departItem].managerList.length > 0 ? dutyInfo[departItem].managerList.join(' ') : '',
-                  managersRowspan: 1,
-                  managersShow: true,
-                  managersColspan: 1,
-                  roleName: '',
-                  roleNameRowspan: 1,
-                  roleNameShow: true,
-                  isCenter: false,
-                  dates: []
-                }
-                dateList.forEach((date, index) => {
-                  let piece = {}
-                  piece[date] = dutyInfo[departItem][detailItem][date] ? dutyInfo[departItem][detailItem][date] : '--'
-                  emptyRoleObj.dates.push(piece)
-                })
-                this.tableList.push(emptyRoleObj)
-                countFlag++
               }
             }
-            departCount -= 1
+          } else { // 当前部门并没有安排角色，只有count和managerList
+            // 说明当前只有count与managerList这两个键，该部门还未安排任何角色
+            let otherEmptyRoleObj = {
+              departName: departItem,
+              departNameRowspan: 1,
+              departNameShow: true,
+              departNameColspan: 1,
+              managers: dutyInfo[departItem]['managerList'].length > 0 ? dutyInfo[departItem]['managerList'].join(' ') : '',
+              managersRowspan: 1,
+              managersShow: true,
+              managersColspan: 1,
+              roleName: '',
+              roleNameRowspan: 1,
+              roleNameShow: true,
+              isCenter: false,
+              dates: {}
+            }
+            dateList.forEach((date, index) => {
+              otherEmptyRoleObj.dates[date] = '--'
+            })
+            this.tableList.push(otherEmptyRoleObj)
           }
         }
       }
