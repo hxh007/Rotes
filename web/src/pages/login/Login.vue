@@ -1,6 +1,11 @@
 <template>
   <div class="login-container">
-    <div class="login-form" id="login-form">
+    <div class="login-form" v-bind:class="{hidden: flag}">
+      <Icon type="md-close" class="close-ddlogin" @click="close_ddlogin" />
+      <div id="login-form" class="login-form">
+    </div>
+    </div>
+    <div class="login-form" v-bind:class="{hidden: !flag}">
       <div class="logo-title">
         <h1>Rotas</h1>
       </div>
@@ -58,7 +63,8 @@ export default {
           { type: 'string', min: 6, message: '密码长度不得低于6位', trigger: 'blur' }
         ]
       },
-      urlCommon: ''
+      urlCommon: '',
+      flag: true
     }
   },
   methods: {
@@ -95,6 +101,7 @@ export default {
     },
     ddLogin () {
       // 初始化钉钉登录
+      this.flag = false
       if (typeof window.addEventListener !== 'undefined') {
         window.addEventListener('message', this.handleMessage, false)
       } else if (typeof window.attachEvent !== 'undefined') {
@@ -118,6 +125,9 @@ export default {
           height: '400'
         })
       })
+    },
+    close_ddlogin () {
+      this.flag = true
     },
     handleMessage () {
       let origin = event.origin
@@ -179,7 +189,6 @@ body,html
       border-radius 2px 2px 0 0
       background #313b4c
       text-align center
-      line-height 121px
       color #ffffff
       font-size 30px
   .ivu-form-item-content
@@ -201,4 +210,9 @@ body,html
       font-size 16px
     .goToRegister
       color #313b4c
+  .hidden
+    display none!important
+  .close-ddlogin
+    font-size 24px
+    cursor pointer
 </style>
