@@ -34,7 +34,7 @@ def data_to_xlsx(filename, dateList, capp):
         sheet.merge_range(1, 0, 1, 2, u'值班总监', merge_format)
         sheet.merge_range(2, 0, 2, 2, u'三线值班', merge_format)
         row_depart = 1
-        tf_alias = Department.query.filter_by(name='MODULE_VT').first().alias
+        tf_alias = Department.query.filter_by(name='MODULE_TF').first().alias
         tf_roles_list = filter(lambda x: x not in ['count', 'managerList'], dutyInfo[tf_alias].keys())
         if tf_roles_list:
             for os_role in tf_roles_list:
@@ -159,7 +159,7 @@ def data_to_xlsx(filename, dateList, capp):
                     row_depart += count1
             else:
                 row_depart += depart_counts
-        # sheet.set_column(3, -1, 30)
+        sheet.set_column(3, len(list_table_head)-1, 18)
         workbook.close()
         output.seek(0)
         return output

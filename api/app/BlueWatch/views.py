@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
-import os
 
 
 from flask import render_template, request, jsonify
