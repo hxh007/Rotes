@@ -5,7 +5,7 @@ from collections import defaultdict
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
 import os
-from threading import Thread
+
 
 from flask import render_template, request, jsonify
 from flask import send_file, current_app, send_from_directory
@@ -14,10 +14,9 @@ from . import blue_watch
 from app import db
 from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
-from config import Config
+# from config import Config
 from app.BlueAuth.auth import Authentication
 from exportdutyinfo import exportdutyinfo
-import xlrd
 
 
 # 新增单条值班记录
@@ -537,11 +536,12 @@ def xlsx():
     except:
         result['msg'] = u'日期格式不正确'
         return jsonify(result)
-    # 3 调用生成excel函数
-    Excel_filename = os.path.join(Config.Excel_path, dateStart+'_' + dateEnd + '.xlsx')
-    file_con = data_to_xlsx(Excel_filename, dateList, current_app._get_current_object())
+    # 3 生成Excel数据
+    # Excel_filename = os.path.join(Config.Excel_path, dateStart+'_' + dateEnd + '.xlsx')
+    file_name = 'Rotas_' + dateStart+'_' + dateEnd + '.xlsx'
+    file_con = data_to_xlsx(file_name, dateList, current_app._get_current_object())
     # 4 发送Excel文件
-    file_content = send_file(file_con, attachment_filename = 'Rotas_'+ dateStart+'_' + dateEnd + '.xlsx', as_attachment=True)
+    file_content = send_file(file_con, attachment_filename=file_con.name, as_attachment=True, add_etags=False)
     return file_content
 
 

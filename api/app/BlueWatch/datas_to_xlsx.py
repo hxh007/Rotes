@@ -159,7 +159,7 @@ def data_to_xlsx(filename, dateList, capp):
                     row_depart += count1
             else:
                 row_depart += depart_counts
-        # sheet.set_column('D:E', 20)
+        # sheet.set_column(3, -1, 30)
         workbook.close()
         output.seek(0)
         return output
