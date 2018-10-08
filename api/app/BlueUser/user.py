@@ -77,7 +77,7 @@ def __client_register_by_ding(paras):
 # 用户登录
 @blue_user.route('/login', methods=['POST'])
 def auth_login():
-    para_list = ['username', 'password', 'client_type', 'ding_id']
+    para_list = ['username', 'password', 'client_type', 'ding_id', 'code']
     paras = accept_para(para_list)
     # 登录类型
     try:
@@ -117,11 +117,11 @@ def __client_login_by_username(paras):
     user.login_time = datetime.datetime.now()
     res = db_session_add(user)
     if res['code'] == 1:
-        return jsonify(res)
+        return res
     # 生成jwt_token
     jwt_token = Authentication.encode_jwt_token(user)
     if isinstance(jwt_token, dict):
-        return jsonify(jwt_token)
+        return jwt_token
     # 将jwt_token写入redis
     Authentication.set_redis_jwt(user.mobile, jwt_token)
     data = {
@@ -135,8 +135,58 @@ def __client_login_by_username(paras):
 
 # 钉钉登录
 def __client_login_by_ding(paras):
-    pass
-
+    # 获取code请求参数
+    code = paras[4]
+    if not code:
+        return response_return(code=1, msg=u'缺少code')
+    # 创建钉钉登录工具对象
+    oauth = OAuthDD()
+    try:
+        # 通过appid和appsecret获取assess_token
+        access_token = oauth.get_access_token()
+        # 通过accesstoken和code(tmp_auth_code)获取永久授权码
+        openid, persistent_code = oauth.get_persistent_code(access_token, code)
+        # 通过access_token获取sns_token
+        sns_token = oauth.get_sns_token(access_token, openid, persistent_code)
+        # 通过sns_token获取钉钉用户信息
+        user_info = oauth.get_dd_user(sns_token)
+    except Exception:
+        return response_return(code=1, msg=u'钉钉服务异常')
+    # 使用openid查询该钉钉用户是否存在
+    try:
+        oauth_user = User.query.filter_by(ding_id=user_info['dingId']).first()
+    except Exception:
+        return response_return(code=1, msg=u'数据查询出错')
+    if not oauth_user:
+        # 如果openid没绑定用户，创建钉钉用户
+        __client_register_by_ding(user_info)
+    else:
+        user = oauth_user
+        # 获取用户管理身份
+        group_list = [g.name for g in __user_manager_list(user)]
+        if isinstance(group_list, dict):
+            return group_list
+        # 获取用户部门
+        depart_list = __user_depart_list(user)
+        if isinstance(group_list, dict):
+            return depart_list
+        user.login_time = datetime.datetime.now()
+        res = db_session_add(user)
+        if res['code'] == 1:
+            return res
+        # 生成jwt_token
+        jwt_token = Authentication.encode_jwt_token(user)
+        if isinstance(jwt_token, dict):
+            return jwt_token
+        # 将jwt_token写入redis
+        Authentication.set_redis_jwt(user.mobile, jwt_token)
+        data = {
+            'user': user.to_dict(),
+            'jwt_token': jwt_token,
+            'group_list': group_list,
+            'depart_list': depart_list
+        }
+        return response_return(0, u'登录成功', data=data)
 
 # 退出登录
 @blue_user.route('/logout')

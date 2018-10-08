@@ -48,12 +48,12 @@ class OAuthDD(object):
             # 向钉钉服务器发送请求获取access_token
             response = requests.get(url, params=params)
             # 对response进行处理 获取access_token
-            access_token = response
+            access_token = response.json().get('access_token')
         except Exception:
             return response_return(1, u'获取access_token失败')
         return access_token
 
-    def get_persistent_code(self, access_token):
+    def get_persistent_code(self, access_token, code):
         '''通过accesstoken和code(tmp_auth_code)获取永久授权码'''
         # 准备url
         url = 'https://oapi.dingtalk.com/sns/get_persistent_code'
@@ -62,52 +62,52 @@ class OAuthDD(object):
             'access_token': access_token,
         }
         json = {
-            'tmp_auth_code': ''
+            'tmp_auth_code': code
         }
         try:
             # 向钉钉服务器发送请求获取persistent_code
             response = requests.post(url, params=params, json=json)
             # 对response进行处理 获取persistent_token
-            pass
-            persistent_code = None
+            persistent_code_dict= response.json()
+            openid = persistent_code_dict.get('openid')
+            persistent_code = persistent_code_dict.get('persistent_code')
         except Exception:
-            return response_return(1, u'获取persistent_code失败')
-        return persistent_code
+            return response_return(1, u'获取永久授权码失败')
+        return [openid, persistent_code]
 
-    def get_sns_token(self):
+    def get_sns_token(self, access_token, openid, persistent_code):
         '''通过access_token获取sns_token'''
         # 准备url
         url = 'https://oapi.dingtalk.com/sns/get_sns_token'
         # 准备参数
         params = {
-            'access_token': ''
+            'access_token': access_token
         }
         json = {
-            "openid": "",
-            "persistent_code": ""
+            "openid": openid,
+            "persistent_code": persistent_code
         }
         try:
             # 向钉钉服务器发送请求获取sns_token
             response = requests.post(url, params=params, json=json)
             # 数据处理
-            sns_token = response
+            sns_token = response.json().get('sns_token')
         except Exception:
             return response_return(1, u'获取sns_token失败')
         return sns_token
 
-    def get_dd_user(self):
+    def get_dd_user(self, sns_token):
         '''通过sns_token获取钉钉用户信息'''
         # url准备
         url = 'https://oapi.dingtalk.com/sns/getuserinfo'
         # 准备参数
         params = {
-            'sns_token': self.get_sns_token(),
+            'sns_token': sns_token,
         }
         try:
             # 向钉钉服务器发送请求获取用户信息
             response = requests.get(url, params=params)
-            pass
-            user_info = None
+            user_info = response.json().get('user_info')
         except Exception:
             return response_return(1, u'获取钉钉用户信息失败')
-
+        return user_info
