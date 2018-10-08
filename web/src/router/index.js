@@ -7,6 +7,7 @@ import { exitLogin } from '../../libs/util'
 
 Vue.use(Router)
 const router = new Router({
+  mode: 'history',
   routes
 })
 router.beforeEach((to, from, next) => {

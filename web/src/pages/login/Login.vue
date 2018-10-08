@@ -109,6 +109,7 @@ export default {
         let url = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=' + res.appid +
           '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=http://' + urlHead + '&redirect_uri=http://' + urlHead + res.redirect_uri
         this.urlCommon = url
+        console.log(url)
         this.$Spin.hide()
         DDLogin({
           id: 'login-form', // 这里需要你在自己的页面定义一个HTML标签并设置id，例如<div id="login_container"></div>或<span id="login_container"></span>
