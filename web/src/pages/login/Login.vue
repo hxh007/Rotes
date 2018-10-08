@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-form" v-bind:class="{hidden: flag}">
-      <Icon type="md-close" class="close-ddlogin" @click="close_ddlogin" />
+      <Icon type="ios-arrow-dropleft" class="close-ddlogin" @click="close_ddlogin" />
       <div id="login-form" class="login-form">
     </div>
     </div>
@@ -213,6 +213,6 @@ body,html
   .hidden
     display none!important
   .close-ddlogin
-    font-size 24px
+    font-size 36px
     cursor pointer
 </style>

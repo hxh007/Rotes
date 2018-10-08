@@ -10,12 +10,16 @@
 </template>
 
 <script>
+import { GetQueryString } from '../../../libs/util'
 import instance from '../../../libs/axios'
 export default {
   name: 'oauth_callback',
   mounted () {
+    let code = GetQueryString('code')
+    console.log(code)
     instance.post('/back/login', {
-      client_type: 200
+      client_type: 200,
+      code: code
     }).then((response) => {
       const res = response.data
       const data = res.data
