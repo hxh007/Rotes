@@ -14,5 +14,4 @@ REDIRECT_URI = '/oauth_callback'
 STATE = '/'
 SCOPE = 'snsapi_login',
 APPID = 'dingoagyiurxsqapujsvfq'
-# https://oapi.dingtalk.com/connect/qrconnect?appid=dingoagyiurxsqapujsvfq&response_type=code&scope=snsapi_login&state=127.0.0.1&redirect_uri=127.0.0.1
-
+# https://oapi.dingtalk.com/connect/qrconnect?appid=dingoagyiurxsqapujsvfq&response_type=code&scope=snsapi_login&state=http://127.0.0.1&redirect_uri=http://127.0.0.1
