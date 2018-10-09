@@ -7,7 +7,7 @@ from dateutil.parser import parse
 
 
 from flask import render_template, request, jsonify
-from flask import send_file, current_app, send_from_directory
+from flask import send_file, current_app, send_from_directory, make_response
 
 from . import blue_watch
 from app import db
@@ -513,7 +513,7 @@ def smsTemplate():
 
 # 导出Excel文件
 @blue_watch.route('/datatoxlsx', methods=['POST'])
-# @Authentication.required(manager_list=['BU_MANAGEMENT'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
     result = {'code': 1}
     # 1 接收参数
