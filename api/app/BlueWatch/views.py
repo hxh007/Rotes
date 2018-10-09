@@ -513,7 +513,7 @@ def smsTemplate():
 
 # 导出Excel文件
 @blue_watch.route('/datatoxlsx', methods=['POST'])
-# @Authentication.required(manager_list=['BU_MANAGEMENT'])
+@Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
     result = {'code': 1}
     # 1 接收参数
