@@ -21,7 +21,7 @@ class Authentication():
         try:
             managerList = map(lambda m:m.name, user.u_managements.all())
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=JWT_EXP_SECONDS), # 过期时间
+                # 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=JWT_EXP_SECONDS), # 过期时间
                 'iat': datetime.datetime.utcnow(), # 签发时间
                 'iss': 'auth', # 签发人
                 'data':{

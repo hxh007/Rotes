@@ -14,4 +14,6 @@ REDIRECT_URI = '/oauth_callback'
 STATE = '/'
 SCOPE = 'snsapi_login',
 APPID = 'dingoagyiurxsqapujsvfq'
+CORPID = 'ding55af0dbde90fd15435c2f4657eb6378f'
+CORPSECRET = 'UcvqgLD0CC0_MrmVRJUnHBSwYmFK7xxVNqhRa7zWhDFNBN5ZFUm9r0tHMTsMz3jG'
 # https://oapi.dingtalk.com/connect/qrconnect?appid=dingoagyiurxsqapujsvfq&response_type=code&scope=snsapi_login&state=http://127.0.0.1&redirect_uri=http://127.0.0.1

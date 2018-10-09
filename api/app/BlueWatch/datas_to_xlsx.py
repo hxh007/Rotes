@@ -20,8 +20,17 @@ def data_to_xlsx(filename, dateList, capp):
         output = BytesIO()
         output.name = filename
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet()
+        sheet = workbook.add_worksheet(u'值班表')
+        # 文本换行格式
         merge_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'color': '#000000',
+        })
+        merge_format.set_text_wrap()
+        # 第一行格式
+        merge_format1 = workbook.add_format({
             'bold': True,
             'align': 'center',
             'valign': 'vcenter',
@@ -29,7 +38,7 @@ def data_to_xlsx(filename, dateList, capp):
         })
         # 3 表头第一行写入
         for i in range(len(list_table_head)):
-            sheet.write(0, i, list_table_head[i], merge_format)
+            sheet.write(0, i, list_table_head[i], merge_format1)
         # # 4 第二行，值班总监，三线值班
         sheet.merge_range(1, 0, 1, 2, u'值班总监', merge_format)
         sheet.merge_range(2, 0, 2, 2, u'三线值班', merge_format)
@@ -159,6 +168,8 @@ def data_to_xlsx(filename, dateList, capp):
                     row_depart += count1
             else:
                 row_depart += depart_counts
+        sheet.set_column(0, 0, 13)
+        sheet.set_column(2, 2, 10)
         sheet.set_column(3, len(list_table_head)-1, 18)
         workbook.close()
         output.seek(0)
