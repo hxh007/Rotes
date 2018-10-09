@@ -70,8 +70,31 @@ def __client_register_by_username(paras):
     return result
 
 # 钉钉绑定
-def __client_register_by_ding(paras):
-    pass
+def __client_register_by_ding(user_detail):
+    '''
+    {"orderInDepts":"{1:176379156324762512}","department":[1],"unionid":"iilG9aBPo6J9CRwKF8UiSiiwAiEiE",
+    "userid":"manager2654","isSenior":false,"dingId":"$:LWCP_v1:$NA5xFLGJa/nYDB4xwjrU7s+SMgImsXVe","isBoss":false,
+    "name":"侯湘辉","errmsg":"ok","stateCode":"86","avatar":"","errcode":0,"isLeaderInDepts":"{1:false}",
+    "email":"565572139@qq.com","roles":[{"id":351520727,"name":"主管理员","groupName":"默认","type":101}],
+    "active":true,"isAdmin":true,"openId":"iilG9aBPo6J9CRwKF8UiSiiwAiEiE","mobile":"17310380750","isHide":false}
+    '''
+    # 查询用户是否已存在
+    try:
+        user = User.query.filter_by(mobile=user_detail.get('mobile')).first()
+    except Exception:
+        return response_return(1, '数据查询失败')
+    if user:
+        user.ding_id = user_detail.get('openId')
+    else:
+        user = User()
+        user.username = 'ding_' + user_detail.get('userid')
+        user.fullname = user_detail.get('name')
+        user.mobile = user_detail.get('mobile')
+        user.ding_id = user_detail.get('openId')
+    result = db_session_add(user)
+    if result['code']:
+        return result
+    return user
 
 
 # 用户登录
@@ -106,6 +129,59 @@ def __client_login_by_username(paras):
     # 检查用户名和密码
     if not (user.check_password(password=paras[1])):
         return response_return(1, u'用户名或密码错误')
+    # 获取用户用户信息
+    data = __login_user_info(user)
+    if not data.get('user'):
+        return data
+    return response_return(0, u'登录成功', data=data)
+
+
+# 钉钉登录
+def __client_login_by_ding(paras):
+    # 获取code请求参数
+    code = paras[4]
+    if not code:
+        return response_return(code=1, msg=u'缺少code')
+    # 创建钉钉登录工具对象
+    oauth = OAuthDD()
+    try:
+        # 通过appid和appsecret获取assess_token
+        access_token = oauth.get_access_token()
+        # 通过accesstoken和code(tmp_auth_code)获取永久授权码
+        openid, persistent_code, unionid = oauth.get_persistent_code(access_token, code)
+        # 通过access_token获取sns_token
+        # sns_token = oauth.get_sns_token(access_token, openid, persistent_code)
+        # 通过sns_token获取钉钉用户信息
+        # user_info = oauth.get_dd_user(sns_token)
+        # 通过corpid和corpsecret获取access_token
+        corp_access_token = oauth.get_corp_access_token()
+        # 获取用户id
+        user_id = oauth.get_user_id(corp_access_token, unionid)
+        # 通过access_token和unionid获取用户详情
+        user_detail = oauth.get_user_detail(corp_access_token, user_id)
+    except Exception:
+        return response_return(code=1, msg=u'钉钉服务异常')
+    if not all([access_token, openid, persistent_code, unionid, corp_access_token, user_id, user_detail]):
+        return response_return(code=1, msg=u'钉钉参数为空')
+    # 使用openid查询该钉钉用户是否存在
+    try:
+        oauth_user = User.query.filter_by(ding_id=openid).first()
+    except Exception:
+        return response_return(code=1, msg=u'数据查询出错或钉钉服务异常')
+    if not oauth_user:
+        # 如果openid没绑定用户，创建钉钉用户
+        user = __client_register_by_ding(user_detail)
+    else:
+        user = oauth_user
+        # 获取用户用户信息
+    data = __login_user_info(user)
+    if not data.get('user'):
+        return data
+    return response_return(0, u'登录成功', data=data)
+
+
+# 获取登录用户信息
+def __login_user_info(user):
     # 获取用户管理身份
     group_list = [g.name for g in __user_manager_list(user)]
     if isinstance(group_list, dict):
@@ -130,63 +206,8 @@ def __client_login_by_username(paras):
         'group_list': group_list,
         'depart_list': depart_list
     }
-    return response_return(0, u'登录成功', data=data)
+    return data
 
-
-# 钉钉登录
-def __client_login_by_ding(paras):
-    # 获取code请求参数
-    code = paras[4]
-    if not code:
-        return response_return(code=1, msg=u'缺少code')
-    # 创建钉钉登录工具对象
-    oauth = OAuthDD()
-    try:
-        # 通过appid和appsecret获取assess_token
-        access_token = oauth.get_access_token()
-        # 通过accesstoken和code(tmp_auth_code)获取永久授权码
-        openid, persistent_code = oauth.get_persistent_code(access_token, code)
-        # 通过access_token获取sns_token
-        sns_token = oauth.get_sns_token(access_token, openid, persistent_code)
-        # 通过sns_token获取钉钉用户信息
-        user_info = oauth.get_dd_user(sns_token)
-    except Exception:
-        return response_return(code=1, msg=u'钉钉服务异常')
-    # 使用openid查询该钉钉用户是否存在
-    try:
-        oauth_user = User.query.filter_by(ding_id=user_info['dingId']).first()
-    except Exception:
-        return response_return(code=1, msg=u'数据查询出错')
-    if not oauth_user:
-        # 如果openid没绑定用户，创建钉钉用户
-        __client_register_by_ding(user_info)
-    else:
-        user = oauth_user
-        # 获取用户管理身份
-        group_list = [g.name for g in __user_manager_list(user)]
-        if isinstance(group_list, dict):
-            return group_list
-        # 获取用户部门
-        depart_list = __user_depart_list(user)
-        if isinstance(group_list, dict):
-            return depart_list
-        user.login_time = datetime.datetime.now()
-        res = db_session_add(user)
-        if res['code'] == 1:
-            return res
-        # 生成jwt_token
-        jwt_token = Authentication.encode_jwt_token(user)
-        if isinstance(jwt_token, dict):
-            return jwt_token
-        # 将jwt_token写入redis
-        Authentication.set_redis_jwt(user.mobile, jwt_token)
-        data = {
-            'user': user.to_dict(),
-            'jwt_token': jwt_token,
-            'group_list': group_list,
-            'depart_list': depart_list
-        }
-        return response_return(0, u'登录成功', data=data)
 
 # 退出登录
 @blue_user.route('/logout')
