@@ -16,7 +16,6 @@ export default {
   name: 'oauth_callback',
   mounted () {
     let code = GetQueryString('code')
-    console.log(code)
     instance.post('/back/login', {
       client_type: 200,
       code: code

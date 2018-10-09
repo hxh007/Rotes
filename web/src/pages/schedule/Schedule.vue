@@ -2,6 +2,9 @@
   <div style="margin: 20px">
     <div class="action-box" :style="{'overflow': 'hidden'}">
       <h3 :style="{'float': 'left'}">排班详情</h3>
+      <Button v-bind:class="{'hidden-export': !showBackend}" type="primary" :style="{float: 'right', marginLeft: '20px'}" @click="exportScheduleList">
+        导出排班表
+      </Button>
       <div class="dateRange-box" :style="{float: 'right'}">
         <span>查询日期范围</span>
         <DatePicker type="daterange" v-model="dateRange" @on-change="changeDateRange" split-panels placeholder="Select date" style="width: 200px"></DatePicker>
@@ -346,6 +349,38 @@ export default {
           }
         }
       }
+    },
+    exportScheduleList () {
+      const dateStart = this.$root.formatDate('yyyy-MM-dd', this.dateRange[0])
+      const dateEnd = this.$root.formatDate('yyyy-MM-dd', this.dateRange[1])
+      console.log(dateStart, dateEnd)
+      instance.post('/back/datatoxlsx', {
+        dateStart: dateStart,
+        dateEnd: dateEnd
+      }, {
+        responseType: 'blob'
+      }).then((response) => {
+        let res = response.data
+        this.downloadFile(res, 'Rotas_' + dateStart + '_' + dateEnd)
+      })
+    }
+  },
+  computed: {
+    showBackend () {
+      if (this.$store.state.isLogin) { // 已登录
+        // 然后再根据角色进行划分
+        if (this.$store.state.myGroups.length > 0) {
+          const admin = this.$root.whetherAdmin()
+          const businessManager = this.$root.whetherBusiManager()
+          if (admin || businessManager) {
+            return true
+          } else {
+            return false
+          }
+        }
+      } else { // 未登录
+        return false
+      }
     }
   },
   mounted () {
@@ -368,4 +403,6 @@ export default {
 <style scoped lang="stylus">
 .search-box
   margin-top 20px
+.hidden-export
+  display none
 </style>

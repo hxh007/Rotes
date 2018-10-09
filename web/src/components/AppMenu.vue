@@ -50,6 +50,11 @@
             操作管理
           </router-link>
         </MenuItem>
+        <MenuItem name="/backend/planTaskManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+          <router-link tag="li" to="/backend/planTaskManage">
+            计划任务管理
+          </router-link>
+        </MenuItem>
         <MenuItem name="/backend/messageManage" v-if="showBackend">
           <router-link tag="li" to="/backend/messageManage">
             短信模板
