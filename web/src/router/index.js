@@ -8,7 +8,8 @@ import { exitLogin } from '../../libs/util'
 Vue.use(Router)
 const router = new Router({
   mode: 'history',
-  routes
+  routes,
+  history
 })
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
@@ -37,7 +38,7 @@ router.beforeEach((to, from, next) => {
             console.log(1)
             next()
             break
-          case to.path.indexOf('/backend') > -1 && to.path !== '/schedule':
+          case to.path.indexOf('Manage') > -1 && to.path !== '/schedule':
             console.log(2)
             next('/')
             break
