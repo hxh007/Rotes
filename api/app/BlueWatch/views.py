@@ -7,7 +7,7 @@ from dateutil.parser import parse
 
 
 from flask import render_template, request, jsonify
-from flask import send_file, current_app, send_from_directory
+from flask import send_file, current_app, send_from_directory, make_response
 
 from . import blue_watch
 from app import db
@@ -541,7 +541,11 @@ def xlsx():
     file_con = data_to_xlsx(file_name, dateList, current_app._get_current_object())
     # 4 发送Excel文件
     file_content = send_file(file_con, attachment_filename=file_con.name, as_attachment=True, add_etags=False)
-    return file_content
+    r = make_response(file_content)
+    # print file_content, type(file_content)
+    r.headers['filename'] = file_con.name
+    return r
+    # return file_content
 
 
 # 导出排班表

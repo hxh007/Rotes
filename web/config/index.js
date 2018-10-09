@@ -35,7 +35,8 @@ module.exports = {
           '^/back/login': '/users/login',
           '^/back/userInfo': '/users/login_user_info',
           '^/back/logout': '/users/logout',
-          '^/back/dd_login_params': '/users/dd_login_params'
+          '^/back/dd_login_params': '/users/dd_login_params',
+          '^/back/datatoxlsx': '/datatoxlsx'
         }
       }
     },

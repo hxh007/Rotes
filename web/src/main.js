@@ -13,7 +13,18 @@ Vue.config.productionTip = false
 Vue.use(iView)
 Vue.component('full-calendar', fullCalendar)
 Vue.prototype.bus = new Vue()
-
+Vue.prototype.downloadFile = function (data, name) {
+  if (!data) {
+    return
+  }
+  let url = window.URL.createObjectURL(new Blob([data]))
+  let link = document.createElement('a')
+  link.style.display = 'none'
+  link.href = url
+  link.setAttribute('download', name + '.xlsx')
+  document.body.appendChild(link)
+  link.click()
+}
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
