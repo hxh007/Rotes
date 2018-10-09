@@ -541,11 +541,7 @@ def xlsx():
     file_con = data_to_xlsx(file_name, dateList, current_app._get_current_object())
     # 4 发送Excel文件
     file_content = send_file(file_con, attachment_filename=file_con.name, as_attachment=True, add_etags=False)
-    r = make_response(file_content)
-    # print file_content, type(file_content)
-    r.headers['filename'] = file_con.name
-    return r
-    # return file_content
+    return file_content
 
 
 # 导出排班表
