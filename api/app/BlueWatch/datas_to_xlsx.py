@@ -168,8 +168,7 @@ def data_to_xlsx(filename, dateList, capp):
                     row_depart += count1
             else:
                 row_depart += depart_counts
-        sheet.set_column(0, 0, 13)
-        sheet.set_column(2, 2, 10)
+        sheet.set_column(0, 2, 13)
         sheet.set_column(3, len(list_table_head)-1, 18)
         workbook.close()
         output.seek(0)

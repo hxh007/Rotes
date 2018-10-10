@@ -8,10 +8,10 @@ import RoleManage from '@/pages/backend/RoleManage'
 import OperationManage from '@/pages/backend/OperationManage'
 import PermissionManage from '@/pages/backend/PermissionManage'
 import MessageManage from '@/pages/backend/MessageManage'
+import PlanTaskManage from '@/pages/backend/PlanTaskManage'
 import Login from '@/pages/login/Login'
 import oauthCB from '@/pages/login/oauth_callback'
 import Register from '@/pages/register/Register'
-
 export default [
   {
     path: '/',
@@ -31,35 +31,39 @@ export default [
     path: '/backend',
     name: 'Backend',
     component: Layout,
-    redirect: '/backend/userManage',
+    redirect: '/userManage',
     children: [{
-      path: '/backend/userManage',
+      path: '/userManage',
       name: 'UserManage',
       component: UserManage
     }, {
-      path: '/backend/permissionManage',
+      path: '/permissionManage',
       name: 'PermissionManage',
       component: PermissionManage
     }, {
-      path: '/backend/departManage',
+      path: '/departManage',
       name: 'DepartManage',
       component: DepartManage
     }, {
-      path: '/backend/roleManage',
+      path: '/roleManage',
       name: 'RoleManage',
       component: RoleManage
     }, {
-      path: '/backend/adminManage',
+      path: '/adminManage',
       name: 'AdminManage',
       component: AdminManage
     }, {
-      path: '/backend/operationManage',
+      path: '/operationManage',
       name: 'OperationManage',
       component: OperationManage
     }, {
-      path: '/backend/messageManage',
+      path: '/messageManage',
       name: 'messageManage',
       component: MessageManage
+    }, {
+      path: '/planTaskManage',
+      name: 'planTaskManage',
+      component: PlanTaskManage
     }]
   }, {
     path: '/login',
@@ -74,4 +78,5 @@ export default [
     name: 'oauth_callback',
     component: oauthCB
   }
+  // { path: '*', component: NotFoundComponent }
 ]

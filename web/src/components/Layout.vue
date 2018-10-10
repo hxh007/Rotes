@@ -99,7 +99,7 @@ export default {
             if (res.code === 0 || res.code === 2) {
               // 退出成功
               exitLogin()
-              if (this.$route.path.indexOf('/backend') !== -1) {
+              if (this.$route.path.indexOf('Manage') !== -1) { // 所有的后台管理URL末尾必须是Manage
                 this.$router.push('/')
               }
             }
@@ -107,7 +107,7 @@ export default {
         }
       } else {
         exitLogin()
-        if (this.$route.path.indexOf('/backend') !== -1) {
+        if (this.$route.path.indexOf('Manage') !== -1) {
           this.$router.push('/')
         }
       }
