@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
-from time import time
 
 
 from flask import render_template, request, jsonify
@@ -516,7 +515,6 @@ def smsTemplate():
 @blue_watch.route('/datatoxlsx', methods=['POST'])
 @Authentication.required(manager_list=['BU_MANAGEMENT'])
 def xlsx():
-    c = time()
     result = {'code': 1}
     # 1 接收参数
     if request.is_json:
@@ -543,8 +541,6 @@ def xlsx():
     file_con = data_to_xlsx(file_name, dateList, current_app._get_current_object())
     # 4 发送Excel文件
     file_content = send_file(file_con, attachment_filename=file_con.name, as_attachment=True, add_etags=False)
-    e = time()
-    print e-c
     return file_content
 
 
@@ -552,7 +548,6 @@ def xlsx():
 @blue_watch.route('/dutyinfo', methods=['GET'])
 @Authentication.required(endpoint='blue_watch.exportduty')
 def exportduty():
-    c = time()
     result = {'code': 1, 'msg': u'导出排班表'}
     # 1 接收参数
     if request.is_json:
@@ -576,6 +571,4 @@ def exportduty():
     dataResult = exportdutyinfo(dateList, current_app._get_current_object())
     result['code'] = 0
     result['data'] = dataResult
-    e = time()
-    print e-c
     return jsonify(result)
