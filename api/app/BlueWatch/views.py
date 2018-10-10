@@ -13,7 +13,6 @@ from . import blue_watch
 from app import db
 from app.models import Duty, TempText, Department, Role, User
 from datas_to_xlsx import data_to_xlsx
-# from config import Config
 from app.BlueAuth.auth import Authentication
 from exportdutyinfo import exportdutyinfo
 
@@ -536,7 +535,6 @@ def xlsx():
         result['msg'] = u'日期格式不正确'
         return jsonify(result)
     # 3 生成Excel数据
-    # Excel_filename = os.path.join(Config.Excel_path, dateStart+'_' + dateEnd + '.xlsx')
     file_name = 'Rotas_' + dateStart+'_' + dateEnd + '.xlsx'
     file_con = data_to_xlsx(file_name, dateList, current_app._get_current_object())
     # 4 发送Excel文件
