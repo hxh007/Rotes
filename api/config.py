@@ -60,6 +60,15 @@ class Config(object):
     DING_GW = conf.get('ding', 'gw')
     DING_DEFAULT_OWNER = conf.get('ding', 'default_owner')
 
+    # 钉钉扫码登录接口配置
+    APPSECRET = conf.get('ding_login', 'appsecret')
+    REDIRECT_URI = conf.get('ding_login', 'redirect_uri')
+    STATE = conf.get('ding_login', 'state')
+    SCOPE = conf.get('ding_login', 'scope')
+    APPID = conf.get('ding_login', 'appid')
+    CORPID = conf.get('ding_login', 'corpid')
+    CORPSECRET = conf.get('ding_login', 'corpsecret')
+
 
 class DevelopmentConfig(Config):
     # 开启调试模式

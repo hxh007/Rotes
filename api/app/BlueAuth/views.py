@@ -9,7 +9,7 @@ from app.models import (User, Department, Role, Management, Permission,
                         ActionType, db_session_add, db_session_delete,
                         query_relation, append_relation, remove_relation)
 from . import blue_auth
-from .common import (get_table, accept_para, response_return, TableTelationType)
+from .common import (get_table, accept_para, response_return, TableRelationType)
 
 
 # 权限管理 超级管理才能访问
@@ -21,7 +21,22 @@ def auth_supper():
         return jsonify(response_data)
     # 用户所在管理组
     managerList = g.managerList
-    if ('S_MANAGEMENT' not in managerList) and request.method != 'GET':
+    m_endpoint = [
+        'blue_auth.departments', 'blue_auth.department',
+        'blue_auth.user', 'blue_auth.users','blue_auth.many_to_many'
+    ]
+    relation_list = [TableRelationType.DU, TableRelationType.DR]
+    if 'S_MANAGEMENT' in managerList:
+        pass
+    elif request.method == 'GET':
+        pass
+    elif ('BU_MANAGEMENT' in managerList) and (request.endpoint in m_endpoint):
+        if request.endpoint == 'blue_auth.many_to_many':
+            if request.args.get('genre', None, type=int) in relation_list:
+                pass
+        else:
+            pass
+    else:
         return jsonify(response_return(3, u'没有权限访问'))
 
 
@@ -404,7 +419,7 @@ def many_to_many():
     genre = request.args.get('genre', None, type=int)
     if not all([fid, genre]):
         return jsonify(response_return(1, u'参数缺失'))
-    genre_dict = TableTelationType.genre.get(genre, None)
+    genre_dict = TableRelationType.genre.get(genre, None)
     if not genre_dict:
         return jsonify(response_return(1, u'genre无效'))
     # 查询
