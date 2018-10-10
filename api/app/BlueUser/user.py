@@ -14,12 +14,14 @@ from app.BlueAuth.common import accept_para, response_return, get_table
 from app.BlueAuth.auth import Authentication
 from .oauth import OAuthDD
 
+
 # 返回钉钉扫码参数
 @blue_user.route('/dd_login_params')
 def dd_login_params():
     oauth = OAuthDD()
     dd_login_params = oauth.get_dd_login_params()
     return jsonify(dd_login_params)
+
 
 # 注册
 @blue_user.route('/register', methods=['POST'])
@@ -36,6 +38,7 @@ def auth_register():
         ClientType.USER_DING: __client_register_by_ding
     }
     return jsonify(promise[client_type](paras))
+
 
 # 用户名注册
 def __client_register_by_username(paras):
@@ -68,6 +71,7 @@ def __client_register_by_username(paras):
     user.password = paras[3]
     result = db_session_add(user)
     return result
+
 
 # 钉钉绑定
 def __client_register_by_ding(user_detail):
@@ -221,6 +225,7 @@ def auth_logout():
     Authentication.del_redis_jwt(uid)
     return jsonify(response_return(0, u'退出成功'))
 
+
 # 获取用户的管理身份列表
 def __user_manager_list(user):
     try:
@@ -228,6 +233,7 @@ def __user_manager_list(user):
     except Exception:
         return response_return(1, u'数据查询失败')
     return manager_list
+
 
 # 获取用户所在部门列表
 def __user_depart_list(user):
@@ -239,6 +245,7 @@ def __user_depart_list(user):
     for department in departments:
         depart_list.append(department.to_dict())
     return depart_list
+
 
 # 获取用户所有权限
 def __user_permission_list(user):

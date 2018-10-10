@@ -99,7 +99,7 @@ def response_return(code=None, msg=None, data=None):
 
 
 # 查询关系类型
-class TableTelationType:
+class TableRelationType:
     # 部门和用户多对多关系
     DU = 1
     # 部门和角色多对多关系
