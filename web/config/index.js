@@ -13,7 +13,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/back':{
-        target : 'http://127.0.0.1:5000',
+        target : 'http://localhost:5000',
         pathRewrite: {
           '^/back/users': '/auth/users',
           '^/back/admin': '/auth/managements',
@@ -36,7 +36,11 @@ module.exports = {
           '^/back/userInfo': '/users/login_user_info',
           '^/back/logout': '/users/logout',
           '^/back/dd_login_params': '/users/dd_login_params',
-          '^/back/datatoxlsx': '/datatoxlsx'
+          '^/back/datatoxlsx': '/datatoxlsx',
+          '^/back/cron/jobs': '/cron/jobs',
+          '^/back/cron/schedulers': '/cron/schedulers',
+          '^/back/cron/schedulers/pause': '/cron/schedulers/pause',
+          '^/back/cron/schedulers/resume': '/cron/schedulers/resume'
         }
       }
     },

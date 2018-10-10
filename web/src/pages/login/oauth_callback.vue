@@ -10,12 +10,12 @@
 </template>
 
 <script>
-import { GetQueryString } from '../../../libs/util'
+// import { GetQueryString } from '../../../libs/util'
 import instance from '../../../libs/axios'
 export default {
   name: 'oauth_callback',
   mounted () {
-    let code = GetQueryString('code')
+    let code = this.$route.query.code
     instance.post('/back/login', {
       client_type: 200,
       code: code
@@ -28,6 +28,7 @@ export default {
         localStorage.setItem('userToken', data.jwt_token)
         this.$store.dispatch('setUser', data.user.username)
         this.$store.dispatch('setUserId', data.user.id)
+        this.$store.dispatch('setNickName', data.user.fullname)
         this.$store.dispatch('setToken', 'JWT ' + data.jwt_token)
         this.$store.dispatch('setPermissions', data.permission_list)
         this.$store.dispatch('setDeparts', data.depart_list)

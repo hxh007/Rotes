@@ -10,6 +10,7 @@ export default new Vuex.Store({
   state: {
     currentUserId: '',
     currentUser: '',
+    nickName: '',
     isLogin: false,
     token: '',
     myDepartments: [],

@@ -9,6 +9,7 @@ import OperationManage from '@/pages/backend/OperationManage'
 import PermissionManage from '@/pages/backend/PermissionManage'
 import MessageManage from '@/pages/backend/MessageManage'
 import PlanTaskManage from '@/pages/backend/PlanTaskManage'
+import CreateTimingTask from '@/pages/backend/CreateTimingTask'
 import Login from '@/pages/login/Login'
 import oauthCB from '@/pages/login/oauth_callback'
 import Register from '@/pages/register/Register'
@@ -33,37 +34,41 @@ export default [
     component: Layout,
     redirect: '/userManage',
     children: [{
-      path: '/userManage',
+      path: '/backend/userManage',
       name: 'UserManage',
       component: UserManage
     }, {
-      path: '/permissionManage',
+      path: '/backend/permissionManage',
       name: 'PermissionManage',
       component: PermissionManage
     }, {
-      path: '/departManage',
+      path: '/backend/departManage',
       name: 'DepartManage',
       component: DepartManage
     }, {
-      path: '/roleManage',
+      path: '/backend/roleManage',
       name: 'RoleManage',
       component: RoleManage
     }, {
-      path: '/adminManage',
+      path: '/backend/adminManage',
       name: 'AdminManage',
       component: AdminManage
     }, {
-      path: '/operationManage',
+      path: '/backend/operationManage',
       name: 'OperationManage',
       component: OperationManage
     }, {
-      path: '/messageManage',
+      path: '/backend/messageManage',
       name: 'messageManage',
       component: MessageManage
     }, {
-      path: '/planTaskManage',
+      path: '/backend/planTaskManage',
       name: 'planTaskManage',
       component: PlanTaskManage
+    }, {
+      path: '/backend/planTaskManage/createTimingTask',
+      name: 'createTimingTask',
+      component: CreateTimingTask
     }]
   }, {
     path: '/login',

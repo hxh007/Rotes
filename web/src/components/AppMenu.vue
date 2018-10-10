@@ -8,55 +8,55 @@
         <span v-if="isCollapse === true">R</span>
       </router-link>
     </div>
-    <Menu :active-name="activeName" theme="dark" width="auto" :open-names="openNames" @on-select="activeMenuFunc">
+    <Menu :active-name="activeMenu" ref="child" theme="dark" width="auto" :open-names="openNames">
       <MenuItem name="/schedule" tag="li">
         <router-link tag="li" to="/schedule">
           <Icon type="ios-navigate"></Icon>
           <span>排班记录</span>
         </router-link>
       </MenuItem>
-      <Submenu name="/backend" v-if="showBackend">
+      <Submenu name="backend" v-if="showBackend">
         <template slot="title">
           <Icon type="ios-analytics"></Icon>
           后台管理
         </template>
-        <MenuItem name="/adminManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
-          <router-link tag="li" to="/adminManage">
+        <MenuItem name="/backend/adminManage" v-if="showBackend && !showMessManage">
+          <router-link tag="li" to="/backend/adminManage">
             管理组
           </router-link>
         </MenuItem>
-        <MenuItem name="/userManage" v-if="showBackend">
-          <router-link tag="li" to="/userManage">
+        <MenuItem name="/backend/userManage" v-if="showBackend">
+          <router-link tag="li" to="/backend/userManage">
             用户管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/permissionManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
-          <router-link tag="li" to="/permissionManage">
+        <MenuItem name="/backend/permissionManage" v-if="showBackend && !showMessManage">
+          <router-link tag="li" to="/backend/permissionManage">
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/departManage" v-if="showBackend">
-          <router-link tag="li" to="/departManage">
+        <MenuItem name="/backend/departManage" v-if="showBackend">
+          <router-link tag="li" to="/backend/departManage">
             部门管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/roleManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
-          <router-link tag="li" to="/roleManage">
+        <MenuItem name="/backend/roleManage" v-if="showBackend && !showMessManage">
+          <router-link tag="li" to="/backend/roleManage">
             角色管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/operationManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
-          <router-link tag="li" to="/operationManage">
+        <MenuItem name="/backend/operationManage" v-if="showBackend && !showMessManage">
+          <router-link tag="li" to="/backend/operationManage">
             操作管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/planTaskManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
-          <router-link tag="li" to="/planTaskManage">
+        <MenuItem name="/backend/planTaskManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+          <router-link tag="li" to="/backend/planTaskManage">
             计划任务管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/messageManage" v-if="showBackend">
-          <router-link tag="li" to="/messageManage">
+        <MenuItem name="/backend/messageManage" v-if="showBackend">
+          <router-link tag="li" to="/backend/messageManage">
             短信模板
           </router-link>
         </MenuItem>
@@ -70,27 +70,28 @@ export default {
   name: 'AppMenu',
   data () {
     return {
-      subMenus: [],
+      subMenus: ['backend'],
       openNames: [],
-      activeName: ''
-    }
-  },
-  methods: {
-    openFlagArray () {
-      this.openNames = []
-      if (this.$route.path.indexOf('Manage') !== -1) {
-        this.openNames.push('/backend')
-      }
-      this.activeName = this.$route.path
-    },
-    activeMenuFunc (name) {
-      if (name.indexOf('backend') !== -1) {
-        this.activeName = name
-      }
+      activeMenu: ''
     }
   },
   props: {
     isCollapse: Boolean
+  },
+  methods: {
+    openFlagArray () {
+      this.openNames = []
+      this.subMenus.forEach((item, index) => {
+        if (this.$route.path.indexOf(item) !== -1) {
+          this.openNames.push(item)
+          this.activeMenu = this.$route.path
+        }
+      })
+      this.$nextTick(() => {
+        this.$refs.child.updateOpened()
+        this.$refs.child.updateActiveName()
+      })
+    }
   },
   computed: {
     menuitemClasses () {
@@ -121,19 +122,26 @@ export default {
         return true
       }
       return false
+    },
+    getMyGroups () {
+      return this.$store.state.myGroups
     }
   },
   watch: {
+    getMyGroups (new_, old_) {
+      if (new_ !== old_) {
+        let whetherAdmin = this.$root.whetherAdmin()
+        if (!whetherAdmin && this.$route.path.indexOf('backend')) {
+          this.$router.push('/')
+        }
+      }
+    },
     $route () {
       this.openFlagArray()
     }
   },
   mounted () {
-    // this.activeName = this.$route.path
-    // if (this.$route.path.indexOf('Manage') !== -1) {
-    //   this.openNames = ['/backend']
-    //   this.openNames.push(this.$route.path)
-    // }
+    this.openFlagArray()
   }
 }
 </script>

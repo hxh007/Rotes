@@ -11,6 +11,9 @@ export const userStatus = (state, user) => {
     state.token = ''
   }
 }
+export const setNickName = (state, nick) => {
+  state.nickName = nick
+}
 export const setUserId = (state, userId) => {
   state.currentUserId = userId
 }
