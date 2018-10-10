@@ -8,7 +8,7 @@
         <span v-if="isCollapse === true">R</span>
       </router-link>
     </div>
-    <Menu :active-name="activeName" theme="dark" width="auto" :open-names="openNames">
+    <Menu :active-name="activeName" theme="dark" width="auto" :open-names="openNames" @on-select="activeMenuFunc">
       <MenuItem name="/schedule" tag="li">
         <router-link tag="li" to="/schedule">
           <Icon type="ios-navigate"></Icon>
@@ -20,42 +20,42 @@
           <Icon type="ios-analytics"></Icon>
           后台管理
         </template>
-        <MenuItem name="/backend/adminManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/adminManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/adminManage">
             管理组
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/userManage" v-if="showBackend">
+        <MenuItem name="/userManage" v-if="showBackend">
           <router-link tag="li" to="/userManage">
             用户管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/permissionManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/permissionManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/permissionManage">
             权限管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/departManage" v-if="showBackend">
+        <MenuItem name="/departManage" v-if="showBackend">
           <router-link tag="li" to="/departManage">
             部门管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/roleManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/roleManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/roleManage">
             角色管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/operationManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/operationManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/operationManage">
             操作管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/planTaskManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
+        <MenuItem name="/planTaskManage" v-if="this.$root.whetherAdmin() || this.$root.whetherAdmin() && showMessManage">
           <router-link tag="li" to="/planTaskManage">
             计划任务管理
           </router-link>
         </MenuItem>
-        <MenuItem name="/backend/messageManage" v-if="showBackend">
+        <MenuItem name="/messageManage" v-if="showBackend">
           <router-link tag="li" to="/messageManage">
             短信模板
           </router-link>
@@ -80,9 +80,12 @@ export default {
       this.openNames = []
       if (this.$route.path.indexOf('Manage') !== -1) {
         this.openNames.push('/backend')
-        this.activeName = '/backend' + this.$route.path
-      } else {
-        this.activeName = this.$route.path
+      }
+      this.activeName = this.$route.path
+    },
+    activeMenuFunc (name) {
+      if (name.indexOf('backend') !== -1) {
+        this.activeName = name
       }
     }
   },
@@ -126,8 +129,11 @@ export default {
     }
   },
   mounted () {
-    this.openFlagArray()
-    console.log(this.activeName, this.openNames)
+    // this.activeName = this.$route.path
+    // if (this.$route.path.indexOf('Manage') !== -1) {
+    //   this.openNames = ['/backend']
+    //   this.openNames.push(this.$route.path)
+    // }
   }
 }
 </script>
