@@ -3,7 +3,7 @@
 import requests
 
 from app.BlueAuth.common import response_return
-from app.BlueUser import constants
+from config import Config
 
 
 class OAuthDD(object):
@@ -12,17 +12,16 @@ class OAuthDD(object):
     '''
     def __init__(self, appid=None, appsecret=None, redirect_uri=None, state=None, scope=None, corpid=None, corpsecret=None):
         '''构造方法，需要使用到的参数'''
-        self.appid = appid or constants.APPID
-        self.appsecret = appsecret or constants.APPSECRET
-        self.redirect_uri = redirect_uri or constants.REDIRECT_URI
-        self.state = state or constants.STATE
-        self.scope = scope or constants.SCOPE
-        self.corpid = corpid or constants.CORPID
-        self.corpsecret = corpsecret or constants.CORPSECRET
+        self.appid = appid or Config.APPID
+        self.appsecret = appsecret or Config.APPSECRET
+        self.redirect_uri = redirect_uri or Config.REDIRECT_URI
+        self.state = state or Config.STATE
+        self.scope = scope or Config.SCOPE
+        self.corpid = corpid or Config.CORPID
+        self.corpsecret = corpsecret or Config.CORPSECRET
 
     def get_dd_login_params(self):
         '''钉钉扫码登录参数'''
-
         # 准备参数
         params = {
             'appid': self.appid, # 钉钉应用唯一标识
