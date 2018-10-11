@@ -9,7 +9,7 @@ from app.models import (User, Department, Role, Management, Permission,
                         ActionType, db_session_add, db_session_delete,
                         query_relation, append_relation, remove_relation)
 from . import blue_auth
-from .common import (get_table, accept_para, response_return, TableRelationType)
+from .common import (get_table, accept_para, response_return, TableRelationType, BuM)
 
 
 # 权限管理 超级管理才能访问
@@ -21,18 +21,13 @@ def auth_supper():
         return jsonify(response_data)
     # 用户所在管理组
     managerList = g.managerList
-    m_endpoint = [
-        'blue_auth.departments', 'blue_auth.department',
-        'blue_auth.user', 'blue_auth.users','blue_auth.many_to_many'
-    ]
-    relation_list = [TableRelationType.DU, TableRelationType.DR]
     if 'S_MANAGEMENT' in managerList:
         pass
     elif request.method == 'GET':
         pass
-    elif ('BU_MANAGEMENT' in managerList) and (request.endpoint in m_endpoint):
+    elif ('BU_MANAGEMENT' in managerList) and (request.endpoint in BuM.allow_endpoint):
         if request.endpoint == 'blue_auth.many_to_many':
-            if request.args.get('genre', None, type=int) in relation_list:
+            if request.args.get('genre', None, type=int) in BuM.allow_relation:
                 pass
         else:
             pass
