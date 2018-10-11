@@ -40,7 +40,8 @@ module.exports = {
           '^/back/cron/jobs': '/cron/jobs',
           '^/back/cron/schedulers': '/cron/schedulers',
           '^/back/cron/schedulers/pause': '/cron/schedulers/pause',
-          '^/back/cron/schedulers/resume': '/cron/schedulers/resume'
+          '^/back/cron/schedulers/resume': '/cron/schedulers/resume',
+          '^/back/cron/funcs': '/cron/funcs'
         }
       }
     },

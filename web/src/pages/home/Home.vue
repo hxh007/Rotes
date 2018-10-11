@@ -184,6 +184,7 @@ export default {
         // this.fcEvents = res.data
         let departId = this.departSearch === 0 ? undefined : this.departSearch
         if (departId) { // 某个部门
+          console.log(res.data)
           res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
             let dutyListData = res.data.dutyList
             if (dutyListData[item]) { // 该日有值班记录
@@ -262,6 +263,7 @@ export default {
       }).then(this.getDutySucc)
     },
     changeOnSelect () {
+      console.log('changeOnSelect')
       if (this.departSearch !== undefined && this.departSearch !== 0) {
         instance.get('/back/departments/' + this.departSearch).then((response) => {
           const res = response.data
@@ -388,6 +390,7 @@ export default {
     departSearchFunc (new_, old_) {
       if (old_ !== new_) {
         if (new_ > 1) {
+          console.log('departSearchFunc')
           this.departSearch = this.myDeparts[1].id
           instance.get('/back/departments/' + this.departSearch).then((response) => {
             const res = response.data
@@ -420,7 +423,6 @@ export default {
             pLists: this.$store.state.myPermissions[departId].pLists
           })
         }
-        this.getDuties()
       }
     }
   },

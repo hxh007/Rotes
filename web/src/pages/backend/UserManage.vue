@@ -39,8 +39,11 @@
         <FormItem label="工号" prop="tagName">
           <Input type="text" v-model="editFormValidate.tagName" placeholder="请输入工号"></Input>
         </FormItem>
+        <FormItem label="钉_id" prop="ding_id">
+          <Input type="text" disabled v-model="editFormValidate.ding_id"></Input>
+        </FormItem>
         <FormItem label="用户名" prop="userName">
-          <Input type="text" disabled v-model="editFormValidate.userName" placeholder="请输入用户名"></Input>
+          <Input type="text" disabled v-model="editFormValidate.userName"></Input>
         </FormItem>
         <FormItem label="姓名" prop="fullName">
           <Input type="text" v-model="editFormValidate.fullName" placeholder="请输入姓名"></Input>
@@ -53,6 +56,12 @@
         </FormItem>
         <FormItem label="部门负责人">
           <i-switch v-model="editFormValidate.is_department">
+            <span slot="open">是</span>
+            <span slot="close">否</span>
+          </i-switch>
+        </FormItem>
+        <FormItem label="默认建群">
+          <i-switch v-model="editFormValidate.is_default_ops">
             <span slot="open">是</span>
             <span slot="close">否</span>
           </i-switch>
@@ -110,6 +119,10 @@ export default {
           sortable: true
         },
         {
+          title: '钉_id',
+          key: 'ding_id'
+        },
+        {
           title: '用户名',
           key: 'username'
         },
@@ -154,6 +167,27 @@ export default {
           render: (h, params) => {
             let manager = params.row.is_department === true ? '是' : '否'
             return h('div', {}, manager)
+          }
+        },
+        {
+          title: '默认建群',
+          key: 'is_default_ops',
+          render: (h, params) => {
+            let ops
+            switch (params.row.is_default_ops) {
+              case null:
+                ops = '否'
+                break
+              case false:
+                ops = '否'
+                break
+              case true:
+                ops = '是'
+                break
+              default:
+                break
+            }
+            return h('div', {}, ops)
           }
         },
         {
@@ -231,6 +265,7 @@ export default {
         mobile: '',
         remark: '',
         password: '',
+        ding_id: '',
         confirmPassword: ''
       },
       editRule1Validate: {
@@ -256,6 +291,9 @@ export default {
         ]
       },
       editRule2Validate: {
+        ding_id: [{
+          required: true, message: '请输入钉_id!', trigger: 'blur'
+        }],
         userName: [{
           required: true, message: '请输入用户名!', trigger: 'blur'
         }],
@@ -282,10 +320,12 @@ export default {
       let obj = JSON.parse(JSON.stringify(this.curItem))
       this.editFormValidate.tagName = obj.tag
       this.editFormValidate.userName = obj.username
+      this.editFormValidate.ding_id = obj.ding_id
       this.editFormValidate.fullName = obj.fullname
       this.editFormValidate.remark = obj.remark
       this.editFormValidate.mobile = obj.mobile
       this.editFormValidate.is_department = obj.is_department
+      this.editFormValidate.is_default_ops = Boolean(obj.is_default_ops)
       this.editFormValidate.status = obj.status
       this.editFlag = true
     },
@@ -341,12 +381,12 @@ export default {
         mobile: this.editFormValidate.mobile,
         remark: this.editFormValidate.remark,
         is_department: this.editFormValidate.is_department,
+        is_default_ops: this.editFormValidate.is_default_ops,
         status: this.editFormValidate.status
       }
       if (this.isEditPass) { // 编辑密码
         paramObj.password = this.editFormValidate.password
       }
-      console.log(paramObj)
       this.$refs[name].validate((valid) => {
         if (valid) { // 有效
           instance.put('/back/users/' + this.curItem.id, paramObj).then(this.editUserCallback)

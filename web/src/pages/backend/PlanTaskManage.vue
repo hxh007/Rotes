@@ -31,7 +31,9 @@
           </Form>
         </Drawer>
       </div>
-      <Button :style="{'float': 'left', 'marginLeft': '10px'}" type="primary" size="small">创建定时任务</Button>
+      <router-link :style="{'float': 'left', 'marginLeft': '10px'}"  to="/backend/planTaskManage/createTimingTask" role="button">
+        <Button type="primary" size="small">创建定时任务</Button>
+      </router-link>
     </div>
     <Divider/>
     <Table border :columns="columns" :data="taskLists"></Table>
