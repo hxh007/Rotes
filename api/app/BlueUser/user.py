@@ -88,13 +88,13 @@ def __client_register_by_ding(user_detail):
     except Exception:
         return response_return(1, '数据查询失败')
     if user:
-        user.ding_id = user_detail.get('openId')
+        user.ding_id = user_detail.get('userid')
     else:
         user = User()
         user.username = 'ding_' + user_detail.get('userid')
         user.fullname = user_detail.get('name')
         user.mobile = user_detail.get('mobile')
-        user.ding_id = user_detail.get('openId')
+        user.ding_id = user_detail.get('userid')
     result = db_session_add(user)
     if result['code']:
         return result
@@ -169,7 +169,7 @@ def __client_login_by_ding(paras):
         return response_return(code=1, msg=u'钉钉参数为空')
     # 使用openid查询该钉钉用户是否存在
     try:
-        oauth_user = User.query.filter_by(ding_id=openid).first()
+        oauth_user = User.query.filter_by(ding_id=user_id).first()
     except Exception:
         return response_return(code=1, msg=u'数据查询出错或钉钉服务异常')
     if not oauth_user:

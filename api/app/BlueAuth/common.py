@@ -122,3 +122,12 @@ class TableRelationType:
              's_table': Permission
         }
     }
+
+
+# 业务管理员后台权限
+class BuM:
+    allow_endpoint = [
+        'blue_auth.departments', 'blue_auth.department',
+        'blue_auth.user', 'blue_auth.users','blue_auth.many_to_many'
+    ]
+    allow_relation = [TableRelationType.DU, TableRelationType.DR]
