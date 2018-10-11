@@ -114,14 +114,63 @@ export default {
     },
     loadDefaultTbody (dateList, dutyInfo) {
       this.tableList = []
-      // 先渲染值班总监与三线
+      // 先渲染值班总监
       for (let departItem in dutyInfo) {
         if (departItem === '三、四线部门') {
           for (let dutyItem in dutyInfo[departItem]) {
             if (Object.keys(dutyInfo[departItem]).length > 2) {
-              if (dutyItem === '四线值班' || dutyItem === '三线值班') {
+              if (dutyItem === '四线值班') {
                 let obj = {
-                  departName: dutyItem === '四线值班' ? '值班总监' : '三线值班',
+                  departName: '值班总监',
+                  departNameRowspan: 1,
+                  departNameShow: true,
+                  departNameColspan: 3,
+                  managers: '',
+                  managersRowspan: 1,
+                  managersShow: false,
+                  managersColspan: 3,
+                  roleName: '',
+                  roleNameRowspan: 1,
+                  roleNameShow: false,
+                  dates: {},
+                  isCenter: true
+                }
+                dateList.forEach((date, index) => {
+                  obj.dates[date] = dutyInfo[departItem][dutyItem][date] ? dutyInfo[departItem][dutyItem][date][0] : '--'
+                })
+                this.tableList.push(obj)
+              }
+            } else { // = 2 只有count和managerList
+              let obj2 = {
+                departName: '三、四线值班',
+                departNameRowspan: 1,
+                departNameShow: true,
+                departNameColspan: 3,
+                managers: '',
+                managersRowspan: 1,
+                managersShow: false,
+                managersColspan: 3,
+                roleName: '',
+                roleNameRowspan: 1,
+                roleNameShow: false,
+                dates: {}
+              }
+              dateList.forEach((date, index) => {
+                obj2.dates[date] = '--'
+              })
+              this.tableList.push(obj2)
+            }
+          }
+        }
+      }
+      // 再排三线
+      for (let departItem in dutyInfo) {
+        if (departItem === '三、四线部门') {
+          for (let dutyItem in dutyInfo[departItem]) {
+            if (Object.keys(dutyInfo[departItem]).length > 2) {
+              if (dutyItem === '三线值班') {
+                let obj = {
+                  departName: '三线值班',
                   departNameRowspan: 1,
                   departNameShow: true,
                   departNameColspan: 3,

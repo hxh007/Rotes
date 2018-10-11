@@ -188,13 +188,13 @@ export default {
             let dutyListData = res.data.dutyList
             if (dutyListData[item]) { // 该日有值班记录
               for (let dutyName in dutyListData[item]) {
-                if (typeof dutyListData[item][dutyName] === 'number') {
-                  this.fcEvents.push({
-                    'title': dutyName + '——' + dutyListData[item][dutyName] + '条记录',
-                    'start': item,
-                    'end': item
-                  })
-                }
+                // if (typeof dutyListData[item][dutyName] === 'number') {
+                this.fcEvents.push({
+                  'title': dutyName + '——' + dutyListData[item][dutyName] + '条记录',
+                  'start': item,
+                  'end': item
+                })
+                // }
               }
             } else { // 该日没有值班记录
               this.fcEvents.push({

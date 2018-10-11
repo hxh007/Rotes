@@ -7,7 +7,6 @@ import { exitLogin } from '../../libs/util'
 
 Vue.use(Router)
 const router = new Router({
-  mode: 'history',
   routes,
   history
 })
@@ -20,7 +19,7 @@ router.beforeEach((to, from, next) => {
       if (res.code === 0) {
         store.dispatch('setUserId', res.data.user_info.id)
         store.dispatch('setUser', res.data.user_info.name)
-        // store.dispatch('setToken', data.jwt_token)
+        store.dispatch('setNickName', res.data.user_info.fullname)
         store.dispatch('setDeparts', res.data.depart_list)
         store.dispatch('setGroups', res.data.group_list)
         store.dispatch('setPermissions', res.data.permission_list)
@@ -28,6 +27,7 @@ router.beforeEach((to, from, next) => {
         // 需要重新登录
         store.commit('setUserId', null)
         store.commit('userStatus', null)
+        store.commit('setNickName', '')
         store.commit('setDeparts', [])
         store.commit('setPermissions', {})
         store.commit('setGroups', [])
@@ -38,7 +38,7 @@ router.beforeEach((to, from, next) => {
             console.log(1)
             next()
             break
-          case to.path.indexOf('Manage') > -1 && to.path !== '/schedule':
+          case to.path.indexOf('/backend') > -1 && to.path !== '/schedule':
             console.log(2)
             next('/')
             break

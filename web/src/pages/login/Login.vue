@@ -88,6 +88,7 @@ export default {
               localStorage.setItem('userToken', data.jwt_token)
               this.$store.dispatch('setUser', data.user.username)
               this.$store.dispatch('setUserId', data.user.id)
+              this.$store.dispatch('setNickName', data.user.fullname)
               this.$store.dispatch('setToken', 'JWT ' + data.jwt_token)
               this.$store.dispatch('setPermissions', data.permission_list)
               this.$store.dispatch('setDeparts', data.depart_list)
@@ -115,7 +116,7 @@ export default {
       instance.get('/back/dd_login_params').then((response) => {
         let res = response.data
         let url = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=' + res.appid +
-          '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=http://' + urlHead + '&redirect_uri=http://' + urlHead + res.redirect_uri
+          '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=http://' + urlHead + '&redirect_uri=http://' + urlHead + '/' + encodeURIComponent('#') + res.redirect_uri
         this.urlCommon = url
         // dd.ready(function () {
         //   console.log(res.corpid)
@@ -130,6 +131,7 @@ export default {
         //
         //   })
         // })
+        console.log(this.urlCommon)
         this.$Spin.hide()
         DDLogin({
           id: 'login-form', // 这里需要你在自己的页面定义一个HTML标签并设置id，例如<div id="login_container"></div>或<span id="login_container"></span>

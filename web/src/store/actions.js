@@ -1,6 +1,9 @@
 export const setUser = ({commit}, user) => {
   commit('userStatus', user)
 }
+export const setNickName = ({commit}, nick) => {
+  commit('setNickName', nick)
+}
 export const setUserId = ({commit}, userId) => {
   commit('setUserId', userId)
 }

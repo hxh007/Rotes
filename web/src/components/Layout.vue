@@ -15,7 +15,7 @@
             <span>丨</span>
             <Dropdown v-if="isLogin"  @on-click="menuAction">
               <a href="javascript:void(0)" :style="{color: '#666', marginRight: '10px'}">
-                {{this.$store.state.currentUser}}
+                {{this.$store.state.nickName}}
                 <Icon type="ios-arrow-down"></Icon>
               </a>
               <DropdownMenu slot="list">
@@ -99,7 +99,7 @@ export default {
             if (res.code === 0 || res.code === 2) {
               // 退出成功
               exitLogin()
-              if (this.$route.path.indexOf('Manage') !== -1) { // 所有的后台管理URL末尾必须是Manage
+              if (this.$route.path.indexOf('/backend') !== -1) {
                 this.$router.push('/')
               }
             }
@@ -107,7 +107,7 @@ export default {
         }
       } else {
         exitLogin()
-        if (this.$route.path.indexOf('Manage') !== -1) {
+        if (this.$route.path.indexOf('/backend') !== -1) {
           this.$router.push('/')
         }
       }
