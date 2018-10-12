@@ -10,6 +10,7 @@ import PermissionManage from '@/pages/backend/PermissionManage'
 import MessageManage from '@/pages/backend/MessageManage'
 import PlanTaskManage from '@/pages/backend/PlanTaskManage'
 import CreateTimingTask from '@/pages/backend/CreateTimingTask'
+import TriggerActions from '@/pages/backend/TriggerActions'
 import Login from '@/pages/login/Login'
 import oauthCB from '@/pages/login/oauth_callback'
 import Register from '@/pages/register/Register'
@@ -65,6 +66,10 @@ export default [
       path: '/backend/planTaskManage',
       name: 'planTaskManage',
       component: PlanTaskManage
+    }, {
+      path: '/backend/triggerActions',
+      name: 'triggerActions',
+      component: TriggerActions
     }, {
       path: '/backend/planTaskManage/createTimingTask',
       name: 'createTimingTask',

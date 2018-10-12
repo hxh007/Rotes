@@ -7,7 +7,7 @@
       </Sider>
       <Layout :style="[layoutStyle]">
         <Header :style="{padding: '0', position: 'fixed', width: `calc(100% - 200px)`, zIndex: 100}" :class="{'layout-header-bar': true, 'toggleWidth': this.widthFlag}">
-          <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '0 20px'}" type="md-menu" size="24"></Icon>
+          <!--<Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '0 20px'}" type="md-menu" size="24"></Icon>-->
           <div class="user-info-box">
             <div class="icons-box">
               <Icon type="md-notifications-outline" size="24" />
@@ -19,8 +19,8 @@
                 <Icon type="ios-arrow-down"></Icon>
               </a>
               <DropdownMenu slot="list">
-                <DropdownItem name="myDuty">我的值班</DropdownItem>
-                <DropdownItem name="myCenter">个人中心</DropdownItem>
+                <!--<DropdownItem name="myDuty">我的值班</DropdownItem>-->
+                <!--<DropdownItem name="myCenter">个人中心</DropdownItem>-->
                 <DropdownItem name="exit">退出</DropdownItem>
               </DropdownMenu>
             </Dropdown>
