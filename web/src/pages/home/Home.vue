@@ -184,7 +184,6 @@ export default {
         // this.fcEvents = res.data
         let departId = this.departSearch === 0 ? undefined : this.departSearch
         if (departId) { // 某个部门
-          console.log(res.data)
           res.data.dateList.forEach((item, index) => { // 遍历排班的所有日期
             let dutyListData = res.data.dutyList
             if (dutyListData[item]) { // 该日有值班记录
@@ -438,8 +437,11 @@ export default {
       pLists: ['GET', 'PUT', 'POST', 'DELETE']
     }]
     this.getDuties()
-    this.bus.$on('refreshCalendar', () => {
-      this.$router.go(0)
+    // this.bus.$on('refreshCalendar', () => {
+    //   this.$router.go(0)
+    // })
+    this.bus.$on('closeModal', (params) => {
+      this.getDuties()
     })
     this.today = this.$root.getNowFormatDate()
   }
