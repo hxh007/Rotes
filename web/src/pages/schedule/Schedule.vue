@@ -409,9 +409,8 @@ export default {
       }
     },
     exportScheduleList () {
-      const dateStart = this.dateRange[0]
-      const dateEnd = this.dateRange[1]
-      console.log(dateStart, dateEnd)
+      const dateStart = this.$root.formatDate('yyyy-MM-dd', new Date(this.dateRange[0]))
+      const dateEnd = this.$root.formatDate('yyyy-MM-dd', new Date(this.dateRange[1]))
       instance.post('/back/datatoxlsx', {
         dateStart: dateStart,
         dateEnd: dateEnd
@@ -448,7 +447,6 @@ export default {
     const dateStart = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, '01'].join('-')))
     const dateEnd = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, new Date(year, month, 0).getDate()].join('-')))
     this.dateRange = [dateStart, dateEnd]
-    console.log(this.dateRange[0], this.dateRange[1])
     instance.get('/back/dutyinfo', {
       params: {
         dateStart: this.dateRange[0],
