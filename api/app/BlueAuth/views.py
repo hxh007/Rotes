@@ -163,7 +163,6 @@ def department(did):
     if request.method == 'PUT':
         para_list = ['name', 'alias', 'status', 'remark']
         paras = accept_para(para_list)
-        print(paras[0], paras[1], paras[2])
         if not all([paras[0], paras[1]]):
             result['code'] = 1
             result['msg'] = u'参数缺失'
