@@ -1,6 +1,6 @@
 <template>
   <div>
-    <full-calendar :events="fcEvents" locale="en" @changeMonth="changeMonthFunc"
+    <full-calendar :events="fcEvents" lang="zh" @changeMonth="changeMonthFunc"
                    @dayClick="dayClickFunc">
       <div slot="fc-header-right">
         <Row>
@@ -437,9 +437,6 @@ export default {
       pLists: ['GET', 'PUT', 'POST', 'DELETE']
     }]
     this.getDuties()
-    // this.bus.$on('refreshCalendar', () => {
-    //   this.$router.go(0)
-    // })
     this.bus.$on('closeModal', (params) => {
       this.getDuties()
     })
