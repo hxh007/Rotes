@@ -310,6 +310,7 @@ export default {
     cancelModal () {
       this.bus.$emit('refreshCalendar')
       this.departOneModalCopy = false
+      this.bus.$emit('closeModal', this.departOneModalCopy)
     }
   },
   mounted () {

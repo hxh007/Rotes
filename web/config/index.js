@@ -45,6 +45,8 @@ module.exports = {
           '^/back/cron/jobs/:id/pause': '/cron/jobs/:id/pause',
           '^/back/cron/jobs/:id/resume': '/cron/jobs/:id/resume',
           '^/back/cron/jobs/:id': '/cron/jobs/:id',
+          '^/back/cron/ding': '/cron/ding',
+          '^/back/cron/sms': '/cron/sms'
         }
       }
     },

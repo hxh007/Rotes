@@ -63,7 +63,8 @@ class Authentication():
         '''
         try:
             Redis.setex('jwt_' + user_mobile, JWT_EXP_SECONDS, jwt_token)
-        except Exception:
+        except Exception as e:
+            print e
             return response_return(1, u'jwt_token保存失败')
 
     @staticmethod
