@@ -1,13 +1,11 @@
 # coding=utf-8
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import defaultdict
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
 
-
-from flask import render_template, request, jsonify
-from flask import send_file, current_app, send_from_directory, make_response
+from flask import (request, jsonify, send_file, current_app)
 
 from . import blue_watch
 from app import db
@@ -23,56 +21,54 @@ from exportdutyinfo import exportdutyinfo
 def duty_add():
     result = {'code': 0, 'msg': u'新增值班记录成功'}
     if request.is_json:
-        # 接收参数
         data = request.get_json()
-        departId = data.get('departId')
-        roleId = data.get('roleId')
-        staffId = data.get('staffId')
-        date = data.get('dutyDate')
-        # 参数校验
-        if not all([departId, roleId, staffId, date]):
-            result['code'] = 1
-            result['msg'] = u'参数不完整'
-            return jsonify(result)
-        # 数据是否存在，时间格式
-        try:
-            duty_time = datetime.strptime(date, '%Y-%m-%d').date()
-            depart = Department.query.filter_by(id=departId, status=1).first().alias
-            role = Role.query.filter_by(id=roleId, status=1).first().alias
-            # 部门角色关联关系
-            departRoles = Department.query.filter_by(id=departId, status=1).first().roles.all()
-            departRole_list = []
-            for departRole in departRoles:
-                departRole_list.append(departRole.id)
-            user = User.query.filter_by(id=staffId, status=1).first()
-        except:
-            result['code'] = 1
-            result['msg'] = u'参数不正确'
-            return jsonify(result)
-        if not user:
-            result['code'] = 1
-            result['msg'] = u'无此用户'
-            return jsonify(result)
-        if roleId not in departRole_list:
-            result['code'] = 1
-            result['msg'] = u'此部门无此角色'
-            return jsonify(result)
-        duty_name = user.fullname
-        is_duty = Duty.query.filter_by(depart=depart, role=role, duty_time=duty_time, duty_name=duty_name).first()
-        if is_duty:
-            result['code'] = 1
-            result['msg'] = u'已存在此条值班记录'
-            return jsonify(result)
-        mobile = user.mobile
-        ding_id = user.ding_id
-        # 逻辑处理，入库
-        dutyAdd = Duty(depart=depart, role=role, duty_name=duty_name, duty_time=duty_time, mobile=mobile, ding_id=ding_id)
-        result = dutyAdd.add(dutyAdd)
-        return jsonify(result)
     else:
+        data = request.values
+    # 接收参数
+    departId = data.get('departId')
+    roleId = data.get('roleId')
+    staffId = data.get('staffId')
+    date = data.get('dutyDate')
+    # 参数校验
+    if not all([departId, roleId, staffId, date]):
         result['code'] = 1
-        result['msg'] = u'接收不到参数'
+        result['msg'] = u'参数不完整'
         return jsonify(result)
+    # 数据是否存在，时间格式
+    try:
+        duty_time = datetime.strptime(date, '%Y-%m-%d').date()
+        depart = Department.query.filter_by(id=departId, status=1).first().alias
+        role = Role.query.filter_by(id=roleId, status=1).first().alias
+        # 部门角色关联关系
+        departRoles = Department.query.filter_by(id=departId, status=1).first().roles.all()
+        departRole_list = []
+        for departRole in departRoles:
+            departRole_list.append(departRole.id)
+        user = User.query.filter_by(id=staffId, status=1).first()
+    except:
+        result['code'] = 1
+        result['msg'] = u'参数不正确'
+        return jsonify(result)
+    if not user:
+        result['code'] = 1
+        result['msg'] = u'无此用户'
+        return jsonify(result)
+    if int(roleId) not in departRole_list:
+        result['code'] = 1
+        result['msg'] = u'此部门无此角色'
+        return jsonify(result)
+    duty_name = user.fullname
+    is_duty = Duty.query.filter_by(depart=depart, role=role, duty_time=duty_time, duty_name=duty_name).first()
+    if is_duty:
+        result['code'] = 1
+        result['msg'] = u'已存在此条值班记录'
+        return jsonify(result)
+    mobile = user.mobile
+    ding_id = user.ding_id
+    # 逻辑处理，入库
+    dutyAdd = Duty(depart=depart, role=role, duty_name=duty_name, duty_time=duty_time, mobile=mobile, ding_id=ding_id)
+    result = dutyAdd.add(dutyAdd)
+    return jsonify(result)
 
 
 # 单条值班记录编辑(查询、删除)
@@ -315,153 +311,6 @@ def dutysCount():
     result['data']['dutyList'] = dutyLists
     result['code'] = 0
     result['msg'] = u'统计所有部门值班数量成功'
-    return jsonify(result)
-
-
-# 值班记录
-@blue_watch.route('/dutys', methods=['GET'])
-@Authentication.required(endpoint='blue_watch.dutys')
-def dutys():
-    result = {'code': 1, 'data': {}, 'msg': u'此部门值班记录'}
-    if request.is_json:
-        data = request.get_json()
-    else:
-        data = request.values
-    # 1 接收参数
-    dateStart = data.get('dateStart')
-    dateEnd = data.get('dateEnd')
-    departId = data.get('departId')
-    # 2 参数校验
-    if not all([dateStart, dateEnd]):
-        result['msg'] = u'参数缺失'
-    if dateStart > dateEnd:
-        result['msg'] = u'日期不合理'
-        return jsonify(result)
-    try:
-        datelist = list(rrule(DAILY, dtstart=parse(dateStart), until=parse(dateEnd)))
-    except:
-        result['msg'] = u'日期格式不正确'
-        return jsonify(result)
-    s_day = datelist[0].strftime('%Y-%m-%d')
-    e_day = datelist[-1].strftime('%Y-%m-%d')
-    # 3 日期列表
-    dateList = []
-    for date_01 in datelist:
-        dateList.append(date_01.strftime('%Y-%m-%d'))
-    result['data']['dateList'] = dateList
-    # 4 单部门
-    if departId:
-        depart_obj = Department.query.filter_by(status=1, id=departId).first()
-        if not depart_obj:
-            result['msg'] = u'部门不存在'
-            return jsonify(result)
-        # 4.1 部门及负责人信息
-        departInfo = defaultdict(dict)
-        # 4.2 部门负责人
-        is_depart_objs = depart_obj.users.all()
-        is_depart_list = []
-        if is_depart_objs:
-            for is_depart_obj in is_depart_objs:
-                if is_depart_obj.is_department:
-                    is_depart_list.append(is_depart_obj.fullname)
-        departInfo[depart_obj.id][depart_obj.alias] = is_depart_list
-        result['data']['dapartInfo'] = departInfo
-        # 4.3 部门角色信息
-        roleList = {}
-        roleLists = {}
-        role_objs = depart_obj.roles.all()
-        if role_objs:
-            for role_obj in role_objs:
-                roleLists[role_obj.id] = role_obj.alias
-                roleList[role_obj.alias] = 0
-        result['data']['departRoles'] = roleLists
-        dutyList = defaultdict(dict)
-        # 4.3 有记录的值班情况
-        duty_objs = Duty.query.filter(Duty.status == 1, Duty.depart == depart_obj.alias,
-                                      Duty.duty_time.between(s_day, e_day)).all()
-        if duty_objs:
-            for duty_obj in duty_objs:
-                if duty_obj.role in roleList.keys():
-                    if duty_obj.duty_time.strftime('%Y-%m-%d') in dutyList.keys():
-                        if duty_obj.role in dutyList[duty_obj.duty_time.strftime('%Y-%m-%d')].keys():
-                            dutyList[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.role][duty_obj.id] = duty_obj.duty_name
-                            dutyList[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.role]['count'] += 1
-                        else:
-                            dutyList[duty_obj.duty_time.strftime('%Y-%m-%d')][duty_obj.role][duty_obj.id] = duty_obj.duty_name
-                            dutyList[duty_obj.duty_time.strftime('%Y-%m-%d')][duty_obj.role]['count'] = 1
-                    else:
-                        dutyList[duty_obj.duty_time.strftime("%Y-%m-%d")] = defaultdict(dict)
-                        dutyList[duty_obj.duty_time.strftime('%Y-%m-%d')][duty_obj.role][duty_obj.id] = duty_obj.duty_name
-                        dutyList[duty_obj.duty_time.strftime('%Y-%m-%d')][duty_obj.role]['count'] = 1
-                else:
-                    pass
-        result['data']['dutyList'] = dutyList
-        result['code'] = 0
-        return jsonify(result)
-    # 5 全部门
-    # 5.1 部门及负责人信息
-    # 5.2 部门角色关系信息
-    """{部门id: {部门名: [负责人名字列表]},}
-        {部门id: {角色id: 角色名},}"""
-    departList = defaultdict(dict)
-    depart_roles = defaultdict(dict)
-    depart_objs = Department.query.all()
-    if depart_objs:
-        for depart_obj in depart_objs:
-            # 部门负责人
-            is_depart_objs = depart_obj.users.all()
-            is_depart_list = []
-            if is_depart_objs:
-                for is_depart_obj in is_depart_objs:
-                    if is_depart_obj.is_department:
-                        is_depart_list.append(is_depart_obj.fullname)
-            departList[depart_obj.id][depart_obj.alias] = is_depart_list
-            # 部门角色关系
-            role_objs = depart_obj.roles.all()
-            if role_objs:
-                for role_obj in role_objs:
-                    depart_roles[depart_obj.id][role_obj.id] = role_obj.alias
-    result['data']['departInfo'] = departList
-    result['data']['departRoles'] = depart_roles
-    # 5.2 值班统计信息
-    dutyLists = defaultdict(dict)
-    duty_objs = Duty.query.filter(Duty.status == 1, Duty.duty_time.between(s_day, e_day)).all()
-    if duty_objs:
-        for duty_obj in duty_objs:
-            # 先判断时间
-            if duty_obj.duty_time.strftime("%Y-%m-%d") in dutyLists.keys():
-                # 判断部门名
-                if duty_obj.depart in dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")].keys():
-                    # 判断角色名
-                    if duty_obj.role in dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart].keys():
-                        # 存在则数量+1
-                        dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
-                        # count
-                        dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            'count'] += 1
-                    else:
-                        dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
-                        # count
-                        dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                            'count'] = 1
-                else:
-                    dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
-                    dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                        duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
-                    # count
-                    dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][
-                        'count'] = 1
-            else:
-                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")] = defaultdict(dict)
-                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart] = defaultdict(dict)
-                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role][duty_obj.id] = duty_obj.duty_name+duty_obj.mobile
-                # count
-                dutyLists[duty_obj.duty_time.strftime("%Y-%m-%d")][duty_obj.depart][duty_obj.role]['count'] = 1
-    result['data']['dutyList'] = dutyLists
-    result['code'] = 0
-    result['msg'] = u'所有部门值班记录'
     return jsonify(result)
 
 
