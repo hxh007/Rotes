@@ -409,8 +409,8 @@ export default {
       }
     },
     exportScheduleList () {
-      const dateStart = this.$root.formatDate('yyyy-MM-dd', this.dateRange[0])
-      const dateEnd = this.$root.formatDate('yyyy-MM-dd', this.dateRange[1])
+      const dateStart = this.dateRange[0]
+      const dateEnd = this.dateRange[1]
       console.log(dateStart, dateEnd)
       instance.post('/back/datatoxlsx', {
         dateStart: dateStart,
