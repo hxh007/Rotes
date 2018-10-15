@@ -5,12 +5,14 @@ import App from './App'
 import router from './router'
 import store from './store'
 import iView from 'iview'
+import moment from 'vue-moment'
 import fullCalendar from 'vue-fullcalendar'
 import 'iview/dist/styles/iview.css'
 import '@/assets/common.css'
 
 Vue.config.productionTip = false
 Vue.use(iView)
+Vue.use(moment)
 Vue.component('full-calendar', fullCalendar)
 Vue.prototype.bus = new Vue()
 Vue.prototype.downloadFile = function (data, name) {

@@ -184,7 +184,7 @@ export default {
     instance.get('/back/tempContent').then((response) => {
       let res = response.data
       if (res.code === 0) {
-        this.messageInfo = res.data
+        this.messageInfo = res.data.tempContent
       }
     })
   }
