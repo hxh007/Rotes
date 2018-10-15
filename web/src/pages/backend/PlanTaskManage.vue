@@ -26,7 +26,12 @@
                 <span slot="open">运行</span>
                 <span slot="close">暂停</span>
               </i-switch>
-              <Button type="primary" @click="disabled = !disabled">Toggle Disabled</Button>
+              <Button v-if="!disabled" type="primary" @click="disabled = !disabled" size="small">
+                <Icon type="md-unlock" />
+              </Button>
+              <Button v-else type="error" @click="disabled = !disabled" size="small">
+                <Icon type="md-lock" />
+              </Button>
             </FormItem>
           </Form>
         </Drawer>
@@ -55,7 +60,7 @@
         </FormItem>
         <FormItem label="下次执行时间">
           <h3>
-            <Time :time="singleJob.next_run" :interval="1"></Time>
+            <Time :time="singleJob.next_run" :interval="60"></Time>
           </h3>
         </FormItem>
       </Form>
@@ -101,7 +106,7 @@ export default {
               time = new Date(Date(params.row.next_run))
               return h('Time', {
                 props: {
-                  interval: 1,
+                  interval: 60,
                   time: time
                 }
               }, time)

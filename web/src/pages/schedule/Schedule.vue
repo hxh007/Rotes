@@ -37,22 +37,22 @@
               </colgroup>
               <tbody class="ivu-table-tbody">
               <tr class="ivu-table-row"  v-for="(item, index) in tableList" :key="index">
-                <td :rowspan="item.departNameRowspan" :colspan="item.departNameColspan" v-if="item.departNameShow">
+                <td :width="colWidth" :rowspan="item.departNameRowspan" :colspan="item.departNameColspan" v-if="item.departNameShow">
                   <div class="ivu-table-cell" :class="{center: item.isCenter}">
                     <span>{{item.departName}}</span>
                   </div>
                 </td>
-                <td :rowspan="item.managersRowspan" :colspan="item.managersColspan" v-if="item.managersShow">
+                <td :width="colWidth" :rowspan="item.managersRowspan" :colspan="item.managersColspan" v-if="item.managersShow">
                   <div class="ivu-table-cell">
                     <span>{{item.managers}}</span>
                   </div>
                 </td>
-                <td :rowspan="item.roleNameRowspan" v-if="item.roleNameShow">
+                <td :width="colWidth" :rowspan="item.roleNameRowspan" v-if="item.roleNameShow">
                   <div class="ivu-table-cell">
                     <span>{{item.roleName}}</span>
                   </div>
                 </td>
-                <td v-for="(innerItem, index) in item.dates" :key="index">
+                <td :width="colWidth" v-for="(innerItem, index) in item.dates" :key="index">
                   <div class="ivu-table-cell">
                     <span>{{innerItem}}</span>
                   </div>
@@ -82,6 +82,15 @@ export default {
   },
   methods: {
     changeDateRange () {
+      const startYear = this.dateRange[0].getFullYear()
+      const startMonth = this.dateRange[0].getMonth()
+      const startDay = this.dateRange[0].getDate()
+      const endYear = this.dateRange[1].getFullYear()
+      const endMonth = this.dateRange[1].getMonth()
+      const endDay = this.dateRange[1].getDate()
+      const startDate = this.$root.formatDate('yyyy-MM-dd', new Date(startYear, startMonth, startDay))
+      const endDate = this.$root.formatDate('yyyy-MM-dd', new Date(endYear, endMonth, endDay))
+      this.dateRange = [startDate, endDate]
       instance.get('/back/dutyinfo', {
         params: {
           dateStart: this.dateRange[0],
@@ -104,7 +113,7 @@ export default {
         } else {
           let len = res.data.dateList.length + 3
           this.tableWidth = '100%'
-          this.colWidth = parseInt(100 / len) + '%'
+          this.colWidth = (100 / len) + '%'
         }
         // 渲染表格体数据
         this.loadDefaultTbody(res.data.dateList, res.data.dutyInfo)
@@ -439,6 +448,7 @@ export default {
     const dateStart = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, '01'].join('-')))
     const dateEnd = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, new Date(year, month, 0).getDate()].join('-')))
     this.dateRange = [dateStart, dateEnd]
+    console.log(this.dateRange[0], this.dateRange[1])
     instance.get('/back/dutyinfo', {
       params: {
         dateStart: this.dateRange[0],
