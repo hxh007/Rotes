@@ -47,7 +47,7 @@
         <TabPane label="秒">
           <RadioGroup vertical v-model="secondMode" @on-change="changeSecondsMode">
             <Radio label="wildcard">
-              <span>分钟，允许的通配符【,-*/】</span>
+              <span>秒，允许的通配符【,-*/】</span>
             </Radio>
             <Radio label="assign">
               <span>指定</span>
@@ -73,7 +73,7 @@
         <TabPane label="小时">
           <RadioGroup vertical v-model="hourMode" @on-change="changeHourMode">
             <Radio label="wildcard">
-              <span>分钟，允许的通配符【,-*/】</span>
+              <span>小时，允许的通配符【,-*/】</span>
             </Radio>
             <Radio label="assign">
               <span>指定</span>
@@ -86,7 +86,7 @@
         <TabPane label="日">
           <RadioGroup vertical v-model="dayMode" @on-change="changeDayMode">
             <Radio label="wildcard">
-              <span>分钟，允许的通配符【,-*/】</span>
+              <span>日，允许的通配符【,-*/】</span>
             </Radio>
             <Radio label="assign">
               <span>指定</span>
@@ -99,7 +99,7 @@
         <TabPane label="月">
           <RadioGroup vertical v-model="monthMode" @on-change="changeMonthMode">
             <Radio label="wildcard">
-              <span>分钟，允许的通配符【,-*/】</span>
+              <span>月，允许的通配符【,-*/】</span>
             </Radio>
             <Radio label="assign">
               <span>指定</span>
@@ -112,7 +112,7 @@
         <TabPane label="周">
           <RadioGroup vertical v-model="weekMode" @on-change="changeWeekMode">
             <Radio label="wildcard">
-              <span>分钟，允许的通配符【,-*/】</span>
+              <span>周，允许的通配符【,-*/】</span>
             </Radio>
             <Radio label="assign">
               <span>指定</span>
