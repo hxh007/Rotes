@@ -75,6 +75,12 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
+class TestConfig(Config):
+    # 开启测试模式
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///'+os.path.join(Config.basedir, "datas", "app-tests.sqlite3")
+
+
 class ProductionConfig(Config):
     # 关闭调试模式
     DEBUG = False
@@ -83,5 +89,6 @@ class ProductionConfig(Config):
 
 config = {
     "dev_config": DevelopmentConfig,
+    "test_config": TestConfig,
     "pro_config": ProductionConfig
 }
