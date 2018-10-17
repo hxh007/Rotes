@@ -84,8 +84,7 @@ class TestConfig(Config):
 class ProductionConfig(Config):
     # 关闭调试模式
     DEBUG = False
-    # 跨域白名单
-    CORS_URL = []
+
 
 config = {
     "dev_config": DevelopmentConfig,

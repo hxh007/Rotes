@@ -29,7 +29,7 @@ def create_app(config_name):
 
     # 关联程序实例
     db.init_app(app)
-    CORS(app, origins=config[config_name].CORS_URL)
+    CORS(app)
     from .BlueCron.job import listener_cronEvent
     cron_scheduler.init_app(app)
     cron_scheduler.add_listener(listener_cronEvent, EVENT_JOB_EXECUTED|EVENT_JOB_ERROR)
