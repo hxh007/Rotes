@@ -5,6 +5,7 @@
 *.pyc
 migrations/*
 api/datas/app-dev.sqlite3
+api/datas/app-tests.sqlite3
 api/app/BlueAuth/JSON.py
 api/.idea
 api/venv
