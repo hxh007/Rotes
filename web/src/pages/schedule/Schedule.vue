@@ -91,7 +91,7 @@ export default {
       const startDate = this.$root.formatDate('yyyy-MM-dd', new Date(startYear, startMonth, startDay))
       const endDate = this.$root.formatDate('yyyy-MM-dd', new Date(endYear, endMonth, endDay))
       this.dateRange = [startDate, endDate]
-      instance.get('/back/dutyinfo', {
+      instance.get(process.env.API_ROOT + '/dutyinfo', {
         params: {
           dateStart: this.dateRange[0],
           dateEnd: this.dateRange[1]
@@ -411,7 +411,7 @@ export default {
     exportScheduleList () {
       const dateStart = this.$root.formatDate('yyyy-MM-dd', new Date(this.dateRange[0]))
       const dateEnd = this.$root.formatDate('yyyy-MM-dd', new Date(this.dateRange[1]))
-      instance.post('/back/datatoxlsx', {
+      instance.post(process.env.API_ROOT + '/datatoxlsx', {
         dateStart: dateStart,
         dateEnd: dateEnd
       }, {
@@ -447,7 +447,7 @@ export default {
     const dateStart = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, '01'].join('-')))
     const dateEnd = this.$root.formatDate('yyyy-MM-dd', new Date([year, month, new Date(year, month, 0).getDate()].join('-')))
     this.dateRange = [dateStart, dateEnd]
-    instance.get('/back/dutyinfo', {
+    instance.get(process.env.API_ROOT + '/dutyinfo', {
       params: {
         dateStart: this.dateRange[0],
         dateEnd: this.dateRange[1]

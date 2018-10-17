@@ -389,7 +389,6 @@ export default {
     departSearchFunc (new_, old_) {
       if (old_ !== new_) {
         if (new_ > 1) {
-          console.log('departSearchFunc')
           this.departSearch = this.myDeparts[1].id
           instance.get(process.env.API_ROOT + '/auth/departments/' + this.departSearch).then((response) => {
             const res = response.data
