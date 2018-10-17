@@ -16,7 +16,7 @@ export default {
   name: 'oauth_callback',
   mounted () {
     let code = this.$route.query.code
-    instance.post('/back/login', {
+    instance.post(process.env.API_ROOT + '/users/login', {
       client_type: 200,
       code: code
     }).then((response) => {

@@ -94,7 +94,7 @@ export default {
       const token = this.$store.state.token
       if (token) { // 当前用户处于登录状态
         if (name === 'exit') { // 退出
-          instance.get('/back/logout').then((response) => {
+          instance.get(process.env.API_ROOT + '/users/logout').then((response) => {
             let res = response.data
             if (res.code === 0 || res.code === 2) {
               // 退出成功

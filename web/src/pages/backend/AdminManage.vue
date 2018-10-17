@@ -355,7 +355,7 @@ export default {
     createAdminOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.post('/back/admin', {
+          instance.post(process.env.API_ROOT + '/auth/managements', {
             name: this.formValidate.adminName,
             alias: this.formValidate.adminAlias
           }).then(this.createAdminCallback)
@@ -368,7 +368,7 @@ export default {
         // 创建成功
         this.$Message.success('管理员创建成功！')
         this.$refs.formValidate.resetFields()
-        instance.get('/back/admin').then(this.loadAllAdmins)
+        instance.get(process.env.API_ROOT + '/auth/managements').then(this.loadAllAdmins)
         this.createAdminFlag = false
       } else if (res.code === 2) { // 此时需要退出登录
         exitLogin()
@@ -395,7 +395,7 @@ export default {
     editAdminOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.put('/back/admin/' + this.curItem.id, {
+          instance.put(process.env.API_ROOT + '/auth/managements' + this.curItem.id, {
             name: this.editFormValidate.adminName,
             alias: this.editFormValidate.adminAlias,
             remark: this.editFormValidate.remark,
@@ -409,7 +409,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('管理员信息编辑成功！')
         this.$refs.editFormValidate.resetFields()
-        instance.get('/back/admin').then(this.loadAllAdmins)
+        instance.get(process.env.API_ROOT + '/auth/managements').then(this.loadAllAdmins)
         this.editAdminFlag = false
       } else {
         this.editAdminFlag = true
@@ -421,10 +421,10 @@ export default {
         title: '删除管理员',
         content: '确认要删除该管理员？',
         onOk: function () {
-          instance.delete('/back/admin/' + id).then(function (response) {
+          instance.delete(process.env.API_ROOT + '/auth/managements/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('管理员删除成功！')
-              instance.get('/back/admin').then(that.loadAllAdmins)
+              instance.get(process.env.API_ROOT + '/auth/managements').then(that.loadAllAdmins)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -439,14 +439,14 @@ export default {
       this.permissionToGroupFlag = true
     },
     loadGroupsPermissions () {
-      instance.get('/back/relations', { // 已添加关系
+      instance.get(process.env.API_ROOT + '/users/relations', { // 已添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 4,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedPermissions)
-      instance.get('/back/relations', { // 未添加关系
+      instance.get(process.env.API_ROOT + '/users/relations', { // 未添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 4,
@@ -467,7 +467,7 @@ export default {
       }
     },
     addPermission (id) { // 添加权限给指定的管理组
-      instance.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
+      instance.post(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
         sid: id
       }).then(this.addPermissionSuccess)
     },
@@ -481,7 +481,7 @@ export default {
       }
     },
     removePermissions (id) { // 删除已添加的用户
-      instance.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
+      instance.delete(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
         data: {
           sid: id
         }
@@ -503,14 +503,14 @@ export default {
       this.userToAdminGroupFlag = true
     },
     loadUsers () {
-      instance.get('/back/relations', { // 已添加关系
+      instance.get(process.env.API_ROOT + '/users/relations', { // 已添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 3,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedUsers)
-      instance.get('/back/relations', { // 未添加关系
+      instance.get(process.env.API_ROOT + '/users/relations', { // 未添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 3,
@@ -533,7 +533,7 @@ export default {
     addUser (id) { // 添加用户给指定管理组
       if (this.$store.state.currentUserId === id) this.isEditGroup = 1
       else this.isEditGroup = 0
-      instance.post('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
+      instance.post(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         sid: id
       }).then(this.addUserSuccess)
     },
@@ -552,7 +552,7 @@ export default {
     removeUser (id) { // 删除已添加的用户
       if (this.$store.state.currentUserId === id) this.isEditGroup = 1
       else this.isEditGroup = 0
-      instance.delete('/back/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
+      instance.delete(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         data: {
           sid: id
         }
@@ -572,7 +572,7 @@ export default {
     }
   },
   mounted () {
-    instance.get('/back/admin').then(this.loadAllAdmins)
+    instance.get(process.env.API_ROOT + '/auth/managements').then(this.loadAllAdmins)
   }
 }
 </script>

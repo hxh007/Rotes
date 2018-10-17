@@ -218,9 +218,9 @@ export default {
     },
     changeStatus (status) { // status为即将改变的状态
       if (status) { // 恢复
-        instance.post('/back/cron/schedulers/resume').then(this.changeCallback)
+        instance.post(process.env.API_ROOT + '/cron/schedulers/resume').then(this.changeCallback)
       } else { // 暂停
-        instance.post('/back/cron/schedulers/pause').then(this.changeCallback)
+        instance.post(process.env.API_ROOT + '/cron/schedulers/pause').then(this.changeCallback)
       }
     },
     toggleSchedulerFunc () {
@@ -233,7 +233,7 @@ export default {
       }
     },
     toggleScheduler () {
-      instance.get('/back/cron/schedulers').then((response) => {
+      instance.get(process.env.API_ROOT + '/cron/schedulers').then((response) => {
         let res = response.data
         this.scheduler_text = res.detail.status
         this.formItem = {
@@ -249,22 +249,22 @@ export default {
       })
     },
     pauseJob (id) {
-      instance.post('/back/cron/jobs/' + id + '/pause').then((response) => {
+      instance.post(process.env.API_ROOT + '/cron/jobs/' + id + '/pause').then((response) => {
         let res = response.data
         if (res.ret === 0) {
           this.$Message.success(res.msg)
-          instance.get('/back/cron/jobs').then(this.loadAllTasks)
+          instance.get(process.env.API_ROOT + '/cron/jobs').then(this.loadAllTasks)
         } else {
           this.$Message.error(res.msg)
         }
       })
     },
     recoverJob (id) {
-      instance.post('/back/cron/jobs/' + id + '/resume').then((response) => {
+      instance.post(process.env.API_ROOT + '/cron/jobs/' + id + '/resume').then((response) => {
         let res = response.data
         if (res.ret === 0) {
           this.$Message.success(res.msg)
-          instance.get('/back/cron/jobs').then(this.loadAllTasks)
+          instance.get(process.env.API_ROOT + '/cron/jobs').then(this.loadAllTasks)
         } else {
           this.$Message.error(res.msg)
         }
@@ -276,10 +276,10 @@ export default {
         title: '删除任务',
         content: '确认要删除该定时任务？',
         onOk: function () {
-          instance.delete('/back/cron/jobs/' + id).then(function (response) {
+          instance.delete(process.env.API_ROOT + '/cron/jobs/' + id).then(function (response) {
             if (response.data.ret === 0) {
               that.$Message.success(response.data.msg)
-              instance.get('/back/cron/jobs').then(that.loadAllTasks)
+              instance.get(process.env.API_ROOT + '/cron/jobs').then(that.loadAllTasks)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -288,7 +288,7 @@ export default {
       })
     },
     getSingleJob (id) {
-      instance.get('/back/cron/jobs/' + id).then((response) => {
+      instance.get(process.env.API_ROOT + '/cron/jobs/' + id).then((response) => {
         let res = response.data
         if (res.ret === 0) {
           this.singleJob.name = res.detail.name
@@ -310,7 +310,7 @@ export default {
     }
   },
   mounted () {
-    instance.get('/back/cron/jobs').then(this.loadAllTasks)
+    instance.get(process.env.API_ROOT + '/cron/jobs').then(this.loadAllTasks)
     this.toggleScheduler()
   }
 }

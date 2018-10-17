@@ -312,7 +312,7 @@ export default {
     }
   },
   mounted () {
-    instance.get('/back/users').then(this.usersSuccFunc)
+    instance.get(process.env.API_ROOT + '/auth/users').then(this.usersSuccFunc)
   },
   methods: {
     show (params) {
@@ -335,10 +335,10 @@ export default {
         title: '删除用户',
         content: '确认要删除该用户？',
         onOk: function () {
-          instance.delete('/back/users/' + id).then(function (response) {
+          instance.delete(process.env.API_ROOT + '/auth/users/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('数据删除成功！')
-              instance.get('/back/users').then(that.usersSuccFunc)
+              instance.get(process.env.API_ROOT + '/auth/users').then(that.usersSuccFunc)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -365,7 +365,7 @@ export default {
       }
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.post('/back/users', paramObj).then(this.createUserCallback)
+          instance.post(process.env.API_ROOT + '/auth/users', paramObj).then(this.createUserCallback)
           this.createFlag = false
           this.$refs[name].resetFields()
         } else {
@@ -389,7 +389,7 @@ export default {
       }
       this.$refs[name].validate((valid) => {
         if (valid) { // 有效
-          instance.put('/back/users/' + this.curItem.id, paramObj).then(this.editUserCallback)
+          instance.put(process.env.API_ROOT + '/auth/users/' + this.curItem.id, paramObj).then(this.editUserCallback)
         } else {
           this.$Message.error('修改失败！')
         }
@@ -411,7 +411,7 @@ export default {
       } else {
         this.$Message.error(res.msg + '!')
       }
-      instance.get('/back/users').then(this.usersSuccFunc)
+      instance.get(process.env.API_ROOT + '/auth/users').then(this.usersSuccFunc)
     },
     editUserCallback (response) {
       let res = response.data
@@ -421,7 +421,7 @@ export default {
       } else {
         this.$Message.error(res.msg)
       }
-      instance.get('/back/users').then(this.usersSuccFunc)
+      instance.get(process.env.API_ROOT + '/auth/users').then(this.usersSuccFunc)
     },
     validatorCreateUser (rule, value, callback) {
       if (value === '') {

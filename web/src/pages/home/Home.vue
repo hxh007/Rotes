@@ -253,7 +253,7 @@ export default {
     },
     getDuties () { // 获取当前月份视图的所有未排班信息
       let departId = parseInt(this.departSearch) === 0 ? undefined : parseInt(this.departSearch)
-      instance.get('/back/dutysCount', {
+      instance.get(process.env.API_ROOT + '/dutysCount', {
         params: {
           departId: departId,
           dateStart: this.monthviewFisrt,
@@ -264,7 +264,7 @@ export default {
     changeOnSelect () {
       console.log('changeOnSelect')
       if (this.departSearch !== undefined && this.departSearch !== 0) {
-        instance.get('/back/departments/' + this.departSearch).then((response) => {
+        instance.get(process.env.API_ROOT + '/auth/departments/' + this.departSearch).then((response) => {
           const res = response.data
           if (res.code === 0) { // 查询成功
             this.departSearchName = res.data[0].alias
@@ -281,7 +281,7 @@ export default {
       // 查询具体的某一天的全部部门或者所有部门
       let dateStart = this.currentDay
       let dateEnd = this.currentDay
-      instance.get('/back/dutyLists', {
+      instance.get(process.env.API_ROOT + '/dutyLists', {
         params: {
           departId: departId,
           dateStart: dateStart,
@@ -391,7 +391,7 @@ export default {
         if (new_ > 1) {
           console.log('departSearchFunc')
           this.departSearch = this.myDeparts[1].id
-          instance.get('/back/departments/' + this.departSearch).then((response) => {
+          instance.get(process.env.API_ROOT + '/auth/departments/' + this.departSearch).then((response) => {
             const res = response.data
             if (res.code === 0) { // 查询成功
               this.departSearchName = res.data[0].alias

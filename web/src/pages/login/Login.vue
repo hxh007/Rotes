@@ -75,7 +75,7 @@ export default {
     handleSubmit (name) { // 登录
       this.$refs[name].validate((valid) => {
         if (valid) { // 表单验证通过
-          instance.post('/back/login', {
+          instance.post(process.env.API_ROOT + '/users/login', {
             username: this.formItem.user,
             password: this.formItem.password,
             client_type: 100
@@ -113,7 +113,7 @@ export default {
       let host = document.domain
       let port = window.location.port
       let urlHead = port ? host + ':' + port : host
-      instance.get('/back/dd_login_params').then((response) => {
+      instance.get(process.env.API_ROOT + '/users/dd_login_params').then((response) => {
         let res = response.data
         let url = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=' + res.appid +
           '&response_type=' + res.response_type + '&scope=' + res.scope + '&state=http://' + urlHead + '&redirect_uri=http://' + urlHead + '/' + encodeURIComponent('#') + res.redirect_uri

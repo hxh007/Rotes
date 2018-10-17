@@ -192,7 +192,7 @@ export default {
     createPermissionOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.post('/back/permissions', {
+          instance.post(process.env.API_ROOT + '/auth/permissions', {
             derpartment_id: this.selectDepart,
             codename: this.selectAction,
             alias: this.formValidate.alias
@@ -204,7 +204,7 @@ export default {
       let res = response.data
       if (res.code === 0) {
         this.$Message.success('权限添加成功！')
-        instance.get('/back/permissions').then(this.loadAllPermissions)
+        instance.get(process.env.API_ROOT + '/auth/permissions').then(this.loadAllPermissions)
         this.createPermissionFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -227,7 +227,7 @@ export default {
     editPermissionOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.put('/back/permissions/' + this.editFormValidate.id, {
+          instance.put(process.env.API_ROOT + '/auth/permissions/' + this.editFormValidate.id, {
             department_id: this.selectDepart,
             codename: this.selectAction,
             alias: this.editFormValidate.alias,
@@ -242,7 +242,7 @@ export default {
       if (res.code === 0) { // 编辑成功
         this.$Message.success('编辑成功！')
         this.$refs.editFormValidate.resetFields()
-        instance.get('/back/permissions').then(this.loadAllPermissions)
+        instance.get(process.env.API_ROOT + '/auth/permissions').then(this.loadAllPermissions)
         this.editPermissionFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -255,10 +255,10 @@ export default {
         title: '删除权限',
         content: '确认要删除该权限？',
         onOk: function () {
-          instance.delete('/back/permissions/' + id).then(function (response) {
+          instance.delete(process.env.API_ROOT + '/auth/permissions/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('权限删除成功！')
-              instance.get('/back/permissions').then(that.loadAllPermissions)
+              instance.get(process.env.API_ROOT + '/auth/permissions').then(that.loadAllPermissions)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -269,8 +269,8 @@ export default {
   },
   mounted () {
     let that = this
-    instance.get('/back/permissions').then(this.loadAllPermissions)
-    instance.get('/back/departments').then(function (response) {
+    instance.get(process.env.API_ROOT + '/auth/permissions').then(this.loadAllPermissions)
+    instance.get(process.env.API_ROOT + '/auth/departments').then(function (response) {
       let res = response.data
       if (res.code === 0) { // 查询成功
         res.data.forEach(function (item, index) {
@@ -282,7 +282,7 @@ export default {
         })
       }
     })
-    instance.get('/back/actiontypes').then(function (response) {
+    instance.get(process.env.API_ROOT + '/auth/actiontypes').then(function (response) {
       let res = response.data
       if (res.code === 0) {
         res.data.forEach(function (item, index) {

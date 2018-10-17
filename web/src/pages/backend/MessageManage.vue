@@ -75,7 +75,7 @@ export default {
     editSMSOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.put('/back/tempContent', {
+          instance.put(process.env.API_ROOT + '/tempContent', {
             tempContent: this.editFormValidate.tempContent
           }).then(this.editSMSSuccess)
         }
@@ -86,7 +86,7 @@ export default {
       let res = response.data
       if (res.code === 0) { // 修改成功
         this.$Message.success('修改成功！')
-        instance.get('/back/tempContent').then(this.loadAllTemplates)
+        instance.get(process.env.API_ROOT + '/tempContent').then(this.loadAllTemplates)
         this.editFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -101,7 +101,7 @@ export default {
     }
   },
   mounted () {
-    instance.get('/back/tempContent').then(this.loadAllTemplates)
+    instance.get(process.env.API_ROOT + '/tempContent').then(this.loadAllTemplates)
   }
 }
 </script>

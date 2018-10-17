@@ -14,7 +14,7 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
   store.commit('setToken', 'JWT ' + token)
   if (store.state.token && token && token !== 'null') { // 登录-> 查询登录用户信息
-    instance.get('/back/userInfo').then((response) => {
+    instance.get(process.env.API_ROOT + '/users/login_user_info').then((response) => {
       const res = response.data
       if (res.code === 0) {
         store.dispatch('setUserId', res.data.user_info.id)

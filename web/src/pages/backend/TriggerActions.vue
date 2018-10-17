@@ -109,7 +109,7 @@ export default {
           }
         })
         if (dingIds.length > 0) {
-          instance.post('/back/cron/ding', {
+          instance.post(process.env.API_ROOT + '/cron/ding', {
             userids: dingIds,
             message: this.defaultInfo
           }).then((response) => {
@@ -144,7 +144,7 @@ export default {
             targetPhones.push(item)
           }
         })
-        instance.post('/back/cron/sms', {
+        instance.post(process.env.API_ROOT + '/cron/sms', {
           mobiles: targetPhones,
           message: this.messageInfo
         }).then((response) => {
@@ -163,7 +163,7 @@ export default {
   },
   mounted () {
     this.userLists = []
-    instance.get('/back/users').then((response) => {
+    instance.get(process.env.API_ROOT + '/users').then((response) => {
       let res = response.data
       if (res.code === 0) {
         let len = res.data.length
@@ -181,7 +181,7 @@ export default {
       }
     })
     // 用短信模板渲染默认短信发送内容
-    instance.get('/back/tempContent').then((response) => {
+    instance.get(process.env.API_ROOT + '/tempContent').then((response) => {
       let res = response.data
       if (res.code === 0) {
         this.messageInfo = res.data.tempContent

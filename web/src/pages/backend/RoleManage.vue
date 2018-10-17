@@ -166,7 +166,7 @@ export default {
     createRoleOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.post('/back/roles', {
+          instance.post(process.env.API_ROOT + '/auth/roles', {
             name: this.formValidate.roleName,
             alias: this.formValidate.roleAlias
           }).then(this.createRoleCallback)
@@ -178,7 +178,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('角色创建成功！')
         this.$refs.formValidate.resetFields()
-        instance.get('/back/roles').then(this.loadAllRoles)
+        instance.get(process.env.API_ROOT + '/auth/roles').then(this.loadAllRoles)
         this.createRoleFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -200,7 +200,7 @@ export default {
     editRoleOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.put('/back/roles/' + this.curItem.id, {
+          instance.put(process.env.API_ROOT + '/auth/roles/' + this.curItem.id, {
             name: this.editFormValidate.roleName,
             alias: this.editFormValidate.roleAlias,
             remark: this.editFormValidate.remark,
@@ -215,7 +215,7 @@ export default {
       if (res.code === 0) {
         this.$Message.success('角色编辑成功！')
         this.$refs.editFormValidate.resetFields()
-        instance.get('/back/roles').then(this.loadAllRoles)
+        instance.get(process.env.API_ROOT + '/auth/roles').then(this.loadAllRoles)
         this.editRoleFlag = false
       } else {
         this.$Message.error(res.msg)
@@ -227,10 +227,10 @@ export default {
         title: '删除角色',
         content: '确认要删除该角色？',
         onOk: function () {
-          instance.delete('/back/roles/' + id).then(function (response) {
+          instance.delete(process.env.API_ROOT + '/auth/roles/' + id).then(function (response) {
             if (response.data.code === 0) {
               that.$Message.success('角色删除成功！')
-              instance.get('/back/roles').then(that.loadAllRoles)
+              instance.get(process.env.API_ROOT + '/auth/roles').then(that.loadAllRoles)
             } else {
               that.$Message.error(response.data.msg)
             }
@@ -240,7 +240,7 @@ export default {
     }
   },
   mounted () {
-    instance.get('/back/roles').then(this.loadAllRoles)
+    instance.get(process.env.API_ROOT + '/auth/roles').then(this.loadAllRoles)
   }
 }
 </script>

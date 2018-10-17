@@ -114,7 +114,7 @@ export default {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.post('/back/register', {
+          instance.post(process.env.API_ROOT + '/users/register', {
             client_type: 100,
             fullname: this.formItem.fullname,
             username: this.formItem.username,

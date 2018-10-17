@@ -4,7 +4,7 @@ export const loadLoginUserInfo = () => {
   const token = localStorage.getItem('userToken')
   if (token) { // 登录-> 查询登录用户信息
     store.dispatch('setToken', token)
-    instance.get('/back/userInfo').then((response) => {
+    instance.get('/back/users/login_user_info').then((response) => {
       const res = response.data
       if (res.code === 0) {
         store.dispatch('setUserId', res.data.user_info.id)

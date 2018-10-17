@@ -391,14 +391,14 @@ export default {
             month: this.month === '*' ? '*' : this.selectedMonths.join(','),
             day_of_week: week
           }
-          instance.post('/back/cron/jobs', paramObj).then(this.createSucccessCallback)
+          instance.post(process.env.API_ROOT + '/cron/jobs', paramObj).then(this.createSucccessCallback)
         }
       })
     }
   },
   mounted () {
     // 渲染工具参数
-    instance.get('/back/cron/funcs').then(this.loadFuncsCallback)
+    instance.get(process.env.API_ROOT + '/cron/funcs').then(this.loadFuncsCallback)
     // 生成秒数
     this.generateSeconds()
     // 生成分钟数【指定】

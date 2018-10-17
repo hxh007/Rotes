@@ -15,27 +15,27 @@ module.exports = {
       '/back':{
         target : 'http://localhost:5000',
         pathRewrite: {
-          '^/back/users': '/auth/users',
-          '^/back/admin': '/auth/managements',
-          '^/back/users/:id': '/auth/users/:id',
-          '^/back/permissions': '/auth/permissions',
-          '^/back/permissions/:id': '/auth/permissions/:id',
-          '^/back/departments': '/auth/departments',
-          '^/back/departments/:id': '/auth/departments/:id',
-          '^/back/actiontypes': '/auth/actiontypes',
-          '^/back/relations': '/auth/relations',
-          '^/back/roles': '/auth/roles',
+          '^/back/auth/users': '/auth/users',
+          '^/back/auth/managements': '/auth/managements',
+          '^/back/auth/users/:id': '/auth/users/:id',
+          '^/back/auth/permissions': '/auth/permissions',
+          '^/back/auth/permissions/:id': '/auth/permissions/:id',
+          '^/back/auth/departments': '/auth/departments',
+          '^/back/auth/departments/:id': '/auth/departments/:id',
+          '^/back/auth/actiontypes': '/auth/actiontypes',
+          '^/back/auth/relations': '/auth/relations',
+          '^/back/auth/roles': '/auth/roles',
           '^/back/duty': '/duty',
           '^/back/dutysCount': '/dutysCount',
           '^/back/duty/:id': '/duty/:id',
           '^/back/dutyLists': '/dutyLists',
           '^/back/dutyinfo': '/dutyinfo',
           '^/back/tempContent': '/tempContent',
-          '^/back/register': '/users/register',
-          '^/back/login': '/users/login',
-          '^/back/userInfo': '/users/login_user_info',
-          '^/back/logout': '/users/logout',
-          '^/back/dd_login_params': '/users/dd_login_params',
+          '^/back/users/register': '/users/register',
+          '^/back/users/login': '/users/login',
+          '^/back/users/login_user_info': '/users/login_user_info',
+          '^/back/users/logout': '/users/logout',
+          '^/back/users/dd_login_params': '/users/dd_login_params',
           '^/back/datatoxlsx': '/datatoxlsx',
           '^/back/cron/jobs': '/cron/jobs',
           '^/back/cron/schedulers': '/cron/schedulers',
@@ -81,11 +81,9 @@ module.exports = {
 
     cssSourceMap: true
   },
-
   build: {
     // Template for index.html
     index: path.resolve(__dirname, '../../dist/index.html'),
-
     // Paths
     assetsRoot: path.resolve(__dirname, '../../dist'),
     assetsSubDirectory: 'static',
