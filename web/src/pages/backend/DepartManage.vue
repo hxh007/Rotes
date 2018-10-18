@@ -60,7 +60,7 @@
               </Col>
               <Col span="12">
                 <Select v-model="selectDepart" @on-change="loadRoles">
-                  <Option v-for="item in selectedDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
+                  <Option v-for="item in selectedDeparts" :value="item.id" :key="item.key">{{ item.label }}</Option>
                 </Select>
               </Col>
             </Row>
@@ -88,7 +88,7 @@
               </Col>
               <Col span="12">
                 <Select v-model="selectDepart" @on-change="loadUsers">
-                  <Option v-for="item in selectedDeparts" :value="item.id" :key="item.id">{{ item.label }}</Option>
+                  <Option v-for="item in selectedDeparts" :value="item.id" :key="item.key">{{ item.label }}</Option>
                 </Select>
               </Col>
             </Row>
@@ -334,7 +334,8 @@ export default {
         this.selectedDeparts.push({
           label: item.alias,
           name: item.name,
-          id: item.id
+          id: item.id,
+          key: new Date().getTime() + item.id
         })
       })
     },

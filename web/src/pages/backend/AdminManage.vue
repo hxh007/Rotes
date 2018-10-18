@@ -60,7 +60,7 @@
               </Col>
               <Col span="12">
                 <Select v-model="selectAdminGroup" @on-change="loadGroupsPermissions">
-                  <Option v-for="item in selectedGroups" :value="item.id" :key="item.id">{{ item.label }}</Option>
+                  <Option v-for="item in selectedGroups" :value="item.id" :key="item.key">{{ item.label }}</Option>
                 </Select>
               </Col>
             </Row>
@@ -88,7 +88,7 @@
             </Col>
             <Col span="12">
               <Select v-model="selectAdminGroup" @on-change="loadUsers">
-                <Option v-for="item in selectedGroups" :value="item.id" :key="item.id">{{ item.label }}</Option>
+                <Option v-for="item in selectedGroups" :value="item.id" :key="item.key">{{ item.label }}</Option>
               </Select>
             </Col>
           </Row>
@@ -334,13 +334,15 @@ export default {
   methods: {
     loadAllAdmins (response) { // 生成可选的下拉菜单管理组
       let res = response.data
+      let that = this
       if (res.code === 0) {
-        this.adminLists = res.data
-        this.adminLists.forEach((item, index) => {
-          this.selectedGroups.push({
+        that.adminLists = res.data
+        that.adminLists.forEach((item, index) => {
+          that.selectedGroups.push({
             label: item.alias,
             name: item.name,
-            id: item.id
+            id: item.id,
+            key: new Date().getTime() + item.id
           })
         })
       }
@@ -395,7 +397,7 @@ export default {
     editAdminOk (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          instance.put(process.env.API_ROOT + '/auth/managements' + this.curItem.id, {
+          instance.put(process.env.API_ROOT + '/auth/managements/' + this.curItem.id, {
             name: this.editFormValidate.adminName,
             alias: this.editFormValidate.adminAlias,
             remark: this.editFormValidate.remark,
@@ -439,14 +441,14 @@ export default {
       this.permissionToGroupFlag = true
     },
     loadGroupsPermissions () {
-      instance.get(process.env.API_ROOT + '/users/relations', { // 已添加关系
+      instance.get(process.env.API_ROOT + '/auth/relations', { // 已添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 4,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedPermissions)
-      instance.get(process.env.API_ROOT + '/users/relations', { // 未添加关系
+      instance.get(process.env.API_ROOT + '/auth/relations', { // 未添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 4,
@@ -467,7 +469,7 @@ export default {
       }
     },
     addPermission (id) { // 添加权限给指定的管理组
-      instance.post(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
+      instance.post(process.env.API_ROOT + '/auth/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
         sid: id
       }).then(this.addPermissionSuccess)
     },
@@ -481,7 +483,7 @@ export default {
       }
     },
     removePermissions (id) { // 删除已添加的用户
-      instance.delete(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
+      instance.delete(process.env.API_ROOT + '/auth/relations?fid=' + this.selectAdminGroup + '&genre=' + 4, {
         data: {
           sid: id
         }
@@ -503,14 +505,14 @@ export default {
       this.userToAdminGroupFlag = true
     },
     loadUsers () {
-      instance.get(process.env.API_ROOT + '/users/relations', { // 已添加关系
+      instance.get(process.env.API_ROOT + '/auth/relations', { // 已添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 3,
           not_add: 0
         }
       }).then(this.loadAllHasSelectedUsers)
-      instance.get(process.env.API_ROOT + '/users/relations', { // 未添加关系
+      instance.get(process.env.API_ROOT + '/auth/relations', { // 未添加关系
         params: {
           fid: this.selectAdminGroup,
           genre: 3,
@@ -533,7 +535,7 @@ export default {
     addUser (id) { // 添加用户给指定管理组
       if (this.$store.state.currentUserId === id) this.isEditGroup = 1
       else this.isEditGroup = 0
-      instance.post(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
+      instance.post(process.env.API_ROOT + '/auth/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         sid: id
       }).then(this.addUserSuccess)
     },
@@ -552,7 +554,7 @@ export default {
     removeUser (id) { // 删除已添加的用户
       if (this.$store.state.currentUserId === id) this.isEditGroup = 1
       else this.isEditGroup = 0
-      instance.delete(process.env.API_ROOT + '/users/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
+      instance.delete(process.env.API_ROOT + '/auth/relations?fid=' + this.selectAdminGroup + '&genre=' + 3, {
         data: {
           sid: id
         }

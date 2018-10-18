@@ -291,9 +291,6 @@ export default {
         ]
       },
       editRule2Validate: {
-        ding_id: [{
-          required: true, message: '请输入钉_id!', trigger: 'blur'
-        }],
         userName: [{
           required: true, message: '请输入用户名!', trigger: 'blur'
         }],

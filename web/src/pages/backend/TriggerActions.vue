@@ -163,7 +163,7 @@ export default {
   },
   mounted () {
     this.userLists = []
-    instance.get(process.env.API_ROOT + '/users').then((response) => {
+    instance.get(process.env.API_ROOT + '/auth/users').then((response) => {
       let res = response.data
       if (res.code === 0) {
         let len = res.data.length
