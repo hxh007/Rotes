@@ -175,7 +175,11 @@ class Authentication():
                         return jsonify(response_return(3, u'u_p或manager数据查询失败'))
                     u_permissions.extend(u_p)
                 # 访问部门资源
-                module_departId = request.values.get('departId')
+                if request.is_json:
+                    data = request.get_json()
+                else:
+                    data = request.values
+                module_departId = data.get('departId')
                 if module_departId:
                     # 访问此接口所需要的权限
                     depart = get_table(result=response_return(), table=Department,

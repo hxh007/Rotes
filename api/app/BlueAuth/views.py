@@ -44,7 +44,7 @@ def users():
         # 页数，默认1
         page = request.args.get('page', 1, type=int)
         # 一页的数据，默认15
-        per_page = request.args.get('per_page', 15, type=int)
+        per_page = request.args.get('per_page', 1000, type=int)
         # 数据库查询
         paginate = get_table(result=result, table=User, execute='paginate', terms=(User.ctime.desc()), page=page, per_page=per_page)
         if type(paginate) == dict:
